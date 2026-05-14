@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Calendar, ClipboardCheck, Gavel, CheckCircle2 } from "lucide-react";
 
 import { VehicleStatusSelect } from "./VehicleStatusSelect";
+import { InspectorAssignSelect } from "./InspectorAssignSelect";
 import { useTranslations } from "@/i18n/provider";
 import { cn, formatEur } from "@/lib/utils";
 import type { Vehicle } from "@/types";
@@ -13,6 +14,8 @@ interface PipelineColumn {
   vehicles: Vehicle[];
 }
 
+interface Inspector { id: string; full_name: string | null; email: string | null }
+
 const COL_META = {
   scheduled:  { icon: Calendar,        accent: "border-grey-300",   ring: "ring-grey-200",   labelKey: "pipelineScheduled" },
   inspected:  { icon: ClipboardCheck,  accent: "border-brand-400",  ring: "ring-brand-100",  labelKey: "pipelineInspected" },
@@ -20,7 +23,13 @@ const COL_META = {
   sold:       { icon: CheckCircle2,    accent: "border-success-500",ring: "ring-success-100", labelKey: "pipelineSold" },
 } as const;
 
-export function KanbanPipeline({ columns }: { columns: PipelineColumn[] }) {
+export function KanbanPipeline({
+  columns,
+  inspectors = [],
+}: {
+  columns: PipelineColumn[];
+  inspectors?: Inspector[];
+}) {
   const t = useTranslations("admin");
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -62,6 +71,16 @@ export function KanbanPipeline({ columns }: { columns: PipelineColumn[] }) {
                   <div className="mt-2">
                     <VehicleStatusSelect vehicleId={v.id} currentStatus={v.status} compact />
                   </div>
+                  {col.key === "scheduled" && inspectors.length > 0 && (
+                    <div className="mt-1.5">
+                      <InspectorAssignSelect
+                        vehicleId={v.id}
+                        currentInspectorId={v.inspector_id ?? null}
+                        inspectors={inspectors}
+                        compact
+                      />
+                    </div>
+                  )}
                 </li>
               ))}
               {col.vehicles.length > 6 && (

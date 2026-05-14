@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 
 import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
+import { SaveSearchButton } from "@/components/marketplace/SaveSearchButton";
 import { VehicleCard } from "@/components/marketplace/VehicleCard";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRows } from "@/lib/supabase/normalize";
@@ -124,6 +125,7 @@ export default async function MarketplacePage({
 
         <div className="mt-4 flex items-center justify-between text-sm text-grey-600">
           <span>{t("marketplace.resultsCount", { count: list.length })}</span>
+          <SaveSearchButton isAuthenticated={!!user} />
         </div>
 
         {error ? (

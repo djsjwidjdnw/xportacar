@@ -4,9 +4,16 @@ UAE-to-EU online car auction platform. UAE field teams inspect privately
 owned vehicles, list them in timed online auctions, and European companies
 bid on and purchase them.
 
-**Stack:** Next.js 16 (App Router) · TypeScript · Tailwind v4 · shadcn/ui
-(base-nova) · Supabase (Postgres + Auth + Realtime) · next-intl-style i18n
-(EN / DE / AR / FR with RTL).
+**Web stack:** Next.js 16 (App Router) · TypeScript · Tailwind v4 · shadcn/ui
+(base-nova) · Supabase (Postgres + Auth + Realtime + Storage) · recharts ·
+next-intl-style i18n (EN / DE / AR / FR with RTL).
+**Mobile stack:** Expo (React Native) · TypeScript · React Navigation ·
+Supabase JS · expo-image · expo-camera / expo-image-picker · expo-notifications.
+
+This repository covers the **web platform**.  The two mobile companions live
+in sister repos: [`xportacar-mobile`](https://github.com/djsjwidjdnw/xportacar-mobile)
+(buyer) and [`xportacar-inspection`](https://github.com/djsjwidjdnw/xportacar-inspection)
+(field inspector).
 
 ## Phase 1 — what's shipped
 
@@ -18,11 +25,48 @@ bid on and purchase them.
 | 3 | Root + buyer + admin + auth layouts, language switcher | `src/app/layout.tsx` + `src/app/(buyer|admin|auth)/layout.tsx` |
 | 4 | Landing page (hero, stats, features, how-it-works, CTA, footer) | `src/app/(buyer)/page.tsx` |
 | 5 | Marketplace (search + 6 filters + sort + responsive grid, real Supabase data) | `src/app/(buyer)/marketplace/page.tsx` |
-| 6 | Vehicle detail (gallery, specs, condition report, features) | `src/app/(buyer)/vehicle/[id]/page.tsx` |
-| 7 | Auction (sticky bid panel, countdown, bid history, **Realtime**) | `src/app/(buyer)/auction/[id]/page.tsx`, `src/hooks/useAuction.ts` |
-| 8 | Admin dashboard (stats, Kanban pipeline, activity table, dark sidebar) | `src/app/(admin)/admin/dashboard/page.tsx` |
-| 9 | i18n in EN / DE / AR / FR + Arabic RTL | `src/i18n/*.json`, `src/i18n/provider.tsx` |
-| 10 | Login / register / sign-out + protected routes via `proxy.ts` | `src/app/(auth)/*`, `src/proxy.ts` |
+| 6 | Vehicle detail (gallery, specs, condition report, features, shipping estimator) | `src/app/(buyer)/vehicle/[id]/page.tsx` |
+| 7 | Auction (sticky bid panel, countdown, bid history, **Realtime**, proxy bidding, counter offers) | `src/app/(buyer)/auction/[id]/page.tsx`, `src/hooks/useAuction.ts` |
+| 8 | Buyer dashboard (active bids, won, total spent, invoices, saved searches, notifications) | `src/app/(buyer)/dashboard/page.tsx` |
+| 9 | Admin dashboard (stats, recharts analytics, Kanban pipeline, status dropdown, inspector assignment, dark sidebar) | `src/app/(admin)/admin/dashboard/page.tsx` |
+| 10 | i18n in EN / DE / AR / FR + Arabic RTL | `src/i18n/*.json`, `src/i18n/provider.tsx` |
+| 11 | Login / register / sign-out + protected routes via `proxy.ts` | `src/app/(auth)/*`, `src/proxy.ts` |
+
+## Phase 2 — feature drop (May 19 2026)
+
+| Module | What | Where |
+|--------|------|-------|
+| **PWA** | Web app installable as a PWA (manifest, icons, service worker, offline shell) | `public/manifest.json`, `public/sw.js`, `public/icons/*` |
+| **Proxy bidding** | "Set maximum bid" auto-outbids competitors up to user's max in €500 steps | `src/components/auction/BidPanel.tsx`, `placeBidAction` |
+| **Counter offers** | Buyers send private offers, admins accept/reject | `src/app/(admin)/admin/counter-offers/`, `placeCounterOfferAction` |
+| **Inspector assignment** | Kanban dropdown to assign `profiles.role=inspector` to scheduled vehicles | `src/components/admin/InspectorAssignSelect.tsx` |
+| **Analytics** | Auctions/wk bar, revenue/month line, vehicles by status donut — all live data | `src/components/admin/AnalyticsCharts.tsx` |
+| **Invoices** | Auto-generated on auction close, /admin/invoices list + printable detail | `src/app/(admin)/admin/invoices/`, DB trigger |
+| **Saved searches** | "Save this search" on marketplace, listed on buyer dashboard | `src/components/marketplace/SaveSearchButton.tsx` |
+| **Email** | Resend integration (welcome / outbid / won) — skips silently if no API key | `src/lib/email.ts` |
+| **Shipping estimator** | 4-port quote table (Hamburg / Rotterdam / Genoa / Barcelona) | `src/components/vehicle/ShippingEstimator.tsx` |
+| **Stripe Connect** | "Pay now" launches Stripe Checkout for invoice total (auction price + 5 % fee). Webhook marks invoice paid. Shows "coming soon" if keys unset. | `src/lib/stripe.ts`, `src/app/api/stripe/webhook/route.ts` |
+| **KYC flow** | Buyers upload trade licence / ID via profile page; admins review at /admin/kyc | `src/components/profile/KycUploader.tsx`, `src/app/(admin)/admin/kyc/` |
+| **Push tokens** | `/api/push-tokens` accepts Expo push tokens from mobile apps; `sendPushToUser` fans out via Expo Push API alongside in-app notifications | `src/app/api/push-tokens/route.ts`, `src/lib/push.ts` |
+| **Notifications bell** | Bell icon in buyer nav with realtime unread count, mark-as-read | `src/components/layout/NotificationBell.tsx` |
+
+## Database (Phase 2 additions)
+
+`supabase/migrations/002_phase2_features.sql` adds:
+
+- `counter_offers` (with status enum)
+- `invoices`     (auto-generated via trigger when `auctions.status='sold'`)
+- `saved_searches`
+- `shipping_quotes`
+- `kyc_submissions`
+- `push_tokens`
+- `bids.is_proxy` + `bids.proxy_max_eur`
+
+Apply with the Management API helper:
+
+```bash
+SUPABASE_PAT=sbp_... node scripts/apply-phase2.mjs
+```
 
 ## Getting started
 
@@ -33,26 +77,33 @@ bid on and purchase them.
 ### 2. Configure environment
 ```bash
 cp .env.local.example .env.local
-# fill in NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
-#         SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SITE_URL
+# Required:
+#   NEXT_PUBLIC_SUPABASE_URL
+#   NEXT_PUBLIC_SUPABASE_ANON_KEY
+#   SUPABASE_SERVICE_ROLE_KEY
+#   NEXT_PUBLIC_SITE_URL
+# Optional (silently skipped if unset):
+#   RESEND_API_KEY, RESEND_FROM
+#   STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET
+#   SUPABASE_PAT (only needed to apply schema via the API)
 ```
 
 ### 3. Apply schema and seed
 Easiest path is the Supabase dashboard:
 1. **SQL Editor** → paste `supabase/migrations/001_initial_schema.sql` → Run.
-2. **Authentication** → Users → invite (or create with password) the three demo accounts:
+2. **SQL Editor** → paste `supabase/migrations/002_phase2_features.sql` → Run.
+3. **Authentication** → Users → invite (or create with password) the three demo accounts:
    - `admin@xportacar.com`     (`Demo!1234`)
    - `buyer@xportacar.com`     (`Demo!1234`)
    - `inspector@xportacar.com` (`Demo!1234`)
    - *(optional extra bidders)* `buyer2@xportacar.com`, `buyer3@xportacar.com`
-3. **SQL Editor** → paste `supabase/seed.sql` → Run.
-   The seed updates the auto-created profiles and inserts vehicles, auctions and bids.
+4. **SQL Editor** → paste `supabase/seed.sql` → Run.
 
-If you have the [Supabase CLI](https://supabase.com/docs/guides/cli) linked locally:
+If you have a Supabase PAT (`sbp_...`), one-liners:
+
 ```bash
-supabase db push
-# create the demo users via dashboard or `supabase functions invoke`
-supabase db seed
+SUPABASE_PAT=sbp_... SUPABASE_SERVICE_ROLE=... node scripts/apply-supabase.mjs
+SUPABASE_PAT=sbp_... node scripts/apply-phase2.mjs
 ```
 
 ### 4. Run dev server
@@ -63,34 +114,61 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+### 5. Operational scripts
+```bash
+# Refresh demo: re-curate photos, re-stagger auctions to NOW+2h .. NOW+96h
+SUPABASE_SERVICE_ROLE_KEY=... node scripts/fix-photos-and-auctions.mjs
+
+# Regenerate PWA icons
+node scripts/gen-icons.mjs
+```
+
 ## Routes
 
 | URL | Purpose | Auth |
 |-----|---------|------|
 | `/` | Landing | public |
-| `/marketplace` | Vehicle grid + filters | public |
+| `/marketplace` | Vehicle grid + filters + saved-search | public |
 | `/auctions` | Live auctions only | public |
-| `/vehicle/[id]` | Vehicle detail page | public |
-| `/auction/[id]` | Auction page (Realtime bid panel) | public to view, login to bid |
+| `/vehicle/[id]` | Vehicle detail + shipping estimator | public |
+| `/auction/[id]` | Bid panel · proxy bidding · counter offers · Realtime | public to view, login to bid |
+| `/auction/[id]/won` | Post-auction confirmation + Pay Now | winner |
 | `/login`, `/register` | Supabase email auth | public |
-| `/dashboard`, `/watchlist`, `/profile` | Buyer-private | authenticated |
-| `/admin/dashboard` | Operations dashboard | role = `admin` or `superadmin` |
-| `/api/auth/sign-out` | Sign-out endpoint | any |
+| `/dashboard`, `/watchlist`, `/profile` | Buyer-private (incl. KYC upload, invoices, saved searches) | authenticated |
+| `/admin/dashboard` | Operations dashboard with charts | admin |
+| `/admin/vehicles`, `/admin/vehicles/[id]` | Inventory management | admin |
+| `/admin/counter-offers` | Review buyer offers | admin |
+| `/admin/invoices`, `/admin/invoices/[id]` | Invoicing, printable detail | admin |
+| `/admin/kyc` | Verify trade-licence submissions | admin |
+| `/api/auth/sign-out`, `/api/push-tokens`, `/api/stripe/webhook` | Endpoints | varies |
 
 ## Architecture notes
 
-- **i18n**: lightweight, locale stored in cookie `xpc_locale`, resolved server-side in
-  `src/i18n/server.ts` (cookie → `Accept-Language` → default). Client components
-  use `useTranslations(namespace)`. RTL is auto-applied for Arabic via `dir`.
-- **Auth gating**: handled in `src/proxy.ts` (Next.js 16's renamed Middleware) which
-  refreshes Supabase cookies and redirects unauthenticated/non-admin users.
-- **Realtime**: `useAuction` subscribes to inserts on `bids` and updates on `auctions`
-  for the current auction id, then enriches each new row with the bidder profile.
-- **Supabase clients**: `createClient()` in `lib/supabase/client.ts` (browser) and
-  `lib/supabase/server.ts` (server). The hand-written types in `lib/supabase/types.ts`
-  are exported for query result casts; replace with
-  `supabase gen types typescript --local > src/lib/supabase/types.ts` once you've
-  linked the project.
+- **PWA**: `/manifest.json` + `/sw.js` (network-first navigations,
+  stale-while-revalidate for static assets, runtime cache,
+  Supabase/API requests passed through).  Registration via
+  `<ServiceWorkerRegistrar />` in production builds only.
+- **i18n**: locale stored in cookie `xpc_locale`, resolved server-side in
+  `src/i18n/server.ts` (cookie → `Accept-Language` → default). Client
+  components use `useTranslations(namespace)`. RTL auto-applied for Arabic.
+- **Auth gating**: `src/proxy.ts` (Next 16's renamed middleware) refreshes
+  Supabase cookies and redirects unauth/non-admin users.
+- **Realtime**: `useAuction` subscribes to inserts on `bids` and updates
+  on `auctions`, enriching each new bid with the bidder profile.
+  `NotificationBell` subscribes to `notifications` for the signed-in user.
+- **Proxy bidding cascade**: `placeBidAction` records `is_proxy=true` +
+  `proxy_max_eur` on the user's bid.  After every new bid, `cascadeProxies`
+  walks the active proxy ceilings on the auction and submits auto-bids
+  (using the admin client) in €500 steps until either the top bidder
+  exceeds all rival ceilings or the loop hits its hard stop.
+- **Invoices**: auto-created by the `trg_auctions_invoice` AFTER UPDATE
+  trigger when `auctions.status` flips to `sold`.  Platform fee 5 %,
+  invoice number `XPC-YYYY-NNNNNN` from a sequence.
+- **Email / Stripe**: both fall back to no-op when env vars are missing,
+  so the app is usable in environments without paid services.
+- **Push notifications**: `lib/push.ts` posts to Expo's push endpoint for
+  every registered token belonging to the recipient.  Token registration
+  is handled by the mobile apps via `/api/push-tokens`.
 
 ## Build
 
@@ -100,5 +178,8 @@ npm run build
 
 ## Deploy
 
-Push to GitHub, import to Vercel, set the four env vars from `.env.local.example`,
-hit deploy.
+Push to GitHub, import to Vercel, set the four required env vars (and any
+optional ones you've configured) from `.env.local.example`, hit deploy.
+
+In Supabase, add your Vercel URL to **Authentication → URL configuration →
+Site URL / Redirect URLs** so signup confirmation emails point at production.

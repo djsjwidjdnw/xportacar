@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Car, Gavel, Users, BadgeDollarSign, Settings, ClipboardCheck,
+  MessageSquare, FileText, ShieldCheck,
   ChevronRight, Menu,
 } from "lucide-react";
 import { useState } from "react";
@@ -18,13 +19,16 @@ import { cn, initials } from "@/lib/utils";
 import type { Profile } from "@/types";
 
 const NAV = [
-  { href: "/admin/dashboard",   key: "navDashboard",   icon: LayoutDashboard },
-  { href: "/admin/vehicles",    key: "navVehicles",    icon: Car },
-  { href: "/admin/auctions",    key: "navAuctions",    icon: Gavel },
-  { href: "/admin/inspections", key: "navInspections", icon: ClipboardCheck },
-  { href: "/admin/users",       key: "navUsers",       icon: Users },
-  { href: "/admin/finance",     key: "navFinance",     icon: BadgeDollarSign },
-  { href: "/admin/settings",    key: "navSettings",    icon: Settings },
+  { href: "/admin/dashboard",       key: "navDashboard",   icon: LayoutDashboard },
+  { href: "/admin/vehicles",        key: "navVehicles",    icon: Car },
+  { href: "/admin/counter-offers",  key: "navCounterOffers", icon: MessageSquare },
+  { href: "/admin/invoices",        key: "navInvoices",    icon: FileText },
+  { href: "/admin/kyc",             key: "navKyc",         icon: ShieldCheck },
+  { href: "/admin/auctions",        key: "navAuctions",    icon: Gavel },
+  { href: "/admin/inspections",     key: "navInspections", icon: ClipboardCheck },
+  { href: "/admin/users",           key: "navUsers",       icon: Users },
+  { href: "/admin/finance",         key: "navFinance",     icon: BadgeDollarSign },
+  { href: "/admin/settings",        key: "navSettings",    icon: Settings },
 ] as const;
 
 function NavBody({ onNavigate }: { onNavigate?: () => void }) {

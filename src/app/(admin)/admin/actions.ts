@@ -52,3 +52,44 @@ export async function setVehicleStatusAction(
   revalidatePath(`/admin/vehicles/${vehicleId}`);
   return { ok: true };
 }
+
+export async function assignInspectorAction(
+  vehicleId: string,
+  inspectorId: string | null,
+): Promise<AdminResult> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { data: profile } = await supabase
+    .from("profiles").select("role").eq("id", user.id).single();
+  if (!profile || !["admin", "superadmin"].includes(profile.role)) {
+    return { ok: false, error: "Admin only." };
+  }
+
+  const { error } = await supabase
+    .from("vehicles")
+    .update({ inspector_id: inspectorId })
+    .eq("id", vehicleId);
+  if (error) return { ok: false, error: error.message };
+
+  // Notify the inspector if assignment changed.
+  if (inspectorId) {
+    const { data: vehicle } = await supabase
+      .from("vehicles").select("year, make, model").eq("id", vehicleId).single();
+    await supabase.from("notifications").insert({
+      user_id: inspectorId,
+      type:    "status_update",
+      title:   "New inspection assigned",
+      body:    vehicle
+        ? `${vehicle.year} ${vehicle.make} ${vehicle.model} has been assigned to you for inspection.`
+        : "A vehicle has been assigned to you for inspection.",
+      data:    { vehicle_id: vehicleId },
+    });
+  }
+
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/vehicles");
+  revalidatePath(`/admin/vehicles/${vehicleId}`);
+  return { ok: true };
+}

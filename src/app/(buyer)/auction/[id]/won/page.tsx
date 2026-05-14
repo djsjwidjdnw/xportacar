@@ -3,8 +3,10 @@ import { notFound, redirect } from "next/navigation";
 import { CheckCircle2, ArrowRight, Truck } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
+import { PayNowButton } from "@/components/buyer/PayNowButton";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
+import { isStripeConfigured } from "@/lib/stripe";
 import { cn, formatEur } from "@/lib/utils";
 
 export const metadata = { title: "Auction won" };
@@ -37,6 +39,20 @@ export default async function AuctionWonPage({
   const isWinner = a.winner_id === user.id;
   const v = a.vehicle;
   const amount = a.current_bid_eur ?? a.buy_now_price_eur;
+
+  // Pull the auto-generated invoice (if any) so we can offer Pay Now.
+  let invoiceId: string | null = null;
+  if (isWinner) {
+    const { data: inv } = await supabase
+      .from("invoices")
+      .select("id, status")
+      .eq("auction_id", a.id)
+      .eq("buyer_id", user.id)
+      .single();
+    if (inv && (inv as { status: string }).status !== "paid") {
+      invoiceId = (inv as { id: string }).id;
+    }
+  }
 
   return (
     <div className="bg-grey-50 py-16">
@@ -84,6 +100,12 @@ export default async function AuctionWonPage({
                 Our UAE collection team will email you within 24 hours with the
                 payment instructions and a shipping quote to your address.
               </p>
+            </div>
+          )}
+
+          {isWinner && invoiceId && (
+            <div className="mx-auto mt-6 max-w-md">
+              <PayNowButton invoiceId={invoiceId} stripeConfigured={isStripeConfigured()} />
             </div>
           )}
 

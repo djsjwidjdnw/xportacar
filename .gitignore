@@ -44,3 +44,7 @@ next-env.d.ts
 # Claude Code
 .claude/
 
+# Supabase CLI work dir
+supabase/.temp/
+supabase/.branches/
+

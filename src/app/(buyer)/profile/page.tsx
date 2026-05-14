@@ -3,11 +3,12 @@ import { ShieldCheck } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { KycUploader } from "@/components/profile/KycUploader";
 import { ProfileEditForm } from "@/components/profile/ProfileEditForm";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
 import { formatRelativeTime, initials } from "@/lib/utils";
-import type { Profile } from "@/types";
+import type { KycSubmission, Profile } from "@/types";
 
 export const metadata = { title: "Profile" };
 
@@ -17,8 +18,16 @@ export default async function ProfilePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login?next=/profile");
 
-  const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
-  const profile = (data as Profile | null) ?? {
+  const [{ data: profileRow }, { data: kycRows }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", user.id).single(),
+    supabase
+      .from("kyc_submissions")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
+  ]);
+
+  const profile = (profileRow as Profile | null) ?? {
     id: user.id,
     role: "buyer" as const,
     company_name: null,
@@ -33,6 +42,7 @@ export default async function ProfilePage() {
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
+  const kycSubmissions = (kycRows as KycSubmission[] | null) ?? [];
 
   return (
     <div className="bg-grey-50 py-10">
@@ -80,6 +90,21 @@ export default async function ProfilePage() {
             </div>
           </div>
         </section>
+
+        {profile.kyc_status !== "verified" && (
+          <section className="mt-6 rounded-2xl border border-warning-200 bg-warning-50/30 p-6">
+            <h3 className="flex items-center gap-2 text-lg font-bold text-grey-900">
+              <ShieldCheck className="size-5 text-warning-600" />
+              Verify your account
+            </h3>
+            <p className="mt-1 text-sm text-grey-600">
+              Submit your trade licence and a photo of your government ID. Approval typically takes one business day.
+            </p>
+            <div className="mt-5">
+              <KycUploader submissions={kycSubmissions} />
+            </div>
+          </section>
+        )}
 
         <section className="mt-6 rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
           <h3 className="mb-5 text-lg font-bold text-grey-900">Account details</h3>

@@ -7,6 +7,11 @@ import {
 } from "@/components/ui/table";
 import { KanbanPipeline } from "@/components/admin/KanbanPipeline";
 import { StatCard } from "@/components/admin/StatCard";
+import {
+  AuctionsCompletedChart,
+  RevenueByMonthChart,
+  VehiclesByStatusChart,
+} from "@/components/admin/AnalyticsCharts";
 
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
@@ -24,6 +29,9 @@ export default async function AdminDashboardPage() {
     { count: liveAuctions },
     { count: buyers },
     { data: recentBids },
+    { data: inspectorRows },
+    { data: completedAuctions },
+    { data: invoices },
   ] = await Promise.all([
     supabase.from("vehicles").select("*").order("updated_at", { ascending: false }),
     supabase.from("auctions").select("*", { count: "exact", head: true }).eq("status", "active"),
@@ -40,6 +48,15 @@ export default async function AdminDashboardPage() {
       `)
       .order("created_at", { ascending: false })
       .limit(8),
+    supabase.from("profiles").select("id, full_name, email").eq("role", "inspector"),
+    supabase
+      .from("auctions")
+      .select("id, status, end_time, current_bid_eur")
+      .in("status", ["sold", "ended"])
+      .gte("end_time", new Date(Date.now() - 8 * 7 * 86400_000).toISOString()),
+    supabase
+      .from("invoices")
+      .select("total_eur, status, created_at"),
   ]);
 
   const vList = (vehicles ?? []) as Vehicle[];
@@ -54,6 +71,56 @@ export default async function AdminDashboardPage() {
     in_auction: vList.filter((v) => v.status === "in_auction"),
     sold:       vList.filter((v) => ["sold", "payment_pending", "paid", "collected", "shipped", "delivered"].includes(v.status as VehicleStatus)),
   };
+
+  // ---- Chart data --------------------------------------------------
+  // Auctions completed per week, last 8 weeks.
+  const auctionsByWeek = (() => {
+    const buckets = new Map<string, number>();
+    for (let i = 7; i >= 0; i--) {
+      const d = new Date(Date.now() - i * 7 * 86400_000);
+      const label = `${d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}`;
+      buckets.set(label, 0);
+    }
+    const keys = [...buckets.keys()];
+    for (const a of (completedAuctions ?? []) as { end_time: string }[]) {
+      const t = new Date(a.end_time).getTime();
+      for (let i = 7; i >= 0; i--) {
+        const start = Date.now() - (i + 1) * 7 * 86400_000;
+        const end   = Date.now() - i * 7 * 86400_000;
+        if (t >= start && t < end) {
+          buckets.set(keys[7 - i], (buckets.get(keys[7 - i]) ?? 0) + 1);
+          break;
+        }
+      }
+    }
+    return keys.map((week) => ({ week, count: buckets.get(week) ?? 0 }));
+  })();
+
+  // Revenue by month, last 6 months (from invoices if present, else from sold vehicles).
+  const revenueByMonth = (() => {
+    const out: { month: string; revenue: number }[] = [];
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label    = d.toLocaleDateString("en-GB", { month: "short" });
+      const revenue  = ((invoices ?? []) as { total_eur: number; created_at: string }[])
+        .filter((inv) => inv.created_at.startsWith(monthKey))
+        .reduce((s, inv) => s + Number(inv.total_eur), 0);
+      out.push({ month: label, revenue });
+    }
+    return out;
+  })();
+
+  const vehiclesByStatus = (() => {
+    const counts = new Map<string, number>();
+    for (const v of vList) {
+      counts.set(v.status, (counts.get(v.status) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([status, count]) => ({ status: status.replace(/_/g, " "), count }));
+  })();
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
@@ -81,6 +148,13 @@ export default async function AdminDashboardPage() {
         <StatCard label={t("statRegisteredBuyers")} value={String(buyers ?? 0)}       iconName="users"      delta={{ value: "+24",  positive: true }} accent="brand" />
       </section>
 
+      {/* Analytics */}
+      <section className="mt-10 grid gap-4 lg:grid-cols-3">
+        <AuctionsCompletedChart data={auctionsByWeek} />
+        <RevenueByMonthChart   data={revenueByMonth} />
+        <VehiclesByStatusChart data={vehiclesByStatus} />
+      </section>
+
       {/* Pipeline */}
       <section className="mt-10">
         <header className="mb-3 flex items-center justify-between">
@@ -93,6 +167,7 @@ export default async function AdminDashboardPage() {
             { key: "in_auction", vehicles: grouped.in_auction },
             { key: "sold",       vehicles: grouped.sold },
           ]}
+          inspectors={(inspectorRows ?? []) as { id: string; full_name: string | null; email: string | null }[]}
         />
       </section>
 

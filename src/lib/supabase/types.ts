@@ -25,6 +25,11 @@ export type AuctionStatus =
 export type NotificationType =
   | "outbid" | "auction_won" | "auction_ending"
   | "new_vehicle" | "payment_due" | "status_update";
+export type CounterOfferStatus = "pending" | "accepted" | "rejected" | "expired";
+export type InvoiceStatus      = "pending" | "paid" | "cancelled";
+export type KycDocType         = "trade_license" | "id_document" | "utility_bill" | "other";
+export type KycReviewStatus    = "pending" | "approved" | "rejected";
+export type DevicePlatform     = "ios" | "android" | "web";
 
 export interface Profile {
   id: string;
@@ -141,6 +146,76 @@ export interface Notification {
   created_at: string;
 }
 
+export interface CounterOffer {
+  id: string;
+  auction_id: string;
+  bidder_id: string;
+  amount_eur: number;
+  status: CounterOfferStatus;
+  message: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+}
+
+export interface Invoice {
+  id: string;
+  auction_id: string;
+  buyer_id: string;
+  vehicle_id: string;
+  amount_eur: number;
+  platform_fee_eur: number;
+  total_eur: number;
+  status: InvoiceStatus;
+  invoice_number: string | null;
+  stripe_session_id: string | null;
+  paid_at: string | null;
+  created_at: string;
+}
+
+export interface SavedSearch {
+  id: string;
+  user_id: string;
+  name: string;
+  filters: Record<string, unknown>;
+  notify: boolean;
+  created_at: string;
+}
+
+export interface ShippingQuote {
+  id: string;
+  vehicle_id: string;
+  buyer_id: string | null;
+  destination: string;
+  cost_eur: number;
+  transit_days: number;
+  carrier: string | null;
+  created_at: string;
+}
+
+export interface KycSubmission {
+  id: string;
+  user_id: string;
+  document_type: KycDocType;
+  file_url: string;
+  status: KycReviewStatus;
+  reviewed_by: string | null;
+  reviewer_note: string | null;
+  reviewed_at: string | null;
+  created_at: string;
+}
+
+export interface PushToken {
+  id: string;
+  user_id: string;
+  token: string;
+  platform: DevicePlatform;
+  device_name: string | null;
+  last_seen: string;
+  created_at: string;
+}
+
 // Minimal supabase-js compatible Database shape.
 type RowInsert<T> = Partial<T>;
 type RowUpdate<T> = Partial<T>;
@@ -156,6 +231,12 @@ export interface Database {
       bids:            { Row: Bid;           Insert: RowInsert<Bid>;           Update: RowUpdate<Bid>;           Relationships: [] };
       watchlist:       { Row: WatchlistItem; Insert: RowInsert<WatchlistItem>; Update: RowUpdate<WatchlistItem>; Relationships: [] };
       notifications:   { Row: Notification;  Insert: RowInsert<Notification>;  Update: RowUpdate<Notification>;  Relationships: [] };
+      counter_offers:  { Row: CounterOffer;  Insert: RowInsert<CounterOffer>;  Update: RowUpdate<CounterOffer>;  Relationships: [] };
+      invoices:        { Row: Invoice;       Insert: RowInsert<Invoice>;       Update: RowUpdate<Invoice>;       Relationships: [] };
+      saved_searches:  { Row: SavedSearch;   Insert: RowInsert<SavedSearch>;   Update: RowUpdate<SavedSearch>;   Relationships: [] };
+      shipping_quotes: { Row: ShippingQuote; Insert: RowInsert<ShippingQuote>; Update: RowUpdate<ShippingQuote>; Relationships: [] };
+      kyc_submissions: { Row: KycSubmission; Insert: RowInsert<KycSubmission>; Update: RowUpdate<KycSubmission>; Relationships: [] };
+      push_tokens:     { Row: PushToken;     Insert: RowInsert<PushToken>;     Update: RowUpdate<PushToken>;     Relationships: [] };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

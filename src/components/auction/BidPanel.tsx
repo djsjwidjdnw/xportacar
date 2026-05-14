@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, Gavel, ShoppingCart } from "lucide-react";
+import { Minus, Plus, Gavel, ShoppingCart, MessageSquare, TrendingUp } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,6 +24,7 @@ import { cn, formatEur, formatRelativeTime, initials } from "@/lib/utils";
 import {
   placeBidAction,
   buyNowAction,
+  placeCounterOfferAction,
 } from "@/app/(buyer)/auction/actions";
 import type { Auction, BidWithBidder } from "@/types";
 
@@ -53,10 +55,20 @@ export function BidPanel({
   const [buying, setBuying] = useState(false);
   const [buyOpen, setBuyOpen] = useState(false);
 
+  // Proxy / counter-offer state
+  const [proxyOn, setProxyOn] = useState(false);
+  const [proxyMax, setProxyMax] = useState<number>(minNext + 5_000);
+  const [counterOpen, setCounterOpen] = useState(false);
+  const [counterAmount, setCounterAmount] = useState<number>(currentBid);
+  const [counterMessage, setCounterMessage] = useState("");
+  const [counterSubmitting, setCounterSubmitting] = useState(false);
+
   // Whenever the live current_bid jumps, ensure our input is still legal.
   useEffect(() => {
     setAmount((a) => (a < minNext ? minNext : a));
-  }, [minNext]);
+    setProxyMax((p) => (p < minNext + 1000 ? minNext + 5_000 : p));
+    setCounterAmount((c) => (c < currentBid ? currentBid : c));
+  }, [minNext, currentBid]);
 
   const isWinning = useMemo(
     () => currentUserId != null && bids[0]?.bidder_id === currentUserId,
@@ -81,14 +93,26 @@ export function BidPanel({
       toast.err("Bid too low", `Minimum next bid is ${formatEur(minNext)}.`);
       return;
     }
+    if (proxyOn && proxyMax < amount) {
+      toast.err("Proxy max too low", "Proxy maximum must be at least your bid amount.");
+      return;
+    }
     setSubmitting(true);
-    const res = await placeBidAction({ auctionId: auction.id, amountEur: amount });
+    const res = await placeBidAction({
+      auctionId:   auction.id,
+      amountEur:   amount,
+      proxyMaxEur: proxyOn ? proxyMax : null,
+    });
     setSubmitting(false);
     if (!res.ok) {
       toast.err(t("auction.bidFailed", { error: res.error ?? "Unknown error" }));
       return;
     }
-    toast.ok(t("auction.bidPlaced"), `${formatEur(amount)} on ${vehicleTitle}`);
+    if (proxyOn) {
+      toast.ok("Proxy bid placed", `We'll auto-bid up to ${formatEur(proxyMax)} on your behalf.`);
+    } else {
+      toast.ok(t("auction.bidPlaced"), `${formatEur(amount)} on ${vehicleTitle}`);
+    }
   };
 
   const buyNow = async () => {
@@ -102,6 +126,30 @@ export function BidPanel({
     }
     toast.ok("You won!", `Redirecting to confirmation…`);
     router.push(`/auction/${auction.id}/won`);
+  };
+
+  const placeCounter = async () => {
+    if (!isAuthenticated) {
+      toast.err("Sign in required", "Sign in to make an offer.");
+      return;
+    }
+    if (counterAmount <= 0) {
+      toast.err("Offer too low", "Enter a positive amount.");
+      return;
+    }
+    setCounterSubmitting(true);
+    const res = await placeCounterOfferAction({
+      auctionId: auction.id,
+      amountEur: counterAmount,
+      message:   counterMessage.trim() || undefined,
+    });
+    setCounterSubmitting(false);
+    setCounterOpen(false);
+    if (!res.ok) {
+      toast.err("Couldn't send offer", res.error);
+      return;
+    }
+    toast.ok("Counter-offer sent", `Our team will review and respond within 48h.`);
   };
 
   const adjust = (delta: 1 | -1) => {
@@ -172,6 +220,41 @@ export function BidPanel({
             </Button>
           </div>
 
+          {/* Proxy / maximum bidding */}
+          {isAuthenticated && !auctionEnded && (
+            <div className="mt-3 rounded-lg border border-grey-200 bg-grey-50/60 p-3">
+              <label className="flex items-center gap-2 text-sm font-medium text-grey-800">
+                <input
+                  type="checkbox"
+                  className="size-4 rounded border-grey-300 text-brand-600"
+                  checked={proxyOn}
+                  onChange={(e) => setProxyOn(e.currentTarget.checked)}
+                  disabled={submitting}
+                />
+                <TrendingUp className="size-3.5 text-brand-600" />
+                Set maximum bid (auto-outbid up to)
+              </label>
+              {proxyOn && (
+                <div className="mt-2 relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-grey-400">€</span>
+                  <Input
+                    type="number"
+                    inputMode="numeric"
+                    value={proxyMax}
+                    min={amount}
+                    step={500}
+                    onChange={(e) => setProxyMax(Math.max(amount, Number(e.currentTarget.value || 0)))}
+                    disabled={submitting}
+                    className="h-10 pl-7 text-sm tabular-nums"
+                  />
+                  <p className="mt-1 text-[11px] text-grey-500">
+                    We&apos;ll auto-bid €500 at a time on your behalf up to {formatEur(proxyMax)}.
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {auctionEnded ? (
             <Button disabled size="lg" className="mt-3 h-12 w-full text-base">
               Auction ended
@@ -223,6 +306,60 @@ export function BidPanel({
               </DialogContent>
             </Dialog>
           )}
+
+          {/* Counter offer */}
+          {isAuthenticated && !auctionEnded && (
+            <Dialog open={counterOpen} onOpenChange={setCounterOpen}>
+              <DialogTrigger render={
+                <Button variant="ghost" size="sm" className="mt-2 h-9 w-full text-xs">
+                  <MessageSquare className="size-3.5" />
+                  Make counter-offer
+                </Button>
+              } />
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Send a counter-offer</DialogTitle>
+                  <DialogDescription>
+                    Propose a private price to our sales team. They&apos;ll review and respond within 48 hours.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3">
+                  <label className="block text-sm">
+                    <span className="block mb-1 text-xs font-medium text-grey-700">Your offer (EUR)</span>
+                    <div className="relative">
+                      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-grey-400">€</span>
+                      <Input
+                        type="number"
+                        inputMode="numeric"
+                        value={counterAmount}
+                        min={1}
+                        step={500}
+                        onChange={(e) => setCounterAmount(Math.max(0, Number(e.currentTarget.value || 0)))}
+                        className="h-11 pl-7 text-base tabular-nums"
+                      />
+                    </div>
+                  </label>
+                  <label className="block text-sm">
+                    <span className="block mb-1 text-xs font-medium text-grey-700">Message (optional)</span>
+                    <Textarea
+                      rows={3}
+                      value={counterMessage}
+                      onChange={(e) => setCounterMessage(e.currentTarget.value)}
+                      placeholder="Any context for our team?"
+                    />
+                  </label>
+                </div>
+                <DialogFooter>
+                  <DialogClose render={
+                    <Button variant="outline" disabled={counterSubmitting}>Cancel</Button>
+                  } />
+                  <Button onClick={placeCounter} disabled={counterSubmitting}>
+                    {counterSubmitting ? "Sending…" : "Send offer"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
@@ -258,6 +395,7 @@ export function BidPanel({
                   <div className="min-w-0">
                     <p className="truncate text-sm font-medium text-grey-900">
                       {b.bidder?.company_name ?? b.bidder?.full_name ?? "Bidder"}
+                      {b.is_proxy && <span className="ml-1.5 text-[10px] font-semibold uppercase text-brand-700">· proxy</span>}
                     </p>
                     <p className="truncate text-[11px] text-grey-500">
                       {b.bidder?.country} · {formatRelativeTime(b.created_at)}

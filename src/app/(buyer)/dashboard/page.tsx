@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Gavel, Trophy, Wallet, TrendingUp, Bell } from "lucide-react";
+import { Gavel, Trophy, Wallet, TrendingUp, Bell, FileText, Search } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -23,6 +23,8 @@ export default async function BuyerDashboardPage() {
     { data: myBids },
     { data: wonAuctions },
     { data: notifications },
+    { data: invoices },
+    { data: savedSearches },
   ] = await Promise.all([
     supabase
       .from("bids")
@@ -50,6 +52,17 @@ export default async function BuyerDashboardPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(5),
+    supabase
+      .from("invoices")
+      .select("id, invoice_number, total_eur, status, created_at, vehicle:vehicles!vehicle_id(id, year, make, model)")
+      .eq("buyer_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(5),
+    supabase
+      .from("saved_searches")
+      .select("id, name, filters, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false }),
   ]);
 
   // Aggregate: active bids = distinct auctions where I've bid and auction is active.
@@ -163,6 +176,75 @@ export default async function BuyerDashboardPage() {
             </Table>
           </div>
         </section>
+
+        {/* Invoices */}
+        {(invoices ?? []).length > 0 && (
+          <section className="mt-8 rounded-2xl border border-grey-200 bg-white shadow-xs">
+            <header className="flex items-center justify-between px-5 py-4">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-grey-900">
+                <FileText className="size-4 text-grey-500" /> Invoices
+              </h2>
+            </header>
+            <div className="border-t border-grey-100">
+              <ul className="divide-y divide-grey-100">
+                {(invoices ?? []).map((inv) => {
+                  // deno-lint-ignore no-explicit-any
+                  const r = inv as any;
+                  return (
+                    <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3.5">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-grey-900">
+                          {r.vehicle ? `${r.vehicle.year} ${r.vehicle.make} ${r.vehicle.model}` : "—"}
+                        </p>
+                        <p className="text-[11px] text-grey-500 font-mono">{r.invoice_number ?? r.id.slice(0, 8)}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-semibold tabular-nums text-grey-900">{formatEur(r.total_eur)}</span>
+                        <Link
+                          href={`/admin/invoices/${r.id}`}
+                          className="text-xs font-medium text-brand-700 hover:underline"
+                        >
+                          View →
+                        </Link>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </section>
+        )}
+
+        {/* Saved searches */}
+        {(savedSearches ?? []).length > 0 && (
+          <section className="mt-8 rounded-2xl border border-grey-200 bg-white shadow-xs">
+            <header className="flex items-center justify-between px-5 py-4">
+              <h2 className="flex items-center gap-2 text-lg font-bold text-grey-900">
+                <Search className="size-4 text-grey-500" /> Saved searches
+              </h2>
+            </header>
+            <div className="border-t border-grey-100">
+              <ul className="divide-y divide-grey-100">
+                {(savedSearches ?? []).map((s) => {
+                  // deno-lint-ignore no-explicit-any
+                  const r = s as any;
+                  const qs = new URLSearchParams(Object.entries(r.filters ?? {}).filter(([_, v]) => v != null).map(([k, v]) => [k, String(v)]));
+                  return (
+                    <li key={r.id} className="flex items-center justify-between gap-3 px-5 py-3.5">
+                      <p className="font-medium text-grey-900">{r.name}</p>
+                      <Link
+                        href={`/marketplace${qs.toString() ? `?${qs.toString()}` : ""}`}
+                        className="text-xs font-medium text-brand-700 hover:underline"
+                      >
+                        Open search →
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </section>
+        )}
 
         {/* Recent activity */}
         <section className="mt-8 rounded-2xl border border-grey-200 bg-white shadow-xs">

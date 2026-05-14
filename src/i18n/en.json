@@ -181,6 +181,9 @@
   "admin": {
     "navDashboard": "Dashboard",
     "navVehicles": "Vehicles",
+    "navCounterOffers": "Counter offers",
+    "navInvoices": "Invoices",
+    "navKyc": "KYC review",
     "navAuctions": "Auctions",
     "navInspections": "Inspections",
     "navUsers": "Users",

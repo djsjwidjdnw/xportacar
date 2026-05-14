@@ -201,6 +201,9 @@
     "activityVehicle": "المركبة",
     "activityEvent": "الحدث",
     "activityValue": "القيمة",
-    "activityWhen": "متى"
+    "activityWhen": "متى",
+    "navCounterOffers": "Counter offers",
+    "navInvoices": "Invoices",
+    "navKyc": "KYC review"
   }
 }

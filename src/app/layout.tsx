@@ -6,6 +6,7 @@ import { I18nProvider } from "@/i18n/provider";
 import { messages, direction } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
 import { Toaster } from "@/components/ui/toast";
+import { ServiceWorkerRegistrar } from "@/components/shared/ServiceWorkerRegistrar";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -28,6 +29,33 @@ export const metadata: Metadata = {
   description:
     "Premium UAE vehicles, inspected and auctioned to verified European trade buyers. Door-to-door logistics included.",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  manifest: "/manifest.json",
+  applicationName: "XportACar",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "XportACar",
+  },
+  formatDetection: { telephone: false },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+  },
+};
+
+export const viewport = {
+  themeColor: "#1570EF",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover" as const,
 };
 
 export default async function RootLayout({
@@ -55,6 +83,7 @@ export default async function RootLayout({
         <I18nProvider locale={locale} messages={messages[locale]}>
           <Toaster>{children}</Toaster>
         </I18nProvider>
+        <ServiceWorkerRegistrar />
       </body>
     </html>
   );

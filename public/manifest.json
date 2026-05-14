@@ -1,0 +1,21 @@
+{
+  "name": "XportACar",
+  "short_name": "XportACar",
+  "description": "UAE-to-EU online car auction platform",
+  "start_url": "/marketplace",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1570EF",
+  "categories": ["business", "shopping", "auto"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Marketplace",   "short_name": "Market", "url": "/marketplace", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Live Auctions", "short_name": "Live",   "url": "/auctions",    "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "My Bids",       "short_name": "Bids",   "url": "/dashboard",   "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

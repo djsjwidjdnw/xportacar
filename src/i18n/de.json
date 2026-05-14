@@ -201,6 +201,9 @@
     "activityVehicle": "Fahrzeug",
     "activityEvent": "Ereignis",
     "activityValue": "Wert",
-    "activityWhen": "Wann"
+    "activityWhen": "Wann",
+    "navCounterOffers": "Counter offers",
+    "navInvoices": "Invoices",
+    "navKyc": "KYC review"
   }
 }

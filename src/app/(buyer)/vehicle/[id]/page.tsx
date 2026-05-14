@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
+import { ShippingEstimator } from "@/components/vehicle/ShippingEstimator";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
 import { createClient } from "@/lib/supabase/server";
@@ -128,6 +129,8 @@ export default async function VehicleDetailPage({
               </h2>
               <ConditionReport damages={v.vehicle_damages ?? []} />
             </section>
+
+            <ShippingEstimator vehicleId={v.id} />
 
             {v.description && (
               <section className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
