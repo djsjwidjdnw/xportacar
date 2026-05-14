@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, MapPin, Sparkles } from "lucide-react";
+import { ArrowRight, Gavel, Hourglass, MapPin, Sparkles } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -58,6 +58,8 @@ export default async function VehicleDetailPage({
     ? (auction.current_bid_eur ?? auction.starting_price_eur)
     : v.listed_price_eur;
 
+  const auctionLive = auction?.status === "active";
+
   return (
     <div className="bg-grey-50 py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -67,6 +69,52 @@ export default async function VehicleDetailPage({
             ← {t("nav.marketplace")}
           </Link>
         </nav>
+
+        {/* Above-the-fold CTA — visible before the user scrolls.
+            Auction live → current bid + "Go to Auction" button.
+            Auction scheduled → "Coming soon" notice.
+            Listed only → "View auction" disabled link. */}
+        {auctionLive && auction && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-error-200 bg-error-50/70 p-4 shadow-sm sm:p-5">
+            <div className="flex items-center gap-4">
+              <span className="inline-flex size-10 items-center justify-center rounded-full bg-error-600 text-white">
+                <Gavel className="size-5" />
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-error-700">
+                  <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-error-600 align-middle" />
+                  Auction live · {auction.bid_count} bids
+                </p>
+                <p className="mt-0.5 text-lg font-extrabold tabular-nums text-grey-900">
+                  {t("common.currentBid")}: {formatEur(headlinePrice ?? 0)}
+                </p>
+              </div>
+            </div>
+            <Link
+              href={`/auction/${auction.id}`}
+              className={cn(
+                buttonVariants({ variant: "default", size: "lg" }),
+                "h-12 gap-2 px-6 text-base shadow-sm",
+              )}
+            >
+              {t("common.viewAuction")}
+              <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        )}
+        {auction?.status === "scheduled" && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-warning-200 bg-warning-50/70 p-4 shadow-sm sm:p-5">
+            <div className="flex items-center gap-3">
+              <Hourglass className="size-5 text-warning-700" />
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-warning-700">Auction coming soon</p>
+                <p className="text-sm text-warning-800/90">
+                  Listed price {formatEur(v.listed_price_eur ?? 0)} · starts {new Date(auction.end_time).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-10 lg:grid-cols-12">
           {/* Gallery + main info */}

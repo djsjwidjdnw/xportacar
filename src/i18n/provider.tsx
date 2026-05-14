@@ -3,7 +3,7 @@
 // React context that exposes the active locale + a translator to client
 // components.  Hydrated with the messages we resolved on the server.
 
-import { createContext, useCallback, useContext, useMemo, useTransition } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 
 import {
   DEFAULT_LOCALE,
@@ -33,13 +33,21 @@ export function I18nProvider({
   messages: Messages;
   children: React.ReactNode;
 }) {
-  const [isPending, startTransition] = useTransition();
+  // Use plain state, not useTransition — we want the reload to fire
+  // immediately, not get deferred by React's transition scheduler.
+  const [isPending, setIsPending] = useState(false);
 
   const setLocale = useCallback((next: Locale) => {
-    // 1-year cookie, root path so SSR and proxy can both see it
-    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
-    startTransition(() => {
-      // Hard reload — server renders the new locale and rehydrates messages
+    if (typeof document === "undefined" || typeof window === "undefined") return;
+
+    // 1-year cookie, root path so SSR and proxy can both see it.
+    document.cookie =
+      `${LOCALE_COOKIE}=${encodeURIComponent(next)}; path=/; max-age=${60 * 60 * 24 * 365}; samesite=lax`;
+
+    setIsPending(true);
+    // Hard reload — defer one microtask so the cookie set above flushes
+    // into document.cookie before navigation starts on slower browsers.
+    queueMicrotask(() => {
       window.location.reload();
     });
   }, []);

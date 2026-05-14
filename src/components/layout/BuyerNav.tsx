@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Gavel, Heart, LayoutDashboard, Menu, ShoppingBag, TrendingUp, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -22,13 +22,24 @@ import { useTranslations } from "@/i18n/provider";
 import { cn, initials } from "@/lib/utils";
 import type { Notification, Profile } from "@/types";
 
-interface NavLink { href: string; key: string }
+interface NavLink {
+  href: string;
+  key: string;
+  icon: React.ComponentType<{ className?: string }>;
+  authOnly?: boolean;
+}
 
+// Public links (shown to everyone) + authed-only "My Bids" / "Dashboard" /
+// "Watchlist".  Profile lives in the avatar dropdown, NOT here.
+// "My Bids" anchors to the bids section of the dashboard; "Dashboard" lands
+// at the top with the stat cards.  Same page, two entry points — matches
+// what the buyer's testing feedback asked for.
 const LINKS: NavLink[] = [
-  { href: "/marketplace", key: "marketplace" },
-  { href: "/auctions",    key: "auctions" },
-  { href: "/dashboard",   key: "myBids" },
-  { href: "/watchlist",   key: "watchlist" },
+  { href: "/marketplace",     key: "marketplace", icon: ShoppingBag },
+  { href: "/auctions",        key: "auctions",    icon: Gavel },
+  { href: "/dashboard#bids",  key: "myBids",      icon: TrendingUp,     authOnly: true },
+  { href: "/dashboard",       key: "dashboard",   icon: LayoutDashboard, authOnly: true },
+  { href: "/watchlist",       key: "watchlist",   icon: Heart,          authOnly: true },
 ];
 
 export function BuyerNav({
@@ -42,15 +53,16 @@ export function BuyerNav({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  const visibleLinks = LINKS.filter((l) => !l.authOnly || !!profile);
+
   return (
     <header className="sticky top-0 z-40 border-b border-grey-200 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/65">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           <Logo />
-          <nav className="hidden items-center gap-1 md:flex">
-            {LINKS.map((l) => {
-              const active =
-                pathname === l.href || pathname.startsWith(l.href + "/");
+          <nav className="hidden items-center gap-0.5 md:flex">
+            {visibleLinks.map((l) => {
+              const active = isActive(pathname, l.href);
               return (
                 <Link
                   key={l.href}
@@ -101,14 +113,33 @@ export function BuyerNav({
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem render={<Link href="/dashboard" />}>{t("dashboard")}</DropdownMenuItem>
-                <DropdownMenuItem render={<Link href="/profile" />}>{t("profile")}</DropdownMenuItem>
+
+                {/* Plain <Link> wrappers — earlier `render={<Link>}` lost
+                    children in base-ui's slot, which is why dropdown
+                    items appeared blank for some users. */}
+                <DropdownMenuItem>
+                  <Link href="/dashboard" className="flex w-full items-center gap-2">
+                    <LayoutDashboard className="size-4 text-grey-500" />
+                    {t("dashboard")}
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <Link href="/profile" className="flex w-full items-center gap-2">
+                    {t("profile")}
+                  </Link>
+                </DropdownMenuItem>
                 {(profile.role === "admin" || profile.role === "superadmin") && (
-                  <DropdownMenuItem render={<Link href="/admin/dashboard" />}>Admin</DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Link href="/admin/dashboard" className="flex w-full items-center gap-2">
+                      Admin
+                    </Link>
+                  </DropdownMenuItem>
                 )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem render={<Link href="/api/auth/sign-out" />} className="text-error-600">
-                  {t("signOut")}
+                <DropdownMenuItem className="text-error-600">
+                  <Link href="/api/auth/sign-out" className="flex w-full items-center gap-2">
+                    {t("signOut")}
+                  </Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -137,21 +168,44 @@ export function BuyerNav({
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 p-3">
-                {LINKS.map((l) => (
-                  <Link
-                    key={l.href}
-                    href={l.href}
-                    onClick={() => setOpen(false)}
-                    className={cn(
-                      "rounded-md px-3 py-2.5 text-sm font-medium",
-                      pathname.startsWith(l.href)
-                        ? "bg-brand-50 text-brand-700"
-                        : "text-grey-700 hover:bg-grey-50",
-                    )}
-                  >
-                    {t(l.key)}
-                  </Link>
-                ))}
+                {visibleLinks.map((l) => {
+                  const Icon = l.icon;
+                  return (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium",
+                        isActive(pathname, l.href)
+                          ? "bg-brand-50 text-brand-700"
+                          : "text-grey-700 hover:bg-grey-50",
+                      )}
+                    >
+                      <Icon className="size-4 text-grey-500" />
+                      {t(l.key)}
+                    </Link>
+                  );
+                })}
+                {profile && (
+                  <>
+                    <div className="mt-1 border-t border-grey-200 pt-1" />
+                    <Link
+                      href="/profile"
+                      onClick={() => setOpen(false)}
+                      className="rounded-md px-3 py-2.5 text-sm font-medium text-grey-700 hover:bg-grey-50"
+                    >
+                      {t("profile")}
+                    </Link>
+                    <Link
+                      href="/api/auth/sign-out"
+                      onClick={() => setOpen(false)}
+                      className="rounded-md px-3 py-2.5 text-sm font-medium text-error-600 hover:bg-error-50"
+                    >
+                      {t("signOut")}
+                    </Link>
+                  </>
+                )}
                 {!profile && (
                   <div className="mt-2 flex flex-col gap-2 border-t border-grey-200 pt-3">
                     <Link href="/login" onClick={() => setOpen(false)} className={cn(buttonVariants({ variant: "outline", size: "default" }))}>
@@ -169,4 +223,14 @@ export function BuyerNav({
       </div>
     </header>
   );
+}
+
+function isActive(pathname: string, href: string): boolean {
+  // Strip hash/query for the active comparison so /dashboard#bids and
+  // /dashboard both highlight when pathname is /dashboard.
+  const cleanHref = href.split(/[?#]/)[0];
+  if (cleanHref === "/marketplace") return pathname === "/marketplace" || pathname.startsWith("/vehicle/");
+  if (cleanHref === "/dashboard")   return pathname === "/dashboard" && href === "/dashboard";
+  if (href === "/dashboard#bids")   return false; // never sticky-highlight the anchor entry
+  return pathname === cleanHref || pathname.startsWith(cleanHref + "/");
 }

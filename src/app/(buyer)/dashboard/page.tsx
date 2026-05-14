@@ -113,7 +113,7 @@ export default async function BuyerDashboardPage() {
         </section>
 
         {/* Active bids table */}
-        <section className="mt-10 rounded-2xl border border-grey-200 bg-white shadow-xs">
+        <section id="bids" className="mt-10 scroll-mt-24 rounded-2xl border border-grey-200 bg-white shadow-xs">
           <header className="flex items-center justify-between px-5 py-4">
             <h2 className="text-lg font-bold text-grey-900">Your bids</h2>
             <Link href="/auctions" className="text-sm font-medium text-brand-700 hover:underline">Live auctions</Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Clock, Fuel, Gauge, MapPin } from "lucide-react";
+import { Clock, Fuel, Gauge, Gavel, Hourglass, MapPin } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -39,6 +39,7 @@ export function VehicleCard({
     vehicle.vehicle_photos?.sort((a, b) => a.sort_order - b.sort_order)[0]?.url
     ?? "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=1200&q=80";
   const isLive = auction && auction.status === "active";
+  const isScheduled = auction && auction.status === "scheduled";
   const remaining = useAuctionTick(auction?.end_time);
   const headlinePrice = isLive
     ? (auction?.current_bid_eur ?? auction?.starting_price_eur)
@@ -125,6 +126,27 @@ export function VehicleCard({
                     ? t("reserveMet") : t("reserveNotMet")}
                 </span>
               )}
+            </div>
+          )}
+
+          {/* Prominent CTA — makes auction state obvious at a glance. */}
+          {isLive && auction ? (
+            <Link
+              href={`/auction/${auction.id}`}
+              onClick={(e) => e.stopPropagation()}
+              className="mt-1 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-brand-600 px-3 text-sm font-bold text-white shadow-sm transition-colors hover:bg-brand-700"
+            >
+              <Gavel className="size-4" />
+              Bid now
+            </Link>
+          ) : isScheduled ? (
+            <div className="mt-1 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-warning-200 bg-warning-50 px-3 text-sm font-bold text-warning-700">
+              <Hourglass className="size-4" />
+              Coming soon
+            </div>
+          ) : (
+            <div className="mt-1 inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-grey-200 bg-grey-50 px-3 text-sm font-semibold text-grey-600">
+              View details
             </div>
           )}
         </div>
