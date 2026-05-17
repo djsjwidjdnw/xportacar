@@ -1,14 +1,23 @@
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
+
+const LOGO_SRC = "/logos/xportacar-logo.jpg";
 
 export function Logo({
   className,
   variant = "light",
   href = "/",
+  withWordmark = true,
+  size = 36,
 }: {
   className?: string;
   variant?: "light" | "dark";
   href?: string;
+  /** Show the "XportACar" wordmark next to the logo image. */
+  withWordmark?: boolean;
+  /** Pixel height of the rendered logo image. */
+  size?: number;
 }) {
   return (
     <Link
@@ -19,19 +28,20 @@ export function Logo({
         className,
       )}
     >
-      <span
-        aria-hidden
-        className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-sm"
-      >
-        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.5">
-          <path d="M3 13l2-5h14l2 5M5 13v5h2m12-5v5h-2M5 18h14M8 13h8" strokeLinecap="round" strokeLinejoin="round" />
-          <circle cx="8" cy="18" r="1.5" fill="currentColor" stroke="none" />
-          <circle cx="16" cy="18" r="1.5" fill="currentColor" stroke="none" />
-        </svg>
-      </span>
-      <span className="text-lg">
-        Xport<span className="text-brand-600">A</span>Car
-      </span>
+      <Image
+        src={LOGO_SRC}
+        alt="XportACar"
+        width={size}
+        height={size}
+        priority
+        className="h-auto w-auto rounded-md object-contain"
+        style={{ height: size }}
+      />
+      {withWordmark && (
+        <span className="text-lg">
+          Xport<span className="text-brand-600">A</span>Car
+        </span>
+      )}
     </Link>
   );
 }
