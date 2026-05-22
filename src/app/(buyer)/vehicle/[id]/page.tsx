@@ -6,8 +6,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
-import { ShippingEstimator } from "@/components/vehicle/ShippingEstimator";
+import { ShippingOptions } from "@/components/vehicle/ShippingOptions";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
+import { VehiclePriceCard } from "@/components/vehicle/VehiclePriceCard";
 import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
@@ -178,7 +179,7 @@ export default async function VehicleDetailPage({
               <ConditionReport damages={v.vehicle_damages ?? []} />
             </section>
 
-            <ShippingEstimator vehicleId={v.id} />
+            <ShippingOptions vehicleId={v.id} vehiclePriceEur={headlinePrice ?? null} />
 
             {v.description && (
               <section className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
@@ -192,77 +193,31 @@ export default async function VehicleDetailPage({
 
           {/* Sticky right rail */}
           <aside className="lg:col-span-4">
-            <div className="lg:sticky lg:top-24">
-              <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">
-                  {auction?.status === "active" ? t("common.currentBid") : t("common.startingPrice")}
-                </p>
-                <p className="mt-1 text-3xl font-extrabold text-grey-900">
-                  {formatEur(headlinePrice ?? 0)}
-                </p>
-
-                {auction && (
-                  <p className="mt-1 text-sm text-grey-500">
-                    {auction.bid_count} {t("common.bids")} · {auction.bidder_count} {t("common.bidders")}
-                  </p>
-                )}
-
-                {auction ? (
-                  <Link
-                    href={`/auction/${auction.id}`}
-                    className={cn(
-                      buttonVariants({ variant: "default", size: "lg" }),
-                      "mt-5 h-12 w-full text-base",
-                    )}
-                  >
-                    {t("common.viewAuction")}
-                    <ArrowRight className="size-4" />
-                  </Link>
-                ) : (
-                  <Link
-                    href="/marketplace"
-                    className={cn(
-                      buttonVariants({ variant: "outline", size: "lg" }),
-                      "mt-5 h-12 w-full text-base",
-                    )}
-                  >
-                    {t("common.back")}
-                  </Link>
-                )}
-
-                <div className="mt-2">
-                  <WatchlistButton
-                    vehicleId={v.id}
-                    initiallyWatching={watching}
-                    isAuthenticated={!!user}
-                    vehicleTitle={`${v.year} ${v.make} ${v.model}`}
-                    variant="full"
-                  />
-                </div>
-
-                <dl className="mt-6 space-y-2.5 border-t border-grey-100 pt-5 text-sm">
-                  {v.buy_now_price_eur != null && (
-                    <Row label={t("common.buyNow")} value={formatEur(v.buy_now_price_eur)} />
-                  )}
-                  {v.reserve_price_eur != null && (
-                    <Row label="Reserve" value={formatEur(v.reserve_price_eur)} />
-                  )}
-                  <Row label={t("vehicle.location")} value={`${v.location_city}, ${v.location_country}`} />
-                </dl>
-              </div>
+            <div className="lg:sticky lg:top-24 space-y-3">
+              <VehiclePriceCard
+                auction={auction ? {
+                  id: auction.id,
+                  status: auction.status,
+                  bid_count: auction.bid_count,
+                  bidder_count: auction.bidder_count,
+                } : null}
+                headlinePriceEur={headlinePrice ?? null}
+                buyNowPriceEur={v.buy_now_price_eur}
+                reservePriceEur={v.reserve_price_eur}
+                locationCity={v.location_city}
+                locationCountry={v.location_country}
+              />
+              <WatchlistButton
+                vehicleId={v.id}
+                initiallyWatching={watching}
+                isAuthenticated={!!user}
+                vehicleTitle={`${v.year} ${v.make} ${v.model}`}
+                variant="full"
+              />
             </div>
           </aside>
         </div>
       </div>
-    </div>
-  );
-}
-
-function Row({ label, value }: { label: string; value: React.ReactNode }) {
-  return (
-    <div className="flex justify-between gap-3">
-      <dt className="text-grey-500">{label}</dt>
-      <dd className="font-medium text-grey-900">{value}</dd>
     </div>
   );
 }

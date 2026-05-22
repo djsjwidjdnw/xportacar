@@ -20,7 +20,9 @@ import { toast } from "@/components/ui/toast";
 import { bidIncrement } from "@/lib/constants";
 import { useTranslations } from "@/i18n/provider";
 import { useAuction } from "@/hooks/useAuction";
-import { cn, formatEur, formatRelativeTime, initials } from "@/lib/utils";
+import { useCurrency } from "@/lib/currency";
+import { CurrencyPills } from "@/components/buyer/CurrencyPills";
+import { cn, formatRelativeTime, initials } from "@/lib/utils";
 import {
   placeBidAction,
   buyNowAction,
@@ -45,6 +47,7 @@ export function BidPanel({
 }) {
   const t = useTranslations();
   const router = useRouter();
+  const { format } = useCurrency();
   const { auction, bids } = useAuction({ initialAuction, initialBids });
 
   const currentBid = auction.current_bid_eur ?? auction.starting_price_eur;
@@ -90,7 +93,7 @@ export function BidPanel({
       return;
     }
     if (amount < minNext) {
-      toast.err("Bid too low", `Minimum next bid is ${formatEur(minNext)}.`);
+      toast.err("Bid too low", `Minimum next bid is ${format(minNext)}.`);
       return;
     }
     if (proxyOn && proxyMax < amount) {
@@ -109,9 +112,9 @@ export function BidPanel({
       return;
     }
     if (proxyOn) {
-      toast.ok("Proxy bid placed", `We'll auto-bid up to ${formatEur(proxyMax)} on your behalf.`);
+      toast.ok("Proxy bid placed", `We'll auto-bid up to ${format(proxyMax)} on your behalf.`);
     } else {
-      toast.ok(t("auction.bidPlaced"), `${formatEur(amount)} on ${vehicleTitle}`);
+      toast.ok(t("auction.bidPlaced"), `${format(amount)} on ${vehicleTitle}`);
     }
   };
 
@@ -159,13 +162,13 @@ export function BidPanel({
   return (
     <div className="space-y-4">
       <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-md">
-        <div className="flex items-baseline justify-between gap-3">
+        <div className="flex flex-wrap items-baseline justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">
               {t("auction.currentBid")}
             </p>
             <p className="mt-1 text-3xl font-extrabold text-grey-900 sm:text-4xl tabular-nums">
-              {formatEur(currentBid)}
+              {format(currentBid)}
             </p>
           </div>
           {userHasBid && (
@@ -178,6 +181,9 @@ export function BidPanel({
               {isWinning ? t("auction.winning") : t("auction.outbid")}
             </Badge>
           )}
+        </div>
+        <div className="mt-3">
+          <CurrencyPills />
         </div>
 
         <div className="mt-2 flex items-center gap-3 text-sm text-grey-500">
@@ -196,7 +202,7 @@ export function BidPanel({
             {t("auction.yourBid")}
           </p>
           <p className="mt-1 text-xs text-grey-500">
-            {t("auction.minBid", { price: formatEur(minNext) })}
+            {t("auction.minBid", { price: format(minNext) })}
           </p>
           <div className="mt-3 flex gap-2">
             <Button variant="outline" size="icon-lg" aria-label="Decrease" onClick={() => adjust(-1)} disabled={!isAuthenticated || submitting || auctionEnded}>
@@ -248,7 +254,7 @@ export function BidPanel({
                     className="h-10 pl-7 text-sm tabular-nums"
                   />
                   <p className="mt-1 text-[11px] text-grey-500">
-                    We&apos;ll auto-bid €500 at a time on your behalf up to {formatEur(proxyMax)}.
+                    We&apos;ll auto-bid €500 at a time on your behalf up to {format(proxyMax)}. Other bidders won&apos;t see your limit.
                   </p>
                 </div>
               )}
@@ -283,7 +289,7 @@ export function BidPanel({
               <DialogTrigger render={
                 <Button variant="outline" size="lg" className="mt-2 h-12 w-full text-base">
                   <ShoppingCart className="size-4" />
-                  {t("auction.buyNowFor", { price: formatEur(buyNowPriceEur) })}
+                  {t("auction.buyNowFor", { price: format(buyNowPriceEur) })}
                 </Button>
               } />
               <DialogContent className="max-w-md">
@@ -291,7 +297,7 @@ export function BidPanel({
                   <DialogTitle>End the auction with Buy Now?</DialogTitle>
                   <DialogDescription>
                     You are about to purchase <span className="font-semibold text-grey-900">{vehicleTitle}</span> for{" "}
-                    <span className="font-semibold text-grey-900">{formatEur(buyNowPriceEur)}</span>.
+                    <span className="font-semibold text-grey-900">{format(buyNowPriceEur)}</span>.
                     This closes the auction immediately — other bidders will not be able to outbid you.
                   </DialogDescription>
                 </DialogHeader>
@@ -403,7 +409,7 @@ export function BidPanel({
                   </div>
                 </div>
                 <p className="shrink-0 text-sm font-bold tabular-nums text-grey-900">
-                  {formatEur(b.amount_eur)}
+                  {format(b.amount_eur)}
                 </p>
               </li>
             ))}

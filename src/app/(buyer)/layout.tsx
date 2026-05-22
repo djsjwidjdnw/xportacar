@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { BuyerNav } from "@/components/layout/BuyerNav";
 import { Footer } from "@/components/layout/Footer";
 import { WelcomeToast } from "@/components/shared/WelcomeToast";
+import { CurrencyProvider } from "@/lib/currency";
 import { createClient } from "@/lib/supabase/server";
 import type { Notification, Profile } from "@/types";
 
@@ -31,13 +32,13 @@ export default async function BuyerLayout({
   }
 
   return (
-    <>
+    <CurrencyProvider>
       <BuyerNav profile={profile} notifications={notifications} />
       <Suspense fallback={null}>
         <WelcomeToast />
       </Suspense>
       <main className="flex-1">{children}</main>
       <Footer />
-    </>
+    </CurrencyProvider>
   );
 }
