@@ -213,16 +213,18 @@ function FilterSelect({
   onChange: (v: string) => void;
   options: { value: string; label: string }[];
 }) {
+  // Base UI's SelectTrigger renders its first child as the visible
+  // label AND ALSO renders <SelectValue /> separately — passing both
+  // produces the doubled "ALL MAKES ALL MAKES" text. Render only the
+  // custom span and skip SelectValue here.
+  const selected = options.find((o) => o.value === value)?.label ?? value;
   return (
     <Select value={value} onValueChange={(v) => onChange(v as string)}>
       <SelectTrigger className="h-11 w-full justify-between">
-        <span className="truncate">
+        <span className="truncate text-left">
           <span className="text-grey-500">{label}: </span>
-          <span className="font-medium text-grey-900">
-            {options.find((o) => o.value === value)?.label ?? value}
-          </span>
+          <span className="font-medium text-grey-900">{selected}</span>
         </span>
-        <SelectValue className="hidden" />
       </SelectTrigger>
       <SelectContent>
         {options.map((o) => (

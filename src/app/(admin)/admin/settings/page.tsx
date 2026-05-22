@@ -4,25 +4,13 @@ import {
 } from "lucide-react";
 
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
+import { PlatformSettingsForm } from "@/components/admin/PlatformSettingsForm";
 import { isStripeConfigured } from "@/lib/stripe";
+import { loadPlatformSettings } from "@/lib/platform-settings";
 import { createClient } from "@/lib/supabase/server";
 import { formatNumber } from "@/lib/utils";
 
 export const metadata = { title: "Settings · Admin" };
-
-// Platform defaults — these mirror the constants used by the auction and
-// bid logic. Editable settings would land in a `platform_settings` table
-// once we have a UI to mutate them; for now this page surfaces the
-// current effective config so an admin can audit it at a glance.
-const PLATFORM_SETTINGS = {
-  name:                  "XportACar",
-  feePercentage:         5,
-  defaultAuctionDays:    7,
-  minBidIncrementEur:    100,   // matches lib/constants bidIncrement floor
-  reserveEnforced:       true,
-  proxyBiddingEnabled:   true,
-  buyNowEnabled:         true,
-};
 
 export default async function AdminSettingsPage() {
   const supabase = await createClient();
@@ -30,6 +18,9 @@ export default async function AdminSettingsPage() {
   // service-role client can read it. Falls back to "—" if not.
   const stripeOk = isStripeConfigured();
   const emailOk  = !!process.env.RESEND_API_KEY;
+
+  // Live, editable platform config loaded from the storage-backed JSON.
+  const settings = await loadPlatformSettings();
 
   // Counts for the storage panel (counts only — bytes require the storage
   // admin API which isn't accessible through createClient).
@@ -55,17 +46,26 @@ export default async function AdminSettingsPage() {
         </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Platform settings */}
-        <Section title="Platform" icon={Building2}>
-          <Setting label="Platform name"           value={PLATFORM_SETTINGS.name} />
-          <Setting label="Platform fee"            value={`${PLATFORM_SETTINGS.feePercentage}%`} />
-          <Setting label="Default auction duration" value={`${PLATFORM_SETTINGS.defaultAuctionDays} days`} />
-          <Setting label="Minimum bid increment"   value={`€${PLATFORM_SETTINGS.minBidIncrementEur}+`}
+      {/* Editable platform config — saves to Supabase Storage (JSON blob) */}
+      <section className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 flex items-center gap-2 text-base font-bold text-grey-900">
+          <Building2 className="size-4 text-brand-600" />
+          Platform configuration
+        </h2>
+        <p className="mb-6 text-xs text-grey-500">
+          These values are persisted under <code className="rounded bg-grey-100 px-1 py-0.5 text-[11px]">_internal/platform-settings.json</code> in Supabase Storage. Reads happen on every server render so changes take effect immediately.
+        </p>
+        <PlatformSettingsForm initial={settings} />
+      </section>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        {/* Read-only flags from the same config blob */}
+        <Section title="Auction features" icon={Building2}>
+          <Setting label="Reserve price"  value={settings.reserveEnforced     ? "Enforced" : "Disabled"} status={settings.reserveEnforced ? "ok" : "warn"} />
+          <Setting label="Proxy bidding"  value={settings.proxyBiddingEnabled ? "Enabled"  : "Disabled"} status={settings.proxyBiddingEnabled ? "ok" : "warn"} />
+          <Setting label="Buy-now"        value={settings.buyNowEnabled       ? "Enabled"  : "Disabled"} status={settings.buyNowEnabled ? "ok" : "warn"} />
+          <Setting label="Min bid increment" value={`€${settings.minBidIncrementEur}+`}
                    hint="Tiered: €100 / €250 / €500 / €1k / €2.5k by current bid band" />
-          <Setting label="Reserve price"           value={PLATFORM_SETTINGS.reserveEnforced ? "Enforced" : "Disabled"} status={PLATFORM_SETTINGS.reserveEnforced ? "ok" : "warn"} />
-          <Setting label="Proxy bidding"           value={PLATFORM_SETTINGS.proxyBiddingEnabled ? "Enabled" : "Disabled"} status={PLATFORM_SETTINGS.proxyBiddingEnabled ? "ok" : "warn"} />
-          <Setting label="Buy-now"                 value={PLATFORM_SETTINGS.buyNowEnabled ? "Enabled" : "Disabled"} status={PLATFORM_SETTINGS.buyNowEnabled ? "ok" : "warn"} />
         </Section>
 
         {/* Email */}
@@ -106,7 +106,7 @@ export default async function AdminSettingsPage() {
       {/* Footnote */}
       <p className="mt-8 flex items-center gap-2 rounded-xl border border-grey-200 bg-grey-50 px-4 py-3 text-xs text-grey-600">
         <Database className="size-3.5 shrink-0" />
-        These values are read-only for now. A dedicated platform_settings table will land in the next admin pass so you can edit them inline.
+        Saved to <code className="rounded bg-white px-1 py-0.5 text-[11px]">vehicle-photos/_internal/platform-settings.json</code> in Supabase Storage. Falls back to baked-in defaults if the file is missing.
       </p>
     </div>
   );
