@@ -8,6 +8,7 @@ import { LandingHeading } from "@/components/landing/LandingHeading";
 import { LandingFeatureGrid } from "@/components/landing/LandingFeatureGrid";
 import { LandingHowItWorks } from "@/components/landing/LandingHowItWorks";
 import { LandingCta } from "@/components/landing/LandingCta";
+import { TrustBadges } from "@/components/landing/TrustBadges";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "@/i18n/server";
@@ -43,7 +44,10 @@ export default async function HomePage() {
     <>
       {/* ----------------------------- HERO ----------------------------- */}
       <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white">
+        {/* Faint grid + soft radial glow overlay — adds depth without
+            distracting from the headline / photo mosaic. */}
         <div className="absolute inset-0 -z-10 bg-grid-faint [mask-image:radial-gradient(ellipse_at_top,black_20%,transparent_70%)]" />
+        <div className="absolute -top-32 left-1/2 -z-10 size-[60rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-300/30 via-brand-200/20 to-transparent blur-3xl" />
         <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-12 lg:gap-8 lg:px-8 lg:py-28">
           <div className="lg:col-span-7">
             <Badge variant="outline" className="mb-5 border-brand-200 bg-brand-50 text-brand-700">
@@ -58,14 +62,20 @@ export default async function HomePage() {
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/marketplace"
-                className={cn(buttonVariants({ variant: "default", size: "lg" }), "h-12 px-6 text-base")}
+                className={cn(
+                  buttonVariants({ variant: "default", size: "lg" }),
+                  "group h-14 px-7 text-base font-bold shadow-lg shadow-brand-500/25 transition-all hover:shadow-xl hover:shadow-brand-500/40 hover:-translate-y-0.5",
+                )}
               >
                 {t("heroCta")}
-                <ArrowRight className="ml-1 size-4" />
+                <ArrowRight className="ml-1 size-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <Link
                 href="#how"
-                className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-12 px-6 text-base")}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "lg" }),
+                  "h-14 px-7 text-base font-semibold transition-colors hover:bg-grey-50",
+                )}
               >
                 {t("heroCtaSecondary")}
               </Link>
@@ -103,6 +113,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* -------------------------- TRUST BADGES ------------------------- */}
+      <TrustBadges />
 
       {/* --------------------------- FEATURES --------------------------- */}
       <section className="border-t border-grey-200 bg-white py-20">

@@ -6,6 +6,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { StatCard } from "@/components/admin/StatCard";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
 import { formatEur, formatRelativeTime } from "@/lib/utils";
@@ -95,6 +96,7 @@ export default async function BuyerDashboardPage() {
   return (
     <div className="bg-grey-50 py-10">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <Breadcrumbs className="mb-5" items={[{ label: t("myBids") }]} />
         <header className="mb-8 flex items-center gap-3">
           <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand-700 ring-1 ring-brand-100">
             <Gavel className="size-5" />

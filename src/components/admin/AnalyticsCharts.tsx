@@ -11,10 +11,10 @@ const eurFmt = new Intl.NumberFormat("en-GB", { style: "currency", currency: "EU
 
 export function AuctionsCompletedChart({ data }: { data: { week: string; count: number }[] }) {
   return (
-    <div className="rounded-2xl border border-grey-200 bg-white p-5 shadow-xs">
+    <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
       <h3 className="mb-1 text-sm font-bold text-grey-900">Auctions completed</h3>
       <p className="mb-4 text-xs text-grey-500">Last 8 weeks</p>
-      <ResponsiveContainer width="100%" height={220}>
+      <ResponsiveContainer width="100%" height={280}>
         <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 4 }}>
           <CartesianGrid stroke="#eaecf0" strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="week" tick={{ fontSize: 11, fill: "#667085" }} tickLine={false} axisLine={false} />
@@ -29,10 +29,10 @@ export function AuctionsCompletedChart({ data }: { data: { week: string; count: 
 
 export function RevenueByMonthChart({ data }: { data: { month: string; revenue: number }[] }) {
   return (
-    <div className="rounded-2xl border border-grey-200 bg-white p-5 shadow-xs">
+    <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
       <h3 className="mb-1 text-sm font-bold text-grey-900">Revenue</h3>
       <p className="mb-4 text-xs text-grey-500">Monthly hammer + platform fee, last 6 months</p>
-      <ResponsiveContainer width="100%" height={220}>
+      <ResponsiveContainer width="100%" height={280}>
         <LineChart data={data} margin={{ top: 8, right: 16, left: 0, bottom: 4 }}>
           <CartesianGrid stroke="#eaecf0" strokeDasharray="3 3" vertical={false} />
           <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#667085" }} tickLine={false} axisLine={false} />
@@ -51,10 +51,10 @@ export function RevenueByMonthChart({ data }: { data: { month: string; revenue: 
 export function VehiclesByStatusChart({ data }: { data: { status: string; count: number }[] }) {
   const total = data.reduce((s, d) => s + d.count, 0);
   return (
-    <div className="rounded-2xl border border-grey-200 bg-white p-5 shadow-xs">
+    <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
       <h3 className="mb-1 text-sm font-bold text-grey-900">Vehicles by status</h3>
       <p className="mb-4 text-xs text-grey-500">{total} vehicles total</p>
-      <ResponsiveContainer width="100%" height={220}>
+      <ResponsiveContainer width="100%" height={280}>
         <PieChart>
           <Pie data={data} dataKey="count" nameKey="status" innerRadius={50} outerRadius={80} paddingAngle={2}>
             {data.map((_, i) => <Cell key={i} fill={PALETTE[i % PALETTE.length]} />)}

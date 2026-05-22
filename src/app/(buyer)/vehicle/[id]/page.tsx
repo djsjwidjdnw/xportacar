@@ -1,9 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, Gavel, Hourglass, MapPin, Sparkles } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { ShippingOptions } from "@/components/vehicle/ShippingOptions";
@@ -15,6 +17,52 @@ import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
 import { cn, formatEur } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
+
+// Generate OG/Twitter metadata per vehicle so shared links render with
+// the car's photo + title + asking price.
+export async function generateMetadata(
+  { params }: { params: Promise<{ id: string }> },
+): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("vehicles")
+    .select(`
+      year, make, model, location_city, location_country, listed_price_eur,
+      vehicle_photos ( url, sort_order )
+    `)
+    .eq("id", id)
+    .single();
+  if (!data) return { title: "Vehicle not found" };
+  // deno-lint-ignore no-explicit-any
+  const v = data as any;
+  const photo = (v.vehicle_photos ?? [])
+    .slice()
+    .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)[0];
+  const title = `${v.year} ${v.make} ${v.model}`;
+  const description = [
+    `${v.year} ${v.make} ${v.model} — auctioned from ${v.location_city}, ${v.location_country}.`,
+    v.listed_price_eur ? `Listed from €${Number(v.listed_price_eur).toLocaleString("en-GB")}.` : "",
+    "Inspected by XportACar's UAE field team and shipped door-to-port across the EU.",
+  ].filter(Boolean).join(" ");
+
+  return {
+    title,
+    description,
+    openGraph: {
+      type: "website",
+      title,
+      description,
+      images: photo ? [{ url: photo.url, width: 1200, height: 800, alt: title }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: photo ? [photo.url] : undefined,
+    },
+  };
+}
 
 export default async function VehicleDetailPage({
   params,
@@ -61,15 +109,49 @@ export default async function VehicleDetailPage({
 
   const auctionLive = auction?.status === "active";
 
+  // JSON-LD Vehicle structured data — Google enriches listings with
+  // mileage / fuel / price when this is present.
+  const jsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "Vehicle",
+    name: `${v.year} ${v.make} ${v.model}`,
+    brand:  { "@type": "Brand", name: v.make },
+    model:  v.model,
+    vehicleIdentificationNumber: v.vin,
+    modelDate: v.year,
+    bodyType: v.body_type ?? undefined,
+    fuelType: v.fuel_type,
+    vehicleTransmission: v.transmission,
+    color: v.exterior_color ?? undefined,
+    mileageFromOdometer: v.mileage_km ? { "@type": "QuantitativeValue", value: v.mileage_km, unitCode: "KMT" } : undefined,
+    image: photos.map((p) => p.url),
+    offers: headlinePrice
+      ? {
+          "@type": "Offer",
+          priceCurrency: "EUR",
+          price: headlinePrice,
+          itemCondition: "https://schema.org/UsedCondition",
+          availability: auctionLive ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+          seller: { "@type": "Organization", name: "XportACar" },
+          areaServed: ["Germany", "Netherlands", "Italy", "Spain", "France", "Austria", "Belgium"],
+        }
+      : undefined,
+  };
+
   return (
     <div className="bg-grey-50 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Breadcrumb / back */}
-        <nav aria-label="Breadcrumb" className="mb-6 text-sm">
-          <Link href="/marketplace" className="text-grey-500 hover:text-brand-600">
-            ← {t("nav.marketplace")}
-          </Link>
-        </nav>
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { href: "/marketplace", label: t("nav.marketplace") },
+            { label: `${v.year} ${v.make} ${v.model}` },
+          ]}
+        />
 
         {/* Above-the-fold CTA — visible before the user scrolls.
             Auction live → current bid + "Go to Auction" button.

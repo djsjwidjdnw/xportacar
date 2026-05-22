@@ -21,16 +21,28 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+const SITE_TITLE = "XportACar — UAE-to-EU Online Car Auctions";
+const SITE_DESCRIPTION =
+  "Premium UAE vehicles, inspected and auctioned to verified European trade buyers. Door-to-door logistics included.";
+
 export const metadata: Metadata = {
   title: {
-    default: "XportACar — UAE-to-EU Online Car Auctions",
+    default: SITE_TITLE,
     template: "%s · XportACar",
   },
-  description:
-    "Premium UAE vehicles, inspected and auctioned to verified European trade buyers. Door-to-door logistics included.",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  description: SITE_DESCRIPTION,
+  metadataBase: new URL(SITE_URL),
   manifest: "/manifest.json",
   applicationName: "XportACar",
+  keywords: [
+    "UAE car auction", "Dubai cars", "import car Europe",
+    "RoRo shipping", "German TÜV", "European trade buyers",
+    "luxury car auction", "Mercedes Dubai", "BMW UAE", "Porsche UAE",
+  ],
+  authors: [{ name: "XportACar" }],
+  creator: "XportACar",
+  publisher: "XportACar",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -43,6 +55,34 @@ export const metadata: Metadata = {
       { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+  openGraph: {
+    type: "website",
+    siteName: "XportACar",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    locale: "en_GB",
+    alternateLocale: ["de_DE", "fr_FR", "ar_AE"],
+    images: [
+      {
+        url: "/icons/icon-512.png",
+        width: 512,
+        height: 512,
+        alt: "XportACar logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    images: ["/icons/icon-512.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
   other: {
     "mobile-web-app-capable": "yes",

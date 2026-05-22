@@ -214,3 +214,10 @@
   .scrollbar-thin::-webkit-scrollbar-thumb { background: var(--color-grey-300); border-radius: 999px; }
   .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: var(--color-grey-400); }
 }
+
+/* Shimmer animation used by the Skeleton component — sweeps a soft white
+   highlight from left to right across the placeholder block. */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}

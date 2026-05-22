@@ -6,12 +6,14 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { KanbanPipeline } from "@/components/admin/KanbanPipeline";
+import { QuickActions } from "@/components/admin/QuickActions";
 import { StatCard } from "@/components/admin/StatCard";
 import {
   AuctionsCompletedChart,
   RevenueByMonthChart,
   VehiclesByStatusChart,
 } from "@/components/admin/AnalyticsCharts";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
@@ -124,6 +126,7 @@ export default async function AdminDashboardPage() {
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
+      <Breadcrumbs className="mb-5" items={[{ label: t("dashboardTitle") }]} />
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-grey-900">
@@ -140,7 +143,7 @@ export default async function AdminDashboardPage() {
         </Link>
       </header>
 
-      {/* Stat cards */}
+      {/* Stat cards — consistent shadow + spacing */}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label={t("statActiveVehicles")}   value={String(activeVehicles)}    iconName="car"        delta={{ value: "+12%", positive: true }} accent="brand" />
         <StatCard label={t("statLiveAuctions")}     value={String(liveAuctions ?? 0)} iconName="gavel"      delta={{ value: "+3",   positive: true }} accent="warning" />
@@ -148,8 +151,13 @@ export default async function AdminDashboardPage() {
         <StatCard label={t("statRegisteredBuyers")} value={String(buyers ?? 0)}       iconName="users"      delta={{ value: "+24",  positive: true }} accent="brand" />
       </section>
 
-      {/* Analytics */}
-      <section className="mt-10 grid gap-4 lg:grid-cols-3">
+      {/* Quick actions */}
+      <section className="mt-8">
+        <QuickActions />
+      </section>
+
+      {/* Analytics — bigger charts, more breathing room */}
+      <section className="mt-10 grid gap-6 lg:grid-cols-3">
         <AuctionsCompletedChart data={auctionsByWeek} />
         <RevenueByMonthChart   data={revenueByMonth} />
         <VehiclesByStatusChart data={vehiclesByStatus} />

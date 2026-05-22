@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { Mail, Phone, MapPin } from "lucide-react";
+
 import { Logo } from "@/components/shared/Logo";
 import { useTranslations } from "@/i18n/provider";
 
@@ -11,33 +13,63 @@ export function Footer() {
   return (
     <footer className="border-t border-grey-200 bg-grey-50 mt-auto">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-4">
-          <div className="md:col-span-1">
+        <div className="grid gap-10 lg:grid-cols-12">
+          {/* Brand + tagline + contact strip */}
+          <div className="lg:col-span-5">
             <Logo />
-            <p className="mt-4 max-w-xs text-sm text-grey-600">
+            <p className="mt-4 max-w-sm text-sm leading-relaxed text-grey-600">
               {t("footerTagline")}
             </p>
+            <ul className="mt-6 space-y-2.5 text-sm">
+              <li>
+                <a href="mailto:hello@xportacar.com" className="inline-flex items-center gap-2 text-grey-700 transition-colors hover:text-brand-700">
+                  <Mail className="size-4 text-grey-500" />
+                  hello@xportacar.com
+                </a>
+              </li>
+              <li>
+                <a href="tel:+97140000000" className="inline-flex items-center gap-2 text-grey-700 transition-colors hover:text-brand-700">
+                  <Phone className="size-4 text-grey-500" />
+                  +971 4 000 0000
+                </a>
+              </li>
+              <li className="inline-flex items-center gap-2 text-grey-700">
+                <MapPin className="size-4 text-grey-500" />
+                Dubai Investments Park, UAE
+              </li>
+            </ul>
           </div>
 
-          <FooterCol title={t("footerCol1")} links={[
-            { href: "/marketplace", label: t("footerLinkMarketplace") },
-            { href: "/auctions",    label: t("footerLinkAuctions") },
-          ]}/>
+          {/* Three nav columns */}
+          <div className="grid gap-8 sm:grid-cols-3 lg:col-span-7">
+            <FooterCol title={t("footerCol1")} links={[
+              { href: "/marketplace", label: t("footerLinkMarketplace") },
+              { href: "/auctions",    label: t("footerLinkAuctions") },
+              { href: "/watchlist",   label: "Watchlist" },
+              { href: "/dashboard",   label: "Dashboard" },
+            ]}/>
 
-          <FooterCol title={t("footerCol2")} links={[
-            { href: "/about",   label: t("footerLinkAbout") },
-            { href: "/contact", label: t("footerLinkContact") },
-          ]}/>
+            <FooterCol title={t("footerCol2")} links={[
+              { href: "/about",   label: t("footerLinkAbout") },
+              { href: "/contact", label: t("footerLinkContact") },
+              { href: "/help",    label: t("footerLinkHelp") },
+              { href: "#how",     label: "How it works" },
+            ]}/>
 
-          <FooterCol title={t("footerCol3")} links={[
-            { href: "/help",    label: t("footerLinkHelp") },
-            { href: "/terms",   label: t("footerLinkTerms") },
-            { href: "/privacy", label: t("footerLinkPrivacy") },
-          ]}/>
+            <FooterCol title={t("footerCol3")} links={[
+              { href: "/terms",   label: t("footerLinkTerms") },
+              { href: "/privacy", label: t("footerLinkPrivacy") },
+              { href: "/cookies", label: "Cookie policy" },
+              { href: "/imprint", label: "Imprint" },
+            ]}/>
+          </div>
         </div>
 
-        <div className="mt-12 border-t border-grey-200 pt-6 text-center text-xs text-grey-500">
-          {t("footerCopy", { year })}
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-grey-200 pt-6 text-xs text-grey-500">
+          <p>{t("footerCopy", { year })}</p>
+          <p className="text-grey-400">
+            UAE → EUROPE · Inspected · Auctioned · Delivered
+          </p>
         </div>
       </div>
     </footer>
@@ -52,11 +84,11 @@ function FooterCol({
 }) {
   return (
     <div>
-      <h4 className="text-sm font-semibold text-grey-900">{title}</h4>
+      <h4 className="text-sm font-bold text-grey-900">{title}</h4>
       <ul className="mt-4 space-y-3">
         {links.map((l) => (
-          <li key={l.href}>
-            <Link href={l.href} className="text-sm text-grey-600 transition-colors hover:text-brand-600">
+          <li key={`${l.href}-${l.label}`}>
+            <Link href={l.href} className="text-sm text-grey-600 transition-colors hover:text-brand-700">
               {l.label}
             </Link>
           </li>

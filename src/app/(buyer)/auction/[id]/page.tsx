@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { BidPanel } from "@/components/auction/BidPanel";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
@@ -56,13 +56,14 @@ export default async function AuctionPage({
   return (
     <div className="bg-grey-50 py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Link
-          href={`/vehicle/${v.id}`}
-          className="mb-6 inline-flex items-center gap-1 text-sm text-grey-500 hover:text-brand-600"
-        >
-          <ChevronLeft className="size-4" />
-          {vehicleTitle}
-        </Link>
+        <Breadcrumbs
+          className="mb-6"
+          items={[
+            { href: "/marketplace", label: t("nav.marketplace") },
+            { href: `/vehicle/${v.id}`, label: vehicleTitle },
+            { label: "Auction" },
+          ]}
+        />
 
         <div className="grid gap-8 lg:grid-cols-12">
           <div className="lg:col-span-8 space-y-6">
