@@ -90,6 +90,91 @@ export async function assignInspectorAction(
 
   revalidatePath("/admin/dashboard");
   revalidatePath("/admin/vehicles");
+  revalidatePath("/admin/inspections");
   revalidatePath(`/admin/vehicles/${vehicleId}`);
+  return { ok: true };
+}
+
+// --------------------------------------------------------------------
+// User role assignment (admin → admin/buyer/inspector/superadmin)
+// --------------------------------------------------------------------
+const ALLOWED_ROLES = ["buyer", "inspector", "admin", "superadmin"] as const;
+type Role = (typeof ALLOWED_ROLES)[number];
+
+export async function setUserRoleAction(
+  userId: string,
+  role: Role,
+): Promise<AdminResult> {
+  if (!ALLOWED_ROLES.includes(role)) return { ok: false, error: "Invalid role." };
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+  if (user.id === userId && role !== "superadmin" && role !== "admin") {
+    return { ok: false, error: "You can't demote yourself." };
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles").select("role").eq("id", user.id).single();
+  if (!profile || !["admin", "superadmin"].includes(profile.role)) {
+    return { ok: false, error: "Admin only." };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ role })
+    .eq("id", userId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/users");
+  return { ok: true };
+}
+
+// --------------------------------------------------------------------
+// KYC inline approve / reject  (sets profiles.kyc_status)
+// --------------------------------------------------------------------
+const ALLOWED_KYC = ["pending", "verified", "rejected"] as const;
+type KycStatus = (typeof ALLOWED_KYC)[number];
+
+export async function setUserKycStatusAction(
+  userId: string,
+  kycStatus: KycStatus,
+): Promise<AdminResult> {
+  if (!ALLOWED_KYC.includes(kycStatus)) return { ok: false, error: "Invalid KYC status." };
+
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { data: profile } = await supabase
+    .from("profiles").select("role").eq("id", user.id).single();
+  if (!profile || !["admin", "superadmin"].includes(profile.role)) {
+    return { ok: false, error: "Admin only." };
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ kyc_status: kycStatus })
+    .eq("id", userId);
+  if (error) return { ok: false, error: error.message };
+
+  // Notification — close the loop with the buyer.
+  await supabase.from("notifications").insert({
+    user_id: userId,
+    type:    "status_update",
+    title:   kycStatus === "verified"
+      ? "Your account is verified"
+      : kycStatus === "rejected"
+        ? "KYC verification was rejected"
+        : "KYC review pending",
+    body: kycStatus === "verified"
+      ? "Welcome aboard — you can now bid on live auctions."
+      : kycStatus === "rejected"
+        ? "Our compliance team rejected your submission. Please re-upload clear documents."
+        : "Your account has been moved back to pending review.",
+  });
+
+  revalidatePath("/admin/users");
+  revalidatePath("/admin/kyc");
   return { ok: true };
 }
