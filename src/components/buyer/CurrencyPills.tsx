@@ -7,7 +7,7 @@ export function CurrencyPills({ className }: { className?: string }) {
   const { currency, setCurrency } = useCurrency();
   return (
     <div className={cn(
-      "inline-flex items-center gap-1 rounded-full bg-grey-100 p-1",
+      "inline-flex flex-wrap items-center gap-1 rounded-full bg-grey-100 p-1",
       className,
     )}>
       {CURRENCIES.map((c) => {

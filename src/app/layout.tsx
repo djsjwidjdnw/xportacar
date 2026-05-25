@@ -7,6 +7,7 @@ import { messages, direction } from "@/i18n";
 import { resolveLocale } from "@/i18n/server";
 import { Toaster } from "@/components/ui/toast";
 import { ServiceWorkerRegistrar } from "@/components/shared/ServiceWorkerRegistrar";
+import { AppDownloadBanner } from "@/components/shared/AppDownloadBanner";
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -122,6 +123,7 @@ export default async function RootLayout({
       >
         <I18nProvider locale={locale} messages={messages[locale]}>
           <Toaster>{children}</Toaster>
+          <AppDownloadBanner />
         </I18nProvider>
         <ServiceWorkerRegistrar />
       </body>

@@ -29,7 +29,7 @@ export default async function WatchlistPage() {
     `)
     .eq("user_id", user.id);
 
-  const rows = (watchlist ?? []) as { vehicle: Record<string, unknown> | null }[];
+  const rows = (watchlist ?? []) as unknown as { vehicle: Record<string, unknown> | null }[];
   const all = normalizeVehicleRows(
     rows.map((r) => r.vehicle).filter((v): v is Record<string, unknown> => Boolean(v)),
   );

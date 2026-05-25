@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Gavel, ShoppingCart, MessageSquare, TrendingUp, Trophy, ArrowRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ComponentProps } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,34 @@ import {
   placeCounterOfferAction,
 } from "@/app/(buyer)/auction/actions";
 import type { Auction, BidWithBidder } from "@/types";
+
+// Euro-prefixed numeric field. A flex "input group": the € is a real inline
+// element to the left of a borderless input, so the symbol always sits beside
+// the field — it can never wrap onto its own line the way an absolutely
+// positioned overlay could.
+function EuroInput({
+  heightClass = "h-11",
+  textClass = "text-base",
+  className,
+  ...props
+}: ComponentProps<typeof Input> & { heightClass?: string; textClass?: string }) {
+  return (
+    <div className={cn(
+      "flex items-center gap-1 rounded-lg border border-input bg-transparent pl-3 transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50",
+      heightClass,
+      className,
+    )}>
+      <span className="select-none text-grey-400">€</span>
+      <Input
+        {...props}
+        className={cn(
+          "h-full flex-1 border-0 bg-transparent px-0 pr-3 shadow-none tabular-nums focus-visible:border-0 focus-visible:ring-0",
+          textClass,
+        )}
+      />
+    </div>
+  );
+}
 
 export function BidPanel({
   auction: initialAuction,
@@ -249,19 +277,16 @@ export function BidPanel({
             <Button variant="outline" size="icon-lg" aria-label="Decrease" onClick={() => adjust(-1)} disabled={!isAuthenticated || submitting || auctionEnded}>
               <Minus className="size-4" />
             </Button>
-            <div className="relative flex-1">
-              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-grey-400">€</span>
-              <Input
-                type="number"
-                inputMode="numeric"
-                value={amount}
-                min={minNext}
-                step={bidIncrement(currentBid)}
-                onChange={(e) => setAmount(Math.max(0, Number(e.currentTarget.value || 0)))}
-                disabled={!isAuthenticated || submitting || auctionEnded}
-                className="h-11 pl-7 text-base tabular-nums"
-              />
-            </div>
+            <EuroInput
+              className="flex-1"
+              type="number"
+              inputMode="numeric"
+              value={amount}
+              min={minNext}
+              step={bidIncrement(currentBid)}
+              onChange={(e) => setAmount(Math.max(0, Number(e.currentTarget.value || 0)))}
+              disabled={!isAuthenticated || submitting || auctionEnded}
+            />
             <Button variant="outline" size="icon-lg" aria-label="Increase" onClick={() => adjust(1)} disabled={!isAuthenticated || submitting || auctionEnded}>
               <Plus className="size-4" />
             </Button>
@@ -282,9 +307,10 @@ export function BidPanel({
                 Set maximum bid (auto-outbid up to)
               </label>
               {proxyOn && (
-                <div className="mt-2 relative">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-grey-400">€</span>
-                  <Input
+                <div className="mt-2">
+                  <EuroInput
+                    heightClass="h-10"
+                    textClass="text-sm"
                     type="number"
                     inputMode="numeric"
                     value={proxyMax}
@@ -292,7 +318,6 @@ export function BidPanel({
                     step={500}
                     onChange={(e) => setProxyMax(Math.max(amount, Number(e.currentTarget.value || 0)))}
                     disabled={submitting}
-                    className="h-10 pl-7 text-sm tabular-nums"
                   />
                   <p className="mt-1 text-[11px] text-grey-500">
                     We&apos;ll auto-bid €500 at a time on your behalf up to {format(proxyMax)}. Other bidders won&apos;t see your limit.
@@ -373,18 +398,14 @@ export function BidPanel({
                 <div className="space-y-3">
                   <label className="block text-sm">
                     <span className="block mb-1 text-xs font-medium text-grey-700">Your offer (EUR)</span>
-                    <div className="relative">
-                      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-grey-400">€</span>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        value={counterAmount}
-                        min={1}
-                        step={500}
-                        onChange={(e) => setCounterAmount(Math.max(0, Number(e.currentTarget.value || 0)))}
-                        className="h-11 pl-7 text-base tabular-nums"
-                      />
-                    </div>
+                    <EuroInput
+                      type="number"
+                      inputMode="numeric"
+                      value={counterAmount}
+                      min={1}
+                      step={500}
+                      onChange={(e) => setCounterAmount(Math.max(0, Number(e.currentTarget.value || 0)))}
+                    />
                   </label>
                   <label className="block text-sm">
                     <span className="block mb-1 text-xs font-medium text-grey-700">Message (optional)</span>
