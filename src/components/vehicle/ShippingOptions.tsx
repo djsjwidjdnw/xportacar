@@ -149,7 +149,7 @@ export function ShippingOptions({
             <Ship className="size-3.5" />
             Nearest Port Delivery (RoRo from Jebel Ali)
           </div>
-          <div className="grid gap-1.5 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {PORT_OPTIONS.map((p) => {
               const active = choice.kind === "port" && choice.port === p.port;
               return (

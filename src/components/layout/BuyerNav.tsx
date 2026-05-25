@@ -157,8 +157,8 @@ export function BuyerNav({
           {/* Mobile menu */}
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger render={
-              <Button variant="ghost" size="icon" className="md:hidden" aria-label="Menu">
-                {open ? <X className="size-5" /> : <Menu className="size-5" />}
+              <Button variant="ghost" size="icon" className="size-10 shrink-0 md:hidden" aria-label="Menu">
+                {open ? <X className="size-6" /> : <Menu className="size-6" />}
               </Button>
             } />
             <SheetContent side="right" className="w-[280px] p-0">

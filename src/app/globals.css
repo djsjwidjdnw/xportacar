@@ -178,10 +178,15 @@
   }
   html {
     @apply font-sans;
+    /* Prevent any element from causing horizontal scroll at mobile widths.
+       `clip` (not `hidden`) so it doesn't become a scroll container and
+       break the sticky nav's `position: sticky`. */
+    overflow-x: clip;
   }
   body {
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);

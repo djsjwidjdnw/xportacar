@@ -71,7 +71,7 @@ export default async function AuctionsPage() {
             <p className="mt-1 text-sm text-grey-500">Next batch is being inspected — check back tomorrow.</p>
           </div>
         ) : (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {list.map((v) => (
               <VehicleCard
                 key={v.id}
