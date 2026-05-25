@@ -35,7 +35,12 @@
     "cancel": "Annuler",
     "back": "Retour",
     "next": "Suivant",
-    "previous": "Précédent"
+    "previous": "Précédent",
+    "bidNow": "Enchérir",
+    "endingSoon": "Se termine bientôt",
+    "comingSoon": "Bientôt",
+    "comingSoonStarts": "Bientôt — début {date}",
+    "viewResult": "Voir le résultat"
   },
   "landing": {
     "navAbout": "À propos",
@@ -156,7 +161,11 @@
     "wonTitle": "Vous avez remporté cette enchère !",
     "wonSubtitle": "Votre achat est enregistré. Notre équipe vous contactera très bientôt pour le paiement et la livraison.",
     "wonAmount": "Montant gagnant",
-    "wonAuctionLink": "Voir l'enchère"
+    "wonAuctionLink": "Voir l'enchère",
+    "ended": "Terminée",
+    "wonCta": "Voir la facture et payer",
+    "outbidEnded": "Enchère terminée — vous avez été surenchéri",
+    "endedNoBid": "Cette enchère est terminée"
   },
   "auth": {
     "loginTitle": "Bon retour",

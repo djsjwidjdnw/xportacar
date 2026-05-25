@@ -3,9 +3,11 @@ import { Search } from "lucide-react";
 import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
 import { SaveSearchButton } from "@/components/marketplace/SaveSearchButton";
 import { VehicleCard } from "@/components/marketplace/VehicleCard";
+import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRows } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
+import { auctionPhase } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
 
 interface SearchParams {
@@ -95,14 +97,20 @@ export default async function MarketplacePage({
     watchSet = new Set((w ?? []).map((r) => (r as { vehicle_id: string }).vehicle_id));
   }
 
-  // Default sort "ending soon" — sort in JS so we can sort by joined auction.end_time.
+  // Default sort "ending soon" — sort in JS so we can sort by joined auction
+  // end_time.  Only genuinely-live auctions (end_time still in the future)
+  // count as "ending soon"; ended ones sink to the bottom.
   if ((sp.sort ?? "ending_soon") === "ending_soon") {
+    const liveEnd = (v: VehicleWithMedia) => {
+      const a = v.auctions[0];
+      return auctionPhase(a) === "live" ? new Date(a.end_time).getTime() : null;
+    };
     list.sort((a, b) => {
-      const ae = a.auctions.find((x) => x.status === "active")?.end_time;
-      const be = b.auctions.find((x) => x.status === "active")?.end_time;
-      if (ae && be) return new Date(ae).getTime() - new Date(be).getTime();
-      if (ae) return -1;
-      if (be) return 1;
+      const ae = liveEnd(a);
+      const be = liveEnd(b);
+      if (ae != null && be != null) return ae - be;
+      if (ae != null) return -1;
+      if (be != null) return 1;
       return 0;
     });
   }
@@ -123,9 +131,12 @@ export default async function MarketplacePage({
           <MarketplaceFilters />
         </div>
 
-        <div className="mt-4 flex items-center justify-between text-sm text-grey-600">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-grey-600">
           <span>{t("marketplace.resultsCount", { count: list.length })}</span>
-          <SaveSearchButton isAuthenticated={!!user} />
+          <div className="flex items-center gap-3">
+            <CurrencyPills />
+            <SaveSearchButton isAuthenticated={!!user} />
+          </div>
         </div>
 
         {error ? (

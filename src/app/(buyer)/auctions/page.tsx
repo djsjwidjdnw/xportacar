@@ -1,9 +1,11 @@
 import { Gavel } from "lucide-react";
 
 import { VehicleCard } from "@/components/marketplace/VehicleCard";
+import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRows } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
+import { auctionPhase } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
 
 export const metadata = { title: "Live auctions" };
@@ -23,7 +25,10 @@ export default async function AuctionsPage() {
     .eq("status", "in_auction")
     .eq("auctions.status", "active");
 
-  const list: VehicleWithMedia[] = normalizeVehicleRows(data as unknown as Record<string, unknown>[]);
+  // Exclude any auction whose end_time has already passed — the DB status can
+  // lag, so "active" alone isn't enough to call it live.
+  const list: VehicleWithMedia[] = normalizeVehicleRows(data as unknown as Record<string, unknown>[])
+    .filter((v) => auctionPhase(v.auctions[0]) === "live");
   list.sort((a, b) => {
     const ae = a.auctions[0]?.end_time;
     const be = b.auctions[0]?.end_time;
@@ -42,7 +47,7 @@ export default async function AuctionsPage() {
   return (
     <div className="bg-grey-50 py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <header className="mb-8 flex items-center gap-3">
+        <header className="mb-8 flex flex-wrap items-center gap-3">
           <span className="grid size-10 place-items-center rounded-xl bg-error-50 text-error-600 ring-1 ring-error-100">
             <Gavel className="size-5" />
           </span>
@@ -53,6 +58,9 @@ export default async function AuctionsPage() {
             <p className="text-grey-600">
               {t("marketplace.resultsCount", { count: list.length })} · {t("common.live")}
             </p>
+          </div>
+          <div className="ml-auto">
+            <CurrencyPills />
           </div>
         </header>
 

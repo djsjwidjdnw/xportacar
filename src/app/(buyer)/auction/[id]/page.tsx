@@ -9,6 +9,7 @@ import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
+import { auctionPhase } from "@/lib/utils";
 import type { Auction, BidWithBidder, VehicleWithMedia } from "@/types";
 
 export default async function AuctionPage({
@@ -52,6 +53,7 @@ export default async function AuctionPage({
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((p) => ({ url: p.url, caption: p.caption }));
   const vehicleTitle = `${v.year} ${v.make} ${v.model}`;
+  const phase = auctionPhase(auction);
 
   return (
     <div className="bg-grey-50 py-10">
@@ -71,11 +73,17 @@ export default async function AuctionPage({
 
             <header>
               <div className="flex items-center gap-2">
-                {auction.status === "active" && (
+                {phase === "live" && (
                   <Badge className="bg-error-50 text-error-700 ring-1 ring-error-100">
                     <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-error-600" />
                     {t("common.live")}
                   </Badge>
+                )}
+                {phase === "ended" && (
+                  <Badge className="bg-grey-800 text-white">{t("common.ended")}</Badge>
+                )}
+                {phase === "scheduled" && (
+                  <Badge variant="outline" className="bg-white text-grey-700">{t("common.scheduled")}</Badge>
                 )}
                 <Badge variant="outline" className="border-grey-200 text-grey-600">
                   {v.body_type}

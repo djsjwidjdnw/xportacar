@@ -1,16 +1,18 @@
 "use client";
 
 // Right-rail sticky price card on the vehicle detail page.
-// Lives client-side so the currency selector can update its prices live.
+// Lives client-side so the currency selector can update its prices live and
+// the card flips to its ended state the moment end_time passes.
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { useTranslations } from "@/i18n/provider";
 import { useCurrency } from "@/lib/currency";
-import { cn } from "@/lib/utils";
+import { auctionPhase, cn } from "@/lib/utils";
 
 export function VehiclePriceCard({
   auction,
@@ -20,7 +22,14 @@ export function VehiclePriceCard({
   locationCity,
   locationCountry,
 }: {
-  auction: { id: string; status: string; bid_count: number; bidder_count: number } | null;
+  auction: {
+    id: string;
+    status: string;
+    start_time?: string | null;
+    end_time?: string | null;
+    bid_count: number;
+    bidder_count: number;
+  } | null;
   headlinePriceEur: number | null;
   buyNowPriceEur: number | null;
   reservePriceEur: number | null;
@@ -29,13 +38,25 @@ export function VehiclePriceCard({
 }) {
   const t = useTranslations();
   const { format } = useCurrency();
-  const isActive = auction?.status === "active";
+
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!auction) return;
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+    // Only the auction identity matters for (re)starting the ticker.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auction?.id]);
+
+  const phase = auctionPhase(auction, now);
+  const live = phase === "live";
+  const ended = phase === "ended";
 
   return (
     <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
       <div className="mb-4 flex items-center justify-between gap-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">
-          {isActive ? t("common.currentBid") : t("common.startingPrice")}
+          {ended ? t("common.ended") : live ? t("common.currentBid") : t("common.startingPrice")}
         </p>
         <CurrencyPills />
       </div>
@@ -51,7 +72,7 @@ export function VehiclePriceCard({
 
       {auction ? (
         <div className="mt-5 flex flex-col gap-2">
-          {isActive && (
+          {live && (
             <Link
               href={`/auction/${auction.id}`}
               className={cn(
@@ -59,23 +80,24 @@ export function VehiclePriceCard({
                 "h-12 w-full justify-center text-base font-bold",
               )}
             >
-              Bid Now
+              {t("common.bidNow")}
               <ArrowRight className="size-4" />
             </Link>
           )}
-          {!isActive && (
+          {!live && (
             <Link
               href={`/auction/${auction.id}`}
               className={cn(
-                buttonVariants({ variant: "default", size: "lg" }),
+                buttonVariants({ variant: ended ? "outline" : "default", size: "lg" }),
                 "h-12 w-full justify-center text-base",
               )}
             >
-              {t("common.viewAuction")}
+              {ended ? t("common.viewResult") : t("common.viewAuction")}
               <ArrowRight className="size-4" />
             </Link>
           )}
-          {buyNowPriceEur != null && (
+          {/* Buy Now is only available while the auction is live. */}
+          {buyNowPriceEur != null && live && (
             <Link
               href={`/auction/${auction.id}?buyNow=1`}
               className={cn(
@@ -83,7 +105,7 @@ export function VehiclePriceCard({
                 "h-12 w-full justify-center text-base font-bold",
               )}
             >
-              Buy Now {format(buyNowPriceEur)}
+              {t("common.buyNow")} {format(buyNowPriceEur)}
             </Link>
           )}
         </div>
@@ -100,7 +122,7 @@ export function VehiclePriceCard({
       )}
 
       <dl className="mt-6 space-y-2.5 border-t border-grey-100 pt-5 text-sm">
-        {buyNowPriceEur != null && (
+        {buyNowPriceEur != null && !ended && (
           <Row label={t("common.buyNow")} value={format(buyNowPriceEur)} />
         )}
         {reservePriceEur != null && (

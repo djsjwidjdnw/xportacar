@@ -19,29 +19,35 @@ export function AuctionCountdown({ endTime }: { endTime: string }) {
     return (
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">{t("endsIn")}</p>
-        <p className="mt-1 text-2xl font-extrabold text-error-600">— Ended —</p>
+        <p className="mt-1 text-2xl font-extrabold text-error-600">— {t("ended")} —</p>
       </div>
     );
   }
+
+  // Under an hour: switch the digits to alarm-red.
+  const urgent = new Date(endTime).getTime() - now <= 3_600_000;
 
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">{t("endsIn")}</p>
       <div className="mt-1.5 flex items-end gap-1.5">
-        <Cell value={hours}   label="hh" />
+        <Cell value={hours}   label="hh" urgent={urgent} />
         <Sep />
-        <Cell value={minutes} label="mm" />
+        <Cell value={minutes} label="mm" urgent={urgent} />
         <Sep />
-        <Cell value={seconds} label="ss" />
+        <Cell value={seconds} label="ss" urgent={urgent} />
       </div>
     </div>
   );
 }
 
-function Cell({ value, label }: { value: string; label: string }) {
+function Cell({ value, label, urgent }: { value: string; label: string; urgent?: boolean }) {
   return (
     <div className="text-center">
-      <div className="rounded-lg bg-grey-900 px-3 py-2 font-mono text-2xl font-bold tabular-nums text-white shadow-inner sm:text-3xl">
+      <div className={
+        "rounded-lg px-3 py-2 font-mono text-2xl font-bold tabular-nums text-white shadow-inner sm:text-3xl " +
+        (urgent ? "bg-error-600" : "bg-grey-900")
+      }>
         {value}
       </div>
       <div className="mt-1 text-[10px] font-medium uppercase tracking-wide text-grey-400">

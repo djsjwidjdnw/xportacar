@@ -71,6 +71,58 @@ export function formatRelativeTime(iso: string, locale = "en-GB"): string {
   return new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(new Date(iso));
 }
 
+// ---------------------- Auction state ----------------------
+//
+// The DB `status` column lags reality: there is no job that flips a
+// naturally-expired auction from `active` to `ended`.  So the *effective*
+// phase must always be derived by comparing `end_time` to the clock — never
+// trust `status === "active"` on its own.  This is the single source of
+// truth used by every surface (cards, bid panel, price card, pages).
+
+export type AuctionPhase = "scheduled" | "live" | "ended";
+
+interface AuctionTimes {
+  status?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+}
+
+/** Effective phase of an auction, or null when there is no auction. */
+export function auctionPhase(
+  auction: AuctionTimes | null | undefined,
+  now: number = Date.now(),
+): AuctionPhase | null {
+  if (!auction) return null;
+  const { status } = auction;
+
+  // Terminal DB states are always ended.
+  if (status === "sold" || status === "ended" || status === "cancelled") return "ended";
+
+  // A passed end_time means ended regardless of a stale `active` status.
+  const end = auction.end_time ? new Date(auction.end_time).getTime() : null;
+  if (end != null && Number.isFinite(end) && end <= now) return "ended";
+
+  // Not started yet.
+  const start = auction.start_time ? new Date(auction.start_time).getTime() : null;
+  if (status === "scheduled" || (start != null && Number.isFinite(start) && start > now)) {
+    return "scheduled";
+  }
+
+  if (status === "active") return "live";
+  return null;
+}
+
+/** True when a live auction ends within `withinMs` (default 1 hour). */
+export function isEndingSoon(
+  auction: AuctionTimes | null | undefined,
+  now: number = Date.now(),
+  withinMs = 3_600_000,
+): boolean {
+  if (auctionPhase(auction, now) !== "live" || !auction?.end_time) return false;
+  const ms = new Date(auction.end_time).getTime() - now;
+  return ms > 0 && ms <= withinMs;
+}
+
 export function initials(name: string | null | undefined): string {
   if (!name) return "?";
   return name

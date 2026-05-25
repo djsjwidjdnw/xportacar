@@ -35,7 +35,12 @@
     "cancel": "إلغاء",
     "back": "رجوع",
     "next": "التالي",
-    "previous": "السابق"
+    "previous": "السابق",
+    "bidNow": "زايد الآن",
+    "endingSoon": "ينتهي قريباً",
+    "comingSoon": "قريباً",
+    "comingSoonStarts": "قريباً — يبدأ {date}",
+    "viewResult": "عرض النتيجة"
   },
   "landing": {
     "navAbout": "من نحن",
@@ -156,7 +161,11 @@
     "wonTitle": "لقد فزت بهذا المزاد!",
     "wonSubtitle": "تم تسجيل عملية الشراء. سيتواصل معك فريقنا قريباً بشأن الدفع والشحن.",
     "wonAmount": "مبلغ الفوز",
-    "wonAuctionLink": "عرض المزاد"
+    "wonAuctionLink": "عرض المزاد",
+    "ended": "انتهى",
+    "wonCta": "عرض الفاتورة والدفع",
+    "outbidEnded": "انتهى المزاد — تم تجاوز مزايدتك",
+    "endedNoBid": "انتهى هذا المزاد"
   },
   "auth": {
     "loginTitle": "مرحباً بعودتك",

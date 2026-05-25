@@ -49,26 +49,59 @@ export function lookup(messages: Messages, key: string): string | undefined {
 }
 
 export function format(template: string, values: TranslateValues = {}): string {
-  // Plural blocks first (keep it simple — count must be passed as `count`).
-  let out = template.replace(
-    /\{(\w+),\s*plural,\s*([^}]+(?:\{[^}]*\}[^}]*)*)\}/g,
-    (_match, varName: string, body: string) => {
-      const n = Number(values[varName] ?? 0);
-      const cases = parsePluralCases(body);
-      const exact = cases[`=${n}`];
-      const chosen = exact
-        ?? (n === 1 ? cases["one"] : undefined)
-        ?? cases["other"]
-        ?? cases[Object.keys(cases)[0] ?? ""]
-        ?? "";
-      return chosen.replace(/#/g, String(n));
-    },
-  );
-  out = out.replace(/\{(\w+)\}/g, (_, name: string) => {
+  // Resolve `{var, plural, …}` blocks first, then simple `{name}` placeholders.
+  const out = replacePlurals(template, values);
+  return out.replace(/\{(\w+)\}/g, (_, name: string) => {
     const v = values[name];
     return v == null ? "" : String(v);
   });
-  return out;
+}
+
+/**
+ * Replace every `{var, plural, …}` block in `template`.
+ *
+ * Each plural case (`=0 {…}`, `one {…}`, `other {# …}`) contains its own
+ * `{…}` braces, so we can't terminate the block at the first `}`.  We scan
+ * forward from the `plural,` header counting brace depth until the block
+ * closes — the previous regex stopped at the first `}` and left multi-case
+ * plurals like `=1 {1 bid} other {# bids}` rendered verbatim.
+ */
+function replacePlurals(template: string, values: TranslateValues): string {
+  const head = /\{(\w+),\s*plural,\s*/g;
+  let result = "";
+  let lastIndex = 0;
+  let m: RegExpExecArray | null;
+
+  while ((m = head.exec(template)) !== null) {
+    const start = m.index;
+    const bodyStart = head.lastIndex;
+
+    // Walk forward, counting braces, until the plural block closes.
+    let depth = 1;
+    let i = bodyStart;
+    for (; i < template.length && depth > 0; i++) {
+      const ch = template[i];
+      if (ch === "{") depth++;
+      else if (ch === "}" && --depth === 0) break;
+    }
+    if (depth !== 0) break; // unbalanced — leave the remainder untouched
+
+    const body = template.slice(bodyStart, i);
+    const n = Number(values[m[1]] ?? 0);
+    const cases = parsePluralCases(body);
+    const chosen =
+      cases[`=${n}`]
+      ?? (n === 1 ? cases["one"] : undefined)
+      ?? cases["other"]
+      ?? cases[Object.keys(cases)[0] ?? ""]
+      ?? "";
+
+    result += template.slice(lastIndex, start) + chosen.replace(/#/g, String(n));
+    lastIndex = i + 1;            // skip past the closing `}`
+    head.lastIndex = lastIndex;   // resume scanning after this block
+  }
+
+  return result + template.slice(lastIndex);
 }
 
 function parsePluralCases(body: string): Record<string, string> {

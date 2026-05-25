@@ -15,7 +15,7 @@ import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
-import { cn, formatEur } from "@/lib/utils";
+import { auctionPhase, cn, formatEur } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
 
 // Generate OG/Twitter metadata per vehicle so shared links render with
@@ -79,7 +79,7 @@ export default async function VehicleDetailPage({
       *,
       vehicle_photos ( id, url, sort_order, caption, category ),
       vehicle_damages ( id, location, description, severity, photo_url ),
-      auctions ( id, status, end_time, current_bid_eur, starting_price_eur, bid_count, bidder_count )
+      auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, bid_count, bidder_count )
     `)
     .eq("id", id)
     .single();
@@ -103,11 +103,11 @@ export default async function VehicleDetailPage({
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((p) => ({ url: p.url, caption: p.caption }));
   const auction = v.auctions[0];
-  const headlinePrice = auction?.status === "active"
+  const phase = auctionPhase(auction);
+  const auctionLive = phase === "live";
+  const headlinePrice = phase === "live" || phase === "ended"
     ? (auction.current_bid_eur ?? auction.starting_price_eur)
     : v.listed_price_eur;
-
-  const auctionLive = auction?.status === "active";
 
   // JSON-LD Vehicle structured data — Google enriches listings with
   // mileage / fuel / price when this is present.
@@ -185,17 +185,40 @@ export default async function VehicleDetailPage({
             </Link>
           </div>
         )}
-        {auction?.status === "scheduled" && (
+        {phase === "scheduled" && auction && (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-warning-200 bg-warning-50/70 p-4 shadow-sm sm:p-5">
             <div className="flex items-center gap-3">
               <Hourglass className="size-5 text-warning-700" />
               <div>
                 <p className="text-xs font-bold uppercase tracking-wide text-warning-700">Auction coming soon</p>
                 <p className="text-sm text-warning-800/90">
-                  Listed price {formatEur(v.listed_price_eur ?? 0)} · starts {new Date(auction.end_time).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                  Listed price {formatEur(v.listed_price_eur ?? 0)}
+                  {auction.start_time ? ` · starts ${new Date(auction.start_time).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}` : ""}
                 </p>
               </div>
             </div>
+          </div>
+        )}
+        {phase === "ended" && auction && (
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-grey-200 bg-grey-100 p-4 shadow-sm sm:p-5">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex size-10 items-center justify-center rounded-full bg-grey-800 text-white">
+                <Gavel className="size-5" />
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wide text-grey-600">{t("common.ended")}</p>
+                <p className="mt-0.5 text-sm text-grey-700">
+                  {t("common.currentBid")}: {formatEur(headlinePrice ?? 0)} · {auction.bid_count} {t("common.bids")}
+                </p>
+              </div>
+            </div>
+            <Link
+              href={`/auction/${auction.id}`}
+              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-12 gap-2 px-6 text-base")}
+            >
+              {t("common.viewResult")}
+              <ArrowRight className="size-4" />
+            </Link>
           </div>
         )}
 
@@ -206,11 +229,14 @@ export default async function VehicleDetailPage({
 
             <header>
               <div className="flex items-center gap-2">
-                {auction?.status === "active" && (
+                {phase === "live" && (
                   <Badge className="bg-error-50 text-error-700 ring-1 ring-error-100">
                     <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-error-600" />
                     {t("common.live")}
                   </Badge>
+                )}
+                {phase === "ended" && (
+                  <Badge className="bg-grey-800 text-white">{t("common.ended")}</Badge>
                 )}
                 <Badge variant="outline" className="border-grey-200 text-grey-600">
                   {v.body_type}
@@ -280,6 +306,8 @@ export default async function VehicleDetailPage({
                 auction={auction ? {
                   id: auction.id,
                   status: auction.status,
+                  start_time: auction.start_time,
+                  end_time: auction.end_time,
                   bid_count: auction.bid_count,
                   bidder_count: auction.bidder_count,
                 } : null}

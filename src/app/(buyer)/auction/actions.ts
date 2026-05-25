@@ -109,6 +109,9 @@ export async function buyNowAction(input: {
 
   if (aErr || !auction) return { ok: false, error: "Auction not found." };
   if (auction.status !== "active") return { ok: false, error: "Auction is not live." };
+  if (new Date(auction.end_time).getTime() <= Date.now()) {
+    return { ok: false, error: "Auction has ended." };
+  }
   if (auction.buy_now_price_eur == null) return { ok: false, error: "Buy Now is not available." };
 
   const price = auction.buy_now_price_eur as number;

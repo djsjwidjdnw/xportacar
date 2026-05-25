@@ -35,7 +35,12 @@
     "cancel": "Cancel",
     "back": "Back",
     "next": "Next",
-    "previous": "Previous"
+    "previous": "Previous",
+    "bidNow": "Bid now",
+    "endingSoon": "Ending soon",
+    "comingSoon": "Coming soon",
+    "comingSoonStarts": "Coming soon — starts {date}",
+    "viewResult": "View result"
   },
   "landing": {
     "navAbout": "About",
@@ -156,7 +161,11 @@
     "wonTitle": "You won this auction!",
     "wonSubtitle": "Your purchase has been recorded. Our team will be in touch shortly about payment and shipping.",
     "wonAmount": "Winning amount",
-    "wonAuctionLink": "View auction"
+    "wonAuctionLink": "View auction",
+    "ended": "Ended",
+    "wonCta": "View Invoice & Pay",
+    "outbidEnded": "Auction ended — you were outbid",
+    "endedNoBid": "This auction has ended"
   },
   "auth": {
     "loginTitle": "Welcome back",

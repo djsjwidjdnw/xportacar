@@ -35,7 +35,12 @@
     "cancel": "Abbrechen",
     "back": "Zurück",
     "next": "Weiter",
-    "previous": "Zurück"
+    "previous": "Zurück",
+    "bidNow": "Jetzt bieten",
+    "endingSoon": "Endet bald",
+    "comingSoon": "Demnächst",
+    "comingSoonStarts": "Demnächst — Beginn {date}",
+    "viewResult": "Ergebnis ansehen"
   },
   "landing": {
     "navAbout": "Über uns",
@@ -156,7 +161,11 @@
     "wonTitle": "Sie haben die Auktion gewonnen!",
     "wonSubtitle": "Ihr Kauf wurde erfasst. Unser Team meldet sich in Kürze wegen Zahlung und Versand.",
     "wonAmount": "Gewinnbetrag",
-    "wonAuctionLink": "Zur Auktion"
+    "wonAuctionLink": "Zur Auktion",
+    "ended": "Beendet",
+    "wonCta": "Rechnung ansehen & bezahlen",
+    "outbidEnded": "Auktion beendet – Sie wurden überboten",
+    "endedNoBid": "Diese Auktion ist beendet"
   },
   "auth": {
     "loginTitle": "Willkommen zurück",

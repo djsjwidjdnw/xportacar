@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CheckCircle2, ArrowRight, Trophy } from "lucide-react";
@@ -6,8 +7,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { PayNowButton } from "@/components/buyer/PayNowButton";
 import { WonInvoice } from "@/components/buyer/WonInvoice";
 import { createClient } from "@/lib/supabase/server";
+import { settleEndedAuctions } from "@/lib/auctions";
 import { isStripeConfigured } from "@/lib/stripe";
-import { cn } from "@/lib/utils";
+import { auctionPhase, cn } from "@/lib/utils";
 
 export const metadata = { title: "Auction won" };
 
@@ -25,7 +27,7 @@ export default async function AuctionWonPage({
   const { data: auctionRow, error } = await supabase
     .from("auctions")
     .select(`
-      id, status, winner_id, current_bid_eur, buy_now_price_eur,
+      id, status, winner_id, start_time, end_time, current_bid_eur, buy_now_price_eur,
       vehicle:vehicles!vehicle_id ( id, year, make, model, vin, location_city, location_country )
     `)
     .eq("id", id)
@@ -35,9 +37,31 @@ export default async function AuctionWonPage({
 
   // deno-lint-ignore no-explicit-any
   const a = auctionRow as any;
-  const isWinner = a.winner_id === user.id;
   const v = a.vehicle;
-  const hammerEur = (a.current_bid_eur ?? a.buy_now_price_eur ?? 0) as number;
+  const phase = auctionPhase(a);
+
+  // Resolve the top bidder so a naturally-ended auction whose winner_id hasn't
+  // been written yet still recognises its winner.
+  const { data: top } = await supabase
+    .from("bids")
+    .select("bidder_id, amount_eur")
+    .eq("auction_id", a.id)
+    .order("amount_eur", { ascending: false })
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const topBidderId = (top?.bidder_id as string | undefined) ?? null;
+  const topAmount = top?.amount_eur != null ? Number(top.amount_eur) : null;
+
+  const isWinner =
+    a.winner_id === user.id ||
+    (phase === "ended" && topBidderId != null && topBidderId === user.id);
+  const hammerEur = (a.current_bid_eur ?? a.buy_now_price_eur ?? topAmount ?? 0) as number;
+
+  // Make the win durable for the dashboard / future loads.
+  if (phase === "ended" && a.status === "active") {
+    after(() => settleEndedAuctions([a.id]));
+  }
 
   // Pull the auto-generated invoice (if any) so we can offer Pay Now.
   let invoiceId: string | null = null;

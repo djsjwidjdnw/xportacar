@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import Link from "next/link";
 import { Gavel, Trophy, Wallet, TrendingUp, Bell, FileText, Search } from "lucide-react";
 
@@ -8,8 +9,9 @@ import {
 import { StatCard } from "@/components/admin/StatCard";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { createClient } from "@/lib/supabase/server";
+import { settleEndedAuctions } from "@/lib/auctions";
 import { getTranslations } from "@/i18n/server";
-import { formatEur, formatRelativeTime } from "@/lib/utils";
+import { auctionPhase, formatEur, formatRelativeTime } from "@/lib/utils";
 
 export const metadata = { title: "My bids" };
 
@@ -66,15 +68,23 @@ export default async function BuyerDashboardPage() {
       .order("created_at", { ascending: false }),
   ]);
 
-  // Aggregate: active bids = distinct auctions where I've bid and auction is active.
+  // Aggregate: active bids = distinct auctions where I've bid and the auction
+  // is still genuinely live (end_time in the future, not just status='active').
   // deno-lint-ignore no-explicit-any
   const bidRows = (myBids ?? []) as any[];
   const activeAuctionIds = new Set<string>();
+  const endedToSettle = new Set<string>();
   let totalCommitted = 0;
   for (const b of bidRows) {
-    if (b.auction?.status === "active") {
-      activeAuctionIds.add(b.auction.id);
-    }
+    const ph = auctionPhase(b.auction);
+    if (ph === "live") activeAuctionIds.add(b.auction.id);
+    else if (ph === "ended" && b.auction?.status === "active") endedToSettle.add(b.auction.id);
+  }
+  // Settle any of my auctions that have just expired so wins become durable
+  // (winner_id + status) for next load — after the response, never blocking.
+  if (endedToSettle.size > 0) {
+    const ids = Array.from(endedToSettle);
+    after(() => settleEndedAuctions(ids));
   }
   // deno-lint-ignore no-explicit-any
   const wonRows = (wonAuctions ?? []) as any[];
@@ -139,9 +149,10 @@ export default async function BuyerDashboardPage() {
                 )}
                 {myAuctions.map((row) => {
                   const v = row.auction?.vehicle;
+                  const phase = auctionPhase(row.auction);
+                  const ended = phase === "ended";
                   const winning = row.amount >= (row.auction?.current_bid_eur ?? 0);
-                  const ended = row.auction?.status !== "active";
-                  const won = row.auction?.status === "sold" && row.auction.winner_id === user.id;
+                  const won = ended && (row.auction?.winner_id === user.id || winning);
                   return (
                     <TableRow key={row.auction.id} className="[&>td]:px-5 [&>td]:py-3.5">
                       <TableCell>

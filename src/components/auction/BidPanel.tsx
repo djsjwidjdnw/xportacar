@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, Gavel, ShoppingCart, MessageSquare, TrendingUp } from "lucide-react";
+import { Minus, Plus, Gavel, ShoppingCart, MessageSquare, TrendingUp, Trophy, ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import { useTranslations } from "@/i18n/provider";
 import { useAuction } from "@/hooks/useAuction";
 import { useCurrency } from "@/lib/currency";
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
-import { cn, formatRelativeTime, initials } from "@/lib/utils";
+import { auctionPhase, cn, formatRelativeTime, initials } from "@/lib/utils";
 import {
   placeBidAction,
   buyNowAction,
@@ -82,10 +82,15 @@ export function BidPanel({
     [bids, currentUserId],
   );
 
-  const auctionEnded = useMemo(
-    () => auction.status !== "active" || new Date(auction.end_time).getTime() <= Date.now(),
-    [auction.status, auction.end_time],
-  );
+  // Local clock so the panel flips to its ended state the moment end_time
+  // passes — disabling inputs, hiding Buy Now, and surfacing the won/lost
+  // banner without waiting for a reload or a realtime event.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
+  const auctionEnded = auctionPhase(auction, now) === "ended";
 
   const placeBid = async () => {
     if (!isAuthenticated) {
@@ -161,6 +166,42 @@ export function BidPanel({
 
   return (
     <div className="space-y-4">
+      {/* Outcome banner once the auction has ended. */}
+      {auctionEnded && (
+        isWinning ? (
+          <div className="rounded-2xl border border-success-200 bg-gradient-to-br from-success-600 to-success-700 p-5 text-white shadow-md">
+            <div className="flex items-center gap-3">
+              <span className="grid size-10 shrink-0 place-items-center rounded-full bg-white/15 ring-2 ring-white/25">
+                <Trophy className="size-5" />
+              </span>
+              <div className="min-w-0">
+                <p className="text-base font-extrabold leading-tight">{t("auction.wonTitle")}</p>
+                <p className="mt-0.5 truncate text-sm text-white/90">{vehicleTitle}</p>
+              </div>
+            </div>
+            <Link
+              href={`/auction/${auction.id}/won`}
+              className={cn(
+                buttonVariants({ variant: "default", size: "lg" }),
+                "mt-4 h-11 w-full justify-center bg-white text-success-700 hover:bg-white/90",
+              )}
+            >
+              {t("auction.wonCta")}
+              <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        ) : userHasBid ? (
+          <div className="rounded-2xl border border-warning-200 bg-warning-50 p-5 text-center shadow-xs">
+            <p className="text-sm font-bold text-grey-900">{t("auction.outbidEnded")}</p>
+            <p className="mt-1 text-xs text-grey-600">{vehicleTitle}</p>
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-grey-200 bg-grey-50 p-5 text-center shadow-xs">
+            <p className="text-sm font-bold text-grey-900">{t("auction.endedNoBid")}</p>
+          </div>
+        )
+      )}
+
       <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-md">
         <div className="flex flex-wrap items-baseline justify-between gap-3">
           <div>
