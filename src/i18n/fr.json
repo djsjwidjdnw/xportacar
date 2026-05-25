@@ -112,7 +112,9 @@
     "sortNewest": "Plus récents",
     "sortMileageAsc": "Kilométrage le plus bas",
     "noResults": "Aucun véhicule ne correspond à ces filtres",
-    "clearFilters": "Effacer les filtres"
+    "clearFilters": "Effacer les filtres",
+    "loadMore": "Charger plus",
+    "loadingMore": "Chargement…"
   },
   "vehicle": {
     "specs": "Spécifications",

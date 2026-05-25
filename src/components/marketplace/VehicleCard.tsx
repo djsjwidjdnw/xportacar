@@ -10,7 +10,7 @@ import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
 import { useTranslations, useLocale } from "@/i18n/provider";
 import { useCurrency } from "@/lib/currency";
 import {
-  auctionPhase, cn, formatKm, formatTimeRemaining, isEndingSoon,
+  auctionPhase, cn, formatKm, formatTimeRemaining, isEndingSoon, thumb,
 } from "@/lib/utils";
 import type { Vehicle, Auction } from "@/types";
 
@@ -76,7 +76,7 @@ export function VehicleCard({
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-grey-100">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={photo}
+            src={thumb(photo, 600)}
             alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
             className={cn(
               "size-full max-w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]",

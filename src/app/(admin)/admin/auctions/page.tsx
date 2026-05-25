@@ -6,6 +6,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
+import { LoadMoreLink } from "@/components/admin/LoadMoreLink";
 import { createClient } from "@/lib/supabase/server";
 import { formatEur, formatRelativeTime } from "@/lib/utils";
 import type { AuctionStatus } from "@/types";
@@ -29,7 +30,7 @@ const STATUS_STYLE: Record<AuctionStatus, string> = {
   cancelled: "bg-error-50 text-error-700 ring-error-100",
 };
 
-interface SearchParams { status?: string }
+interface SearchParams { status?: string; show?: string }
 
 export default async function AdminAuctionsPage({
   searchParams,
@@ -38,6 +39,8 @@ export default async function AdminAuctionsPage({
 }) {
   const sp = await searchParams;
   const supabase = await createClient();
+  const show = Math.min(Math.max(Number(sp.show) || 20, 20), 5000);
+  const statusFilter = sp.status && sp.status !== "all" ? sp.status : null;
 
   let query = supabase
     .from("auctions")
@@ -49,21 +52,23 @@ export default async function AdminAuctionsPage({
     `)
     .order("end_time", { ascending: false });
 
-  if (sp.status && sp.status !== "all") query = query.eq("status", sp.status);
+  if (statusFilter) query = query.eq("status", statusFilter);
+  query = query.range(0, show - 1);
 
-  const { data: rowsRaw } = await query;
+  // Per-status counts via head-only queries (indexed on auctions.status) so we
+  // never scan the whole table just to render the filter chips.
+  const STATUSES = ["scheduled", "active", "ended", "sold", "cancelled"] as const;
+  const [{ data: rowsRaw }, allCount, ...statusCounts] = await Promise.all([
+    query,
+    supabase.from("auctions").select("id", { count: "exact", head: true }),
+    ...STATUSES.map((s) => supabase.from("auctions").select("id", { count: "exact", head: true }).eq("status", s)),
+  ]);
   // deno-lint-ignore no-explicit-any
   const rows = (rowsRaw ?? []) as any[];
 
-  // Per-status counts for the filter chips — single round-trip below.
-  const { data: countsRaw } = await supabase
-    .from("auctions").select("status", { count: "exact" });
-  // deno-lint-ignore no-explicit-any
-  const countByStatus: Record<string, number> = {};
-  ((countsRaw ?? []) as { status: string }[]).forEach((r) => {
-    countByStatus[r.status] = (countByStatus[r.status] ?? 0) + 1;
-  });
-  countByStatus.all = Object.values(countByStatus).reduce((s, n) => s + n, 0);
+  const countByStatus: Record<string, number> = { all: allCount.count ?? 0 };
+  STATUSES.forEach((s, i) => { countByStatus[s] = statusCounts[i].count ?? 0; });
+  const total = statusFilter ? (countByStatus[statusFilter] ?? 0) : countByStatus.all;
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
@@ -77,7 +82,7 @@ export default async function AdminAuctionsPage({
             Auctions
           </h1>
           <p className="mt-2 text-grey-600">
-            {rows.length} {sp.status && sp.status !== "all" ? `${sp.status} ` : ""}auctions
+            {total} {statusFilter ? `${statusFilter} ` : ""}auctions
           </p>
         </div>
       </header>
@@ -193,6 +198,8 @@ export default async function AdminAuctionsPage({
           </TableBody>
         </Table>
       </div>
+
+      <LoadMoreLink basePath="/admin/auctions" params={{ status: sp.status }} shown={rows.length} total={total} />
     </div>
   );
 }

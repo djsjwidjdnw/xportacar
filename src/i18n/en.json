@@ -112,7 +112,9 @@
     "sortNewest": "Newest listings",
     "sortMileageAsc": "Lowest mileage",
     "noResults": "No vehicles match these filters",
-    "clearFilters": "Clear filters"
+    "clearFilters": "Clear filters",
+    "loadMore": "Load more",
+    "loadingMore": "Loading…"
   },
   "vehicle": {
     "specs": "Specifications",

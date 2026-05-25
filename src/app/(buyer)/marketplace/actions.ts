@@ -2,6 +2,32 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { fetchVehiclesPage, type MarketplaceSearchParams } from "./query";
+import type { VehicleWithMedia } from "@/types";
+
+// Next page of marketplace vehicles + which of them the user is watching.
+// Backs the "Load more" button so the browser never loads all 100k at once.
+export async function loadMoreVehiclesAction(
+  sp: MarketplaceSearchParams,
+  offset: number,
+): Promise<{ vehicles: VehicleWithMedia[]; hasMore: boolean; watching: string[] }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { vehicles, hasMore } = await fetchVehiclesPage(supabase, sp, offset);
+
+  let watching: string[] = [];
+  if (user && vehicles.length > 0) {
+    const { data: w } = await supabase
+      .from("watchlist")
+      .select("vehicle_id")
+      .eq("user_id", user.id)
+      .in("vehicle_id", vehicles.map((v) => v.id));
+    watching = (w ?? []).map((r) => (r as { vehicle_id: string }).vehicle_id);
+  }
+
+  return { vehicles, hasMore, watching };
+}
 
 export interface SaveSearchInput {
   name: string;

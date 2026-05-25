@@ -112,7 +112,9 @@
     "sortNewest": "Neueste",
     "sortMileageAsc": "Geringste Laufleistung",
     "noResults": "Keine Fahrzeuge passen zu diesen Filtern",
-    "clearFilters": "Filter zurücksetzen"
+    "clearFilters": "Filter zurücksetzen",
+    "loadMore": "Mehr laden",
+    "loadingMore": "Wird geladen…"
   },
   "vehicle": {
     "specs": "Spezifikationen",

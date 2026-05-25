@@ -26,6 +26,39 @@ export function formatKm(value: number | null | undefined, locale = "en-GB"): st
   return `${formatNumber(value, locale)} km`;
 }
 
+// ---------------------- Image thumbnails ----------------------
+//
+// Listing/grid views must NOT download full-size photos — at 100k vehicles ×
+// 10+ photos that's catastrophic. `thumb()` returns a small (default 600px,
+// ~300px @2x) variant for cards; detail pages keep the original. Handles:
+//   • Supabase Storage public URLs → the image render/transform endpoint
+//     (requires Storage image transformation enabled on the project),
+//   • Unsplash CDN URLs → w/q/auto/fit params,
+//   • anything else → returned unchanged.
+export function thumb(url: string | null | undefined, width = 600): string {
+  if (!url) return "";
+  try {
+    const u = new URL(url);
+    if (u.pathname.includes("/storage/v1/object/public/")) {
+      u.pathname = u.pathname.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
+      u.searchParams.set("width", String(width));
+      u.searchParams.set("quality", "70");
+      u.searchParams.set("resize", "cover");
+      return u.toString();
+    }
+    if (u.hostname.includes("images.unsplash.com")) {
+      u.searchParams.set("w", String(width));
+      u.searchParams.set("q", "70");
+      u.searchParams.set("auto", "format");
+      u.searchParams.set("fit", "crop");
+      return u.toString();
+    }
+    return url;
+  } catch {
+    return url;
+  }
+}
+
 // Compact "ending in 4d 2h" / "12h 34m" / "23m 11s"
 export function formatTimeRemaining(endIso: string, now = new Date()): string {
   const ms = new Date(endIso).getTime() - now.getTime();

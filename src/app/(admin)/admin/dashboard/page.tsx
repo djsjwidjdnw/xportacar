@@ -30,14 +30,19 @@ export default async function AdminDashboardPage() {
     { data: vehicles },
     { count: liveAuctions },
     { count: buyers },
+    { count: activeVehicleCount },
     { data: recentBids },
     { data: inspectorRows },
     { data: completedAuctions },
     { data: invoices },
   ] = await Promise.all([
-    supabase.from("vehicles").select("*").order("updated_at", { ascending: false }),
+    // Bounded to the most recently-updated 500 — the Kanban pipeline + status
+    // chart operate on this window, never the whole (100k+) vehicles table.
+    supabase.from("vehicles").select("*").order("updated_at", { ascending: false }).limit(500),
     supabase.from("auctions").select("*", { count: "exact", head: true }).eq("status", "active"),
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "buyer"),
+    // Accurate total of non-terminal vehicles for the stat card (head-only).
+    supabase.from("vehicles").select("id", { count: "exact", head: true }).not("status", "in", "(sold,delivered)"),
     supabase
       .from("bids")
       .select(`
@@ -56,13 +61,16 @@ export default async function AdminDashboardPage() {
       .select("id, status, end_time, current_bid_eur")
       .in("status", ["sold", "ended"])
       .gte("end_time", new Date(Date.now() - 8 * 7 * 86400_000).toISOString()),
+    // Last ~6 months of invoices only — bounds the revenue-chart input.
     supabase
       .from("invoices")
-      .select("total_eur, status, created_at"),
+      .select("total_eur, status, created_at")
+      .gte("created_at", new Date(Date.now() - 183 * 86400_000).toISOString())
+      .limit(5000),
   ]);
 
   const vList = (vehicles ?? []) as Vehicle[];
-  const activeVehicles  = vList.filter((v) => !["sold", "delivered"].includes(v.status)).length;
+  const activeVehicles  = activeVehicleCount ?? 0;
   const monthlyRevenue  = vList
     .filter((v) => ["sold", "paid", "shipped", "delivered"].includes(v.status))
     .reduce((sum, v) => sum + (v.listed_price_eur ?? 0), 0);

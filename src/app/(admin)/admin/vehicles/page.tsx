@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/table";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
 import { AddVehicleButton } from "@/components/admin/AddVehicleButton";
+import { LoadMoreLink } from "@/components/admin/LoadMoreLink";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
 import { formatEur, formatKm } from "@/lib/utils";
@@ -28,7 +29,7 @@ const STATUS_STYLE: Record<VehicleStatus, string> = {
   delivered:            "bg-success-50 text-success-700 ring-success-100",
 };
 
-interface SearchParams { status?: VehicleStatus }
+interface SearchParams { status?: VehicleStatus; show?: string }
 
 export default async function AdminVehiclesPage({
   searchParams,
@@ -38,6 +39,7 @@ export default async function AdminVehiclesPage({
   const sp = await searchParams;
   const supabase = await createClient();
   const t = await getTranslations("admin");
+  const show = Math.min(Math.max(Number(sp.show) || 20, 20), 5000);
 
   let query = supabase
     .from("vehicles")
@@ -47,8 +49,14 @@ export default async function AdminVehiclesPage({
     `)
     .order("updated_at", { ascending: false });
   if (sp.status) query = query.eq("status", sp.status);
+  query = query.range(0, show - 1);
 
-  const { data: vehicles, error } = await query;
+  // Total count is head-only (no rows transferred) so it scales to 100k+.
+  let countQuery = supabase.from("vehicles").select("id", { count: "exact", head: true });
+  if (sp.status) countQuery = countQuery.eq("status", sp.status);
+
+  const [{ data: vehicles, error }, { count: totalRaw }] = await Promise.all([query, countQuery]);
+  const total = totalRaw ?? 0;
 
   // deno-lint-ignore no-explicit-any
   const list = (vehicles ?? []) as (Vehicle & { auctions: any[] })[];
@@ -61,7 +69,7 @@ export default async function AdminVehiclesPage({
             {t("navVehicles")}
           </h1>
           <p className="mt-1 text-grey-600">
-            {list.length} vehicles across the pipeline
+            {total} vehicles across the pipeline
             {sp.status ? ` · filtered by ${sp.status}` : ""}.
           </p>
         </div>
@@ -142,6 +150,8 @@ export default async function AdminVehiclesPage({
           </Table>
         </div>
       )}
+
+      {!error && <LoadMoreLink basePath="/admin/vehicles" params={{ status: sp.status }} shown={list.length} total={total} />}
     </div>
   );
 }

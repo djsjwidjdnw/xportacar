@@ -34,6 +34,19 @@ export async function placeBidAction(input: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in to place a bid." };
 
+  // Rate limit: at most one bid per second per user (anti-spam). Uses the
+  // idx_bids_bidder (bidder_id, created_at desc) index, so it's a cheap lookup.
+  const { data: lastBid } = await supabase
+    .from("bids")
+    .select("created_at")
+    .eq("bidder_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (lastBid && Date.now() - new Date(lastBid.created_at as string).getTime() < 1000) {
+    return { ok: false, error: "You're bidding too fast — wait a second and try again." };
+  }
+
   // Load the auction to validate.
   const { data: auction, error: aErr } = await supabase
     .from("auctions")

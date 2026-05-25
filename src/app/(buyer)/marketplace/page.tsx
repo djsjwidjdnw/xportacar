@@ -2,118 +2,39 @@ import { Search } from "lucide-react";
 
 import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters";
 import { SaveSearchButton } from "@/components/marketplace/SaveSearchButton";
-import { VehicleCard } from "@/components/marketplace/VehicleCard";
+import { MarketplaceResults } from "@/components/marketplace/MarketplaceResults";
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { createClient } from "@/lib/supabase/server";
-import { normalizeVehicleRows } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
-import { auctionPhase } from "@/lib/utils";
-import type { VehicleWithMedia } from "@/types";
-
-interface SearchParams {
-  q?: string;
-  make?: string;
-  year?: string;
-  price?: string;
-  fuel?: string;
-  body?: string;
-  transmission?: string;
-  sort?: string;
-}
+import { fetchVehiclesPage, fetchVehiclesCount, type MarketplaceSearchParams } from "./query";
 
 export const metadata = { title: "Marketplace" };
 
 export default async function MarketplacePage({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams>;
+  searchParams: Promise<MarketplaceSearchParams>;
 }) {
   const sp = await searchParams;
   const supabase = await createClient();
   const t = await getTranslations();
   const { data: { user } } = await supabase.auth.getUser();
 
-  let query = supabase
-    .from("vehicles")
-    .select(`
-      *,
-      vehicle_photos ( url, sort_order ),
-      auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, reserve_price_eur, bid_count, bidder_count )
-    `)
-    .in("status", ["listed", "in_auction"]);
+  // Page 0 only (20 rows) + a head-only total count — never the whole table.
+  const [{ vehicles: page0, hasMore }, total] = await Promise.all([
+    fetchVehiclesPage(supabase, sp, 0),
+    fetchVehiclesCount(supabase, sp),
+  ]);
 
-  if (sp.make && sp.make !== "All makes") query = query.eq("make", sp.make);
-  if (sp.year && sp.year !== "any")        query = query.eq("year", Number(sp.year));
-  if (sp.fuel && sp.fuel !== "All fuel types")
-    query = query.eq("fuel_type", sp.fuel as VehicleWithMedia["fuel_type"]);
-  if (sp.body && sp.body !== "All body types") query = query.eq("body_type", sp.body);
-  if (sp.transmission && sp.transmission !== "All")
-    query = query.eq("transmission", sp.transmission as VehicleWithMedia["transmission"]);
-
-  if (sp.price && sp.price !== "any") {
-    const [minStr, maxStr] = sp.price.split("-");
-    if (sp.price.endsWith("+")) {
-      query = query.gte("listed_price_eur", Number(minStr.replace("+", "")) * 1000);
-    } else {
-      query = query.gte("listed_price_eur", Number(minStr) * 1000)
-                   .lte("listed_price_eur", Number(maxStr) * 1000);
-    }
-  }
-
-  if (sp.q) {
-    const safe = sp.q.replace(/[%_,()]/g, "\\$&");
-    // Standard text search: make / model / vin / description.  If the user
-    // typed a 4-digit year, also match year=N — gives "2023" a useful result.
-    const clauses = [
-      `make.ilike.%${safe}%`,
-      `model.ilike.%${safe}%`,
-      `vin.ilike.%${safe}%`,
-      `description.ilike.%${safe}%`,
-    ];
-    const yearMatch = /^\s*(19|20)\d{2}\s*$/.exec(sp.q);
-    if (yearMatch) clauses.push(`year.eq.${Number(yearMatch[0])}`);
-    query = query.or(clauses.join(","));
-  }
-
-  switch (sp.sort) {
-    case "price_asc":   query = query.order("listed_price_eur", { ascending: true,  nullsFirst: false }); break;
-    case "price_desc":  query = query.order("listed_price_eur", { ascending: false, nullsFirst: false }); break;
-    case "newest":      query = query.order("created_at",       { ascending: false }); break;
-    case "mileage_asc": query = query.order("mileage_km",       { ascending: true });  break;
-    case "ending_soon":
-    default:
-      query = query.order("created_at", { ascending: false });
-  }
-
-  const { data: vehicles, error } = await query;
-  const list: VehicleWithMedia[] = normalizeVehicleRows(vehicles as unknown as Record<string, unknown>[]);
-
-  let watchSet = new Set<string>();
-  if (user) {
+  // Watch state for just the first page's vehicles.
+  let watching: string[] = [];
+  if (user && page0.length > 0) {
     const { data: w } = await supabase
       .from("watchlist")
       .select("vehicle_id")
-      .eq("user_id", user.id);
-    watchSet = new Set((w ?? []).map((r) => (r as { vehicle_id: string }).vehicle_id));
-  }
-
-  // Default sort "ending soon" — tier by phase so ENDED auctions always sink
-  // to the very bottom:
-  //   live (ending soonest) → scheduled (starting soonest) → listed → ended
-  if ((sp.sort ?? "ending_soon") === "ending_soon") {
-    const rank = (v: VehicleWithMedia) => {
-      const ph = auctionPhase(v.auctions[0]);
-      return ph === "live" ? 0 : ph === "scheduled" ? 1 : ph === "ended" ? 3 : 2;
-    };
-    list.sort((a, b) => {
-      const ra = rank(a), rb = rank(b);
-      if (ra !== rb) return ra - rb;
-      const aa = a.auctions[0], ba = b.auctions[0];
-      if (ra === 0) return new Date(aa.end_time).getTime() - new Date(ba.end_time).getTime();
-      if (ra === 1) return new Date(aa.start_time).getTime() - new Date(ba.start_time).getTime();
-      if (ra === 3) return new Date(ba.end_time).getTime() - new Date(aa.end_time).getTime();
-      return 0;
-    });
+      .eq("user_id", user.id)
+      .in("vehicle_id", page0.map((v) => v.id));
+    watching = (w ?? []).map((r) => (r as { vehicle_id: string }).vehicle_id);
   }
 
   return (
@@ -124,7 +45,7 @@ export default async function MarketplacePage({
             {t("marketplace.title")}
           </h1>
           <p className="mt-2 text-grey-600">
-            {t("marketplace.subtitle", { count: list.length })}
+            {t("marketplace.subtitle", { count: total })}
           </p>
         </header>
 
@@ -133,33 +54,26 @@ export default async function MarketplacePage({
         </div>
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-grey-600">
-          <span>{t("marketplace.resultsCount", { count: list.length })}</span>
+          <span>{t("marketplace.resultsCount", { count: total })}</span>
           <div className="flex items-center gap-3">
             <CurrencyPills />
             <SaveSearchButton isAuthenticated={!!user} />
           </div>
         </div>
 
-        {error ? (
-          <div className="mt-12 rounded-xl border border-error-200 bg-error-50 p-6 text-error-700">
-            {error.message}
-          </div>
-        ) : list.length === 0 ? (
+        {page0.length === 0 ? (
           <div className="mt-16 grid place-items-center rounded-2xl border border-dashed border-grey-300 bg-white p-16 text-center">
             <Search className="mb-3 size-8 text-grey-400" />
             <p className="text-base font-semibold text-grey-900">{t("marketplace.noResults")}</p>
           </div>
         ) : (
-          <div className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {list.map((v) => (
-              <VehicleCard
-                key={v.id}
-                vehicle={v}
-                isWatching={watchSet.has(v.id)}
-                isAuthenticated={!!user}
-              />
-            ))}
-          </div>
+          <MarketplaceResults
+            initialVehicles={page0}
+            sp={sp}
+            initialHasMore={hasMore}
+            initialWatching={watching}
+            isAuthenticated={!!user}
+          />
         )}
       </div>
     </div>

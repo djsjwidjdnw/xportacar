@@ -8,6 +8,7 @@ import {
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { KycActionsInline } from "@/components/admin/KycActionsInline";
 import { UserRoleSelect } from "@/components/admin/UserRoleSelect";
+import { LoadMoreLink } from "@/components/admin/LoadMoreLink";
 import { createClient } from "@/lib/supabase/server";
 import { initials } from "@/lib/utils";
 import type { Profile } from "@/types";
@@ -27,16 +28,30 @@ const KYC_STYLE: Record<string, string> = {
   rejected: "bg-error-50 text-error-700 ring-error-100",
 };
 
-export default async function AdminUsersPage() {
+export default async function AdminUsersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ show?: string }>;
+}) {
+  const sp = await searchParams;
   const supabase = await createClient();
+  const show = Math.min(Math.max(Number(sp.show) || 20, 20), 5000);
 
-  const { data: rowsRaw, error } = await supabase
-    .from("profiles")
-    .select(`
-      id, full_name, email, role, company_name, country, kyc_status,
-      avatar_url, created_at
-    `)
-    .order("created_at", { ascending: false });
+  const ROLES = ["buyer", "inspector", "admin", "superadmin"] as const;
+  const KYC = ["verified", "pending", "rejected"] as const;
+
+  // One paged row query + head-only counts for the header tallies, so we never
+  // pull all 100k profiles just to total them up.
+  const [{ data: rowsRaw, error }, totalRes, ...countRes] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select(`id, full_name, email, role, company_name, country, kyc_status, avatar_url, created_at`)
+      .order("created_at", { ascending: false })
+      .range(0, show - 1),
+    supabase.from("profiles").select("id", { count: "exact", head: true }),
+    ...ROLES.map((r) => supabase.from("profiles").select("id", { count: "exact", head: true }).eq("role", r)),
+    ...KYC.map((k) => supabase.from("profiles").select("id", { count: "exact", head: true }).eq("kyc_status", k)),
+  ]);
 
   const rows = (rowsRaw ?? []) as (Profile & {
     company_name: string | null;
@@ -45,12 +60,11 @@ export default async function AdminUsersPage() {
     avatar_url: string | null;
   })[];
 
+  const total = totalRes.count ?? 0;
   const totalsByRole: Record<string, number> = {};
-  const totalsByKyc:  Record<string, number> = {};
-  for (const r of rows) {
-    totalsByRole[r.role]      = (totalsByRole[r.role] ?? 0) + 1;
-    totalsByKyc[r.kyc_status] = (totalsByKyc[r.kyc_status] ?? 0) + 1;
-  }
+  ROLES.forEach((r, i) => { totalsByRole[r] = countRes[i].count ?? 0; });
+  const totalsByKyc: Record<string, number> = {};
+  KYC.forEach((k, i) => { totalsByKyc[k] = countRes[ROLES.length + i].count ?? 0; });
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
@@ -64,7 +78,7 @@ export default async function AdminUsersPage() {
             Users
           </h1>
           <p className="mt-2 text-grey-600">
-            {rows.length} profiles · {totalsByRole.buyer ?? 0} buyers · {totalsByRole.inspector ?? 0} inspectors · {totalsByRole.admin ?? 0} admins
+            {total} profiles · {totalsByRole.buyer ?? 0} buyers · {totalsByRole.inspector ?? 0} inspectors · {totalsByRole.admin ?? 0} admins
           </p>
         </div>
         <div className="flex gap-2 text-xs">
@@ -157,6 +171,8 @@ export default async function AdminUsersPage() {
           </Table>
         </div>
       )}
+
+      {!error && <LoadMoreLink basePath="/admin/users" shown={rows.length} total={total} />}
     </div>
   );
 }

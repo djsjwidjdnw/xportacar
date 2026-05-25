@@ -112,7 +112,9 @@
     "sortNewest": "الأحدث",
     "sortMileageAsc": "أقل ممشى",
     "noResults": "لا توجد مركبات تطابق هذه التصفية",
-    "clearFilters": "مسح التصفية"
+    "clearFilters": "مسح التصفية",
+    "loadMore": "تحميل المزيد",
+    "loadingMore": "جارٍ التحميل…"
   },
   "vehicle": {
     "specs": "المواصفات",
