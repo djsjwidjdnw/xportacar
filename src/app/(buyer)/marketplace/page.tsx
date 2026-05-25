@@ -97,20 +97,21 @@ export default async function MarketplacePage({
     watchSet = new Set((w ?? []).map((r) => (r as { vehicle_id: string }).vehicle_id));
   }
 
-  // Default sort "ending soon" — sort in JS so we can sort by joined auction
-  // end_time.  Only genuinely-live auctions (end_time still in the future)
-  // count as "ending soon"; ended ones sink to the bottom.
+  // Default sort "ending soon" — tier by phase so ENDED auctions always sink
+  // to the very bottom:
+  //   live (ending soonest) → scheduled (starting soonest) → listed → ended
   if ((sp.sort ?? "ending_soon") === "ending_soon") {
-    const liveEnd = (v: VehicleWithMedia) => {
-      const a = v.auctions[0];
-      return auctionPhase(a) === "live" ? new Date(a.end_time).getTime() : null;
+    const rank = (v: VehicleWithMedia) => {
+      const ph = auctionPhase(v.auctions[0]);
+      return ph === "live" ? 0 : ph === "scheduled" ? 1 : ph === "ended" ? 3 : 2;
     };
     list.sort((a, b) => {
-      const ae = liveEnd(a);
-      const be = liveEnd(b);
-      if (ae != null && be != null) return ae - be;
-      if (ae != null) return -1;
-      if (be != null) return 1;
+      const ra = rank(a), rb = rank(b);
+      if (ra !== rb) return ra - rb;
+      const aa = a.auctions[0], ba = b.auctions[0];
+      if (ra === 0) return new Date(aa.end_time).getTime() - new Date(ba.end_time).getTime();
+      if (ra === 1) return new Date(aa.start_time).getTime() - new Date(ba.start_time).getTime();
+      if (ra === 3) return new Date(ba.end_time).getTime() - new Date(aa.end_time).getTime();
       return 0;
     });
   }

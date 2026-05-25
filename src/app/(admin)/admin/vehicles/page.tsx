@@ -6,6 +6,7 @@ import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
+import { AddVehicleButton } from "@/components/admin/AddVehicleButton";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
 import { formatEur, formatKm } from "@/lib/utils";
@@ -64,13 +65,16 @@ export default async function AdminVehiclesPage({
             {sp.status ? ` · filtered by ${sp.status}` : ""}.
           </p>
         </div>
-        <Link
-          href="/admin/dashboard"
-          className="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800"
-        >
-          {t("navDashboard")}
-          <ChevronRight className="size-4" />
-        </Link>
+        <div className="flex items-center gap-3">
+          <AddVehicleButton />
+          <Link
+            href="/admin/dashboard"
+            className="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800"
+          >
+            {t("navDashboard")}
+            <ChevronRight className="size-4" />
+          </Link>
+        </div>
       </header>
 
       {error ? (

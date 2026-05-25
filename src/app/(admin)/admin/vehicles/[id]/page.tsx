@@ -7,6 +7,7 @@ import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
+import { InspectorAssignSelect } from "@/components/admin/InspectorAssignSelect";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { formatEur, formatRelativeTime } from "@/lib/utils";
@@ -37,6 +38,10 @@ export default async function AdminVehicleDetailPage({
   const v: VehicleWithMedia = normalizeVehicleRow(vehicle as unknown as Record<string, unknown>);
   const photos = v.vehicle_photos.sort((a, b) => a.sort_order - b.sort_order).map((p) => ({ url: p.url, caption: p.caption }));
   const auction = v.auctions[0];
+
+  const { data: inspectorsRaw } = await supabase
+    .from("profiles").select("id, full_name, email").eq("role", "inspector");
+  const inspectors = (inspectorsRaw ?? []) as { id: string; full_name: string | null; email: string | null }[];
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
@@ -84,6 +89,15 @@ export default async function AdminVehicleDetailPage({
             <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">Current status</p>
             <div className="mt-2">
               <VehicleStatusSelect vehicleId={v.id} currentStatus={v.status} />
+            </div>
+
+            <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-grey-500">Assigned inspector</p>
+            <div className="mt-2">
+              <InspectorAssignSelect
+                vehicleId={v.id}
+                currentInspectorId={v.inspector_id ?? null}
+                inspectors={inspectors}
+              />
             </div>
 
             <dl className="mt-6 space-y-2.5 border-t border-grey-100 pt-5 text-sm">

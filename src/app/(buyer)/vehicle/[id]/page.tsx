@@ -284,7 +284,12 @@ export default async function VehicleDetailPage({
               <h2 className="mb-4 text-lg font-bold text-grey-900">
                 {t("vehicle.conditionReport")}
               </h2>
-              <ConditionReport damages={v.vehicle_damages ?? []} />
+              <ConditionReport
+                damages={v.vehicle_damages ?? []}
+                photos={photos}
+                inspectionNotes={v.inspection_notes}
+                inspectionDate={v.inspection_date}
+              />
             </section>
 
             <ShippingOptions vehicleId={v.id} vehiclePriceEur={headlinePrice ?? null} />

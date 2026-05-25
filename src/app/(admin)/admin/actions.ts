@@ -96,6 +96,62 @@ export async function assignInspectorAction(
 }
 
 // --------------------------------------------------------------------
+// Create a new vehicle (admin → "Add New Vehicle"), ready for inspection
+// --------------------------------------------------------------------
+export async function createVehicleAction(input: {
+  make: string;
+  model: string;
+  year: number;
+  vin: string;
+  sellerName?: string;
+  sellerPhone?: string;
+}): Promise<AdminResult & { id?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { data: profile } = await supabase
+    .from("profiles").select("role").eq("id", user.id).single();
+  if (!profile || !["admin", "superadmin"].includes(profile.role)) {
+    return { ok: false, error: "Admin only." };
+  }
+
+  const make = input.make?.trim();
+  const model = input.model?.trim();
+  const vin = input.vin?.trim().toUpperCase();
+  const year = Number(input.year);
+  if (!make || !model || !vin || !Number.isFinite(year) || year < 1950 || year > 2100) {
+    return { ok: false, error: "Make, model, VIN and a valid year are required." };
+  }
+
+  const { data, error } = await supabase
+    .from("vehicles")
+    .insert({
+      vin,
+      make,
+      model,
+      year,
+      mileage_km: 0,
+      fuel_type: "petrol",
+      transmission: "automatic",
+      location_city: "Dubai",
+      location_country: "UAE",
+      status: "inspection_scheduled",
+      seller_name: input.sellerName?.trim() || "Walk-in",
+      seller_phone: input.sellerPhone?.trim() || null,
+      created_by: user.id,
+    })
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/admin/vehicles");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/inspections");
+  return { ok: true, id: (data as { id: string }).id };
+}
+
+// --------------------------------------------------------------------
 // User role assignment (admin → admin/buyer/inspector/superadmin)
 // --------------------------------------------------------------------
 const ALLOWED_ROLES = ["buyer", "inspector", "admin", "superadmin"] as const;
