@@ -111,8 +111,8 @@ export default async function AdminVehiclesPage({
           <p className="font-semibold text-grey-900">No vehicles match this filter.</p>
         </div>
       ) : (
-        <div className="rounded-2xl border border-grey-200 bg-white shadow-xs">
-          <Table>
+        <div className="overflow-x-auto rounded-2xl border border-grey-200 bg-white shadow-xs">
+          <Table className="min-w-[960px]">
             <TableHeader>
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Vehicle</TableHead>
