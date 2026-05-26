@@ -8,7 +8,9 @@ import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { MarketValueBar } from "@/components/vehicle/MarketValueBar";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
-import { InspectorAssignSelect } from "@/components/admin/InspectorAssignSelect";
+import { InspectorAssign } from "@/components/admin/InspectorAssign";
+import { CreateAuctionButton } from "@/components/admin/CreateAuctionButton";
+import { VehicleReviewPanel } from "@/components/admin/VehicleReviewPanel";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getVehicleValuation } from "@/lib/valuation-server";
@@ -59,6 +61,35 @@ export default async function AdminVehicleDetailPage({
         All vehicles
       </Link>
 
+      {(v.status === "pending_review" || v.status === "changes_requested") && (
+        <div className="mb-6 space-y-4">
+          {v.status === "pending_review" && (
+            <div className="rounded-xl border-l-4 border-warning-600 bg-warning-50 px-5 py-4">
+              <p className="font-bold text-grey-900">Awaiting your review</p>
+              <p className="mt-0.5 text-sm text-grey-600">
+                The inspector submitted this vehicle for listing. Review the full report below (photos,
+                condition, pricing, market valuation), then approve, request changes, or edit &amp; list.
+              </p>
+            </div>
+          )}
+          {v.status === "changes_requested" && (
+            <div className="rounded-xl border-l-4 border-error-600 bg-error-50 px-5 py-4">
+              <p className="font-bold text-grey-900">Changes requested — sent back to the inspector</p>
+              {v.review_notes
+                ? <p className="mt-1 text-sm text-grey-700">“{v.review_notes}”</p>
+                : <p className="mt-1 text-sm text-grey-600">Waiting for the inspector to re-submit.</p>}
+            </div>
+          )}
+          <VehicleReviewPanel
+            vehicleId={v.id}
+            listedPriceEur={v.listed_price_eur}
+            reservePriceEur={v.reserve_price_eur}
+            buyNowPriceEur={v.buy_now_price_eur}
+            description={v.description}
+          />
+        </div>
+      )}
+
       <div className="grid gap-8 lg:grid-cols-12">
         <div className="space-y-6 lg:col-span-8">
           <PhotoGallery photos={photos} alt={`${v.year} ${v.make} ${v.model}`} />
@@ -99,12 +130,24 @@ export default async function AdminVehicleDetailPage({
 
             <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-grey-500">Assigned inspector</p>
             <div className="mt-2">
-              <InspectorAssignSelect
+              <InspectorAssign
                 vehicleId={v.id}
                 currentInspectorId={v.inspector_id ?? null}
                 inspectors={inspectors}
               />
             </div>
+
+            {v.status === "listed" && (
+              <div className="mt-5 border-t border-grey-100 pt-5">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-grey-500">Ready to auction</p>
+                <CreateAuctionButton
+                  vehicleId={v.id}
+                  listedPriceEur={v.listed_price_eur}
+                  reservePriceEur={v.reserve_price_eur}
+                  buyNowPriceEur={v.buy_now_price_eur}
+                />
+              </div>
+            )}
 
             <dl className="mt-6 space-y-2.5 border-t border-grey-100 pt-5 text-sm">
               <Row label="Listed price" value={formatEur(v.listed_price_eur)} />

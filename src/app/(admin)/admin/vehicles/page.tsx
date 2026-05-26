@@ -7,7 +7,9 @@ import {
 } from "@/components/ui/table";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
 import { AddVehicleButton } from "@/components/admin/AddVehicleButton";
-import { InspectorAssignSelect } from "@/components/admin/InspectorAssignSelect";
+import { InspectorAssign } from "@/components/admin/InspectorAssign";
+import { AutoAssignButton } from "@/components/admin/AutoAssignButton";
+import { CreateAuctionButton } from "@/components/admin/CreateAuctionButton";
 import { LoadMoreLink } from "@/components/admin/LoadMoreLink";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
@@ -28,6 +30,8 @@ const STATUS_STYLE: Record<VehicleStatus, string> = {
   draft:                "bg-grey-100 text-grey-700 ring-grey-200",
   inspection_scheduled: "bg-grey-100 text-grey-700 ring-grey-200",
   inspected:            "bg-brand-50 text-brand-700 ring-brand-100",
+  pending_review:       "bg-warning-50 text-warning-700 ring-warning-600",
+  changes_requested:    "bg-error-50 text-error-700 ring-error-600",
   listed:               "bg-brand-50 text-brand-700 ring-brand-100",
   in_auction:           "bg-warning-50 text-warning-700 ring-warning-100",
   sold:                 "bg-success-50 text-success-700 ring-success-100",
@@ -85,6 +89,7 @@ export default async function AdminVehiclesPage({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <AutoAssignButton />
           <AddVehicleButton />
           <Link
             href="/admin/dashboard"
@@ -153,19 +158,42 @@ export default async function AdminVehiclesPage({
                       )}
                     </TableCell>
                     <TableCell>
-                      <Badge className={`${STATUS_STYLE[v.status]} ring-1 capitalize`}>
-                        {v.status.replace(/_/g, " ")}
-                      </Badge>
+                      {v.status === "pending_review" ? (
+                        <Badge className="gap-1 bg-warning-600 font-bold text-white ring-1 ring-warning-700">
+                          <span className="inline-block size-1.5 rounded-full bg-white" /> Review
+                        </Badge>
+                      ) : (
+                        <Badge className={`${STATUS_STYLE[v.status]} ring-1 capitalize`}>
+                          {v.status.replace(/_/g, " ")}
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="inline-flex w-48 flex-col gap-1.5 text-left">
                         <VehicleStatusSelect vehicleId={v.id} currentStatus={v.status} compact />
-                        <InspectorAssignSelect
+                        <InspectorAssign
                           vehicleId={v.id}
                           currentInspectorId={v.inspector_id ?? null}
                           inspectors={inspectors}
                           compact
                         />
+                        {v.status === "pending_review" && (
+                          <Link
+                            href={`/admin/vehicles/${v.id}`}
+                            className="inline-flex items-center justify-center gap-1 rounded-md bg-warning-600 px-2 py-1 text-xs font-bold text-white hover:bg-warning-700"
+                          >
+                            Review now
+                          </Link>
+                        )}
+                        {v.status === "listed" && (
+                          <CreateAuctionButton
+                            vehicleId={v.id}
+                            listedPriceEur={v.listed_price_eur}
+                            reservePriceEur={v.reserve_price_eur}
+                            buyNowPriceEur={v.buy_now_price_eur}
+                            size="xs"
+                          />
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

@@ -13,6 +13,8 @@ const ALLOWED: VehicleStatus[] = [
   "draft",
   "inspection_scheduled",
   "inspected",
+  "pending_review",
+  "changes_requested",
   "listed",
   "in_auction",
   "sold",
@@ -22,6 +24,22 @@ const ALLOWED: VehicleStatus[] = [
   "shipped",
   "delivered",
 ];
+
+// Single-row platform_settings PK (see migration 003).
+const SETTINGS_ID = "00000000-0000-0000-0000-000000000001";
+
+// Admin gate shared by every action below: returns the request-scoped client
+// plus a clean "Admin only" message instead of a raw RLS error.
+async function requireAdmin() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { supabase, error: "Not signed in." as string | null };
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  if (!profile || !["admin", "superadmin"].includes(profile.role)) {
+    return { supabase, error: "Admin only." };
+  }
+  return { supabase, error: null };
+}
 
 export async function setVehicleStatusAction(
   vehicleId: string,
@@ -53,56 +71,143 @@ export async function setVehicleStatusAction(
   return { ok: true };
 }
 
-export async function assignInspectorAction(
+type ServerClient = Awaited<ReturnType<typeof createClient>>;
+
+function revalidateAdmin(vehicleId?: string) {
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/vehicles");
+  revalidatePath("/admin/inspections");
+  if (vehicleId) revalidatePath(`/admin/vehicles/${vehicleId}`);
+}
+
+// Core assignment used by all three methods (dropdown / email / auto-assign).
+// Sets inspector_id, promotes a draft/listed vehicle into the inspector's
+// queue (status → inspection_scheduled), and drops a notification.
+async function applyAssignment(
+  supabase: ServerClient,
   vehicleId: string,
   inspectorId: string | null,
 ): Promise<AdminResult> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Not signed in." };
-
-  const { data: profile } = await supabase
-    .from("profiles").select("role").eq("id", user.id).single();
-  if (!profile || !["admin", "superadmin"].includes(profile.role)) {
-    return { ok: false, error: "Admin only." };
-  }
-
-  // Load current status so we can promote the vehicle into the inspector's
-  // queue. Without this the inspector_id was set but a "listed"/"draft"
-  // vehicle never showed on the inspector dashboard (which filters on
-  // status in inspection_scheduled/draft) — the "assignment doesn't work" bug.
   const { data: vehicle } = await supabase
     .from("vehicles").select("status, year, make, model").eq("id", vehicleId).single();
 
   const update: { inspector_id: string | null; status?: string } = { inspector_id: inspectorId };
+  // Promote into the inspector's queue. The inspector dashboard lists vehicles
+  // with status inspection_scheduled/draft, so without this an assigned
+  // "listed" vehicle would never appear — the long-standing "assignment
+  // doesn't work" bug.
   if (inspectorId && vehicle && (vehicle.status === "listed" || vehicle.status === "draft")) {
     update.status = "inspection_scheduled";
   }
 
-  const { error } = await supabase
-    .from("vehicles")
-    .update(update)
-    .eq("id", vehicleId);
+  const { error } = await supabase.from("vehicles").update(update).eq("id", vehicleId);
   if (error) return { ok: false, error: error.message };
 
-  // Notify the inspector if assignment changed.
   if (inspectorId) {
     await supabase.from("notifications").insert({
       user_id: inspectorId,
       type:    "status_update",
-      title:   "New inspection assigned",
+      title:   "New vehicle assigned",
       body:    vehicle
-        ? `${vehicle.year} ${vehicle.make} ${vehicle.model} has been assigned to you for inspection.`
+        ? `New vehicle assigned: ${vehicle.year} ${vehicle.make} ${vehicle.model}`
         : "A vehicle has been assigned to you for inspection.",
       data:    { vehicle_id: vehicleId },
     });
   }
-
-  revalidatePath("/admin/dashboard");
-  revalidatePath("/admin/vehicles");
-  revalidatePath("/admin/inspections");
-  revalidatePath(`/admin/vehicles/${vehicleId}`);
   return { ok: true };
+}
+
+// METHOD A — dropdown picker. inspectorId is a profile id (or null to clear).
+export async function assignInspectorAction(
+  vehicleId: string,
+  inspectorId: string | null,
+): Promise<AdminResult> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+
+  const res = await applyAssignment(supabase, vehicleId, inspectorId);
+  if (!res.ok) return res;
+  revalidateAdmin(vehicleId);
+  return res;
+}
+
+// METHOD B — assign by typing an inspector's email address.
+export async function assignInspectorByEmailAction(
+  vehicleId: string,
+  email: string,
+): Promise<AdminResult & { inspectorName?: string }> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+
+  const clean = email.trim();
+  if (!clean) return { ok: false, error: "Enter an email address." };
+
+  const { data: profile } = await supabase
+    .from("profiles").select("id, role, full_name, email").ilike("email", clean).maybeSingle();
+  if (!profile) return { ok: false, error: `No user found with email "${clean}".` };
+  if (profile.role !== "inspector") {
+    return { ok: false, error: `${profile.email ?? clean} is a "${profile.role}", not an inspector.` };
+  }
+
+  const res = await applyAssignment(supabase, vehicleId, profile.id);
+  if (!res.ok) return res;
+  revalidateAdmin(vehicleId);
+  return { ok: true, inspectorName: profile.full_name ?? profile.email ?? clean };
+}
+
+// METHOD C — round-robin auto-assign every unassigned vehicle across all
+// inspectors. The cursor (last_inspector_index) lives on platform_settings so
+// the rotation continues across calls.
+export async function autoAssignInspectorsAction(): Promise<AdminResult & { assigned?: number }> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+
+  const { data: inspectorsRaw } = await supabase
+    .from("profiles").select("id, full_name, email").eq("role", "inspector").order("created_at", { ascending: true });
+  const inspectors = (inspectorsRaw ?? []) as { id: string }[];
+  if (inspectors.length === 0) return { ok: false, error: "No inspectors found. Create an inspector account first." };
+
+  const { data: vehiclesRaw } = await supabase
+    .from("vehicles")
+    .select("id, year, make, model")
+    .is("inspector_id", null)
+    .in("status", ["draft", "inspection_scheduled"])
+    .order("created_at", { ascending: true });
+  const vehicles = (vehiclesRaw ?? []) as { id: string; year: number; make: string; model: string }[];
+  if (vehicles.length === 0) return { ok: true, assigned: 0 };
+
+  // Read the rotation cursor (column may not exist before migration 005 — fall
+  // back to 0 so auto-assign still works, it just always starts from the top).
+  let start = 0;
+  try {
+    const { data: settings } = await supabase
+      .from("platform_settings").select("last_inspector_index").eq("id", SETTINGS_ID).maybeSingle();
+    const idx = (settings as { last_inspector_index?: number } | null)?.last_inspector_index;
+    if (typeof idx === "number") start = idx;
+  } catch { /* column missing — start from 0 */ }
+
+  const n = inspectors.length;
+  let cursor = start;
+  for (let i = 0; i < vehicles.length; i++) {
+    cursor = (start + 1 + i) % n;
+    const v = vehicles[i];
+    await supabase.from("vehicles").update({ inspector_id: inspectors[cursor].id, status: "inspection_scheduled" }).eq("id", v.id);
+    await supabase.from("notifications").insert({
+      user_id: inspectors[cursor].id,
+      type:    "status_update",
+      title:   "New vehicle assigned",
+      body:    `New vehicle assigned: ${v.year} ${v.make} ${v.model}`,
+      data:    { vehicle_id: v.id },
+    });
+  }
+
+  // Persist the rotation cursor (best-effort — ignored if column absent).
+  try {
+    await supabase.from("platform_settings").update({ last_inspector_index: cursor }).eq("id", SETTINGS_ID);
+  } catch { /* column missing */ }
+
+  revalidateAdmin();
+  return { ok: true, assigned: vehicles.length };
 }
 
 // --------------------------------------------------------------------
@@ -243,4 +348,141 @@ export async function setUserKycStatusAction(
   revalidatePath("/admin/users");
   revalidatePath("/admin/kyc");
   return { ok: true };
+}
+
+// =====================================================================
+// Review workflow — pending_review → listed / changes_requested
+// =====================================================================
+
+// Approve a pending_review vehicle and publish it to the marketplace.
+export async function approveAndListAction(vehicleId: string): Promise<AdminResult> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+  const { error } = await supabase
+    .from("vehicles").update({ status: "listed", review_notes: null }).eq("id", vehicleId);
+  if (error) return { ok: false, error: error.message };
+  revalidateAdmin(vehicleId);
+  revalidatePath("/marketplace");
+  return { ok: true };
+}
+
+// Send a vehicle back to its inspector with feedback.
+export async function requestChangesAction(vehicleId: string, notes: string): Promise<AdminResult> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+  const clean = notes.trim();
+  if (!clean) return { ok: false, error: "Describe what needs changing." };
+
+  const { data: vehicle } = await supabase
+    .from("vehicles").select("inspector_id, year, make, model").eq("id", vehicleId).single();
+
+  const { error } = await supabase
+    .from("vehicles").update({ status: "changes_requested", review_notes: clean }).eq("id", vehicleId);
+  if (error) return { ok: false, error: error.message };
+
+  const inspectorId = (vehicle as { inspector_id?: string | null } | null)?.inspector_id;
+  if (inspectorId) {
+    await supabase.from("notifications").insert({
+      user_id: inspectorId,
+      type: "status_update",
+      title: "Changes requested",
+      body: vehicle
+        ? `Changes requested on ${vehicle.year} ${vehicle.make} ${vehicle.model}: ${clean}`
+        : clean,
+      data: { vehicle_id: vehicleId },
+    });
+  }
+  revalidateAdmin(vehicleId);
+  return { ok: true };
+}
+
+// Edit key listing fields then publish (the "Edit & List" path).
+export interface ListingEdit {
+  listed_price_eur?: number | null;
+  reserve_price_eur?: number | null;
+  buy_now_price_eur?: number | null;
+  description?: string | null;
+}
+export async function updateListingAndListAction(vehicleId: string, edit: ListingEdit): Promise<AdminResult> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+  const update: Record<string, unknown> = { status: "listed", review_notes: null };
+  if (edit.listed_price_eur !== undefined) update.listed_price_eur = edit.listed_price_eur;
+  if (edit.reserve_price_eur !== undefined) update.reserve_price_eur = edit.reserve_price_eur;
+  if (edit.buy_now_price_eur !== undefined) update.buy_now_price_eur = edit.buy_now_price_eur;
+  if (edit.description !== undefined) update.description = edit.description;
+  const { error } = await supabase.from("vehicles").update(update).eq("id", vehicleId);
+  if (error) return { ok: false, error: error.message };
+  revalidateAdmin(vehicleId);
+  revalidatePath("/marketplace");
+  return { ok: true };
+}
+
+// =====================================================================
+// Create an auction for a listed vehicle.
+// =====================================================================
+export interface CreateAuctionInput {
+  vehicleId: string;
+  startingPriceEur: number;
+  reservePriceEur?: number | null;
+  buyNowPriceEur?: number | null;
+  durationHours: number;
+  startMode: "now" | "schedule";
+  startTimeISO?: string | null;
+}
+export async function createAuctionAction(
+  input: CreateAuctionInput,
+): Promise<AdminResult & { auctionId?: string }> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+
+  const starting = Number(input.startingPriceEur);
+  if (!Number.isFinite(starting) || starting <= 0) return { ok: false, error: "Enter a valid starting price." };
+  const hours = Number(input.durationHours);
+  if (!Number.isFinite(hours) || hours <= 0) return { ok: false, error: "Choose an auction duration." };
+
+  const start = input.startMode === "schedule" && input.startTimeISO ? new Date(input.startTimeISO) : new Date();
+  if (Number.isNaN(start.getTime())) return { ok: false, error: "Invalid start time." };
+  const end = new Date(start.getTime() + hours * 3_600_000);
+
+  const reserve = input.reservePriceEur != null && Number(input.reservePriceEur) > 0 ? Number(input.reservePriceEur) : null;
+  if (reserve != null && reserve < starting) return { ok: false, error: "Reserve cannot be below the starting price." };
+  const buyNow = input.buyNowPriceEur != null && Number(input.buyNowPriceEur) > 0 ? Number(input.buyNowPriceEur) : null;
+  if (buyNow != null && buyNow < starting) return { ok: false, error: "Buy-now cannot be below the starting price." };
+
+  // Active when it starts now (or in the past); otherwise scheduled for later.
+  const status = start.getTime() <= Date.now() + 60_000 ? "active" : "scheduled";
+
+  const { data, error } = await supabase
+    .from("auctions")
+    .upsert({
+      vehicle_id: input.vehicleId,
+      status,
+      start_time: start.toISOString(),
+      end_time: end.toISOString(),
+      starting_price_eur: starting,
+      reserve_price_eur: reserve,
+      buy_now_price_eur: buyNow,
+      current_bid_eur: null,
+      bid_count: 0,
+      bidder_count: 0,
+      winner_id: null,
+    }, { onConflict: "vehicle_id" })
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: error.message };
+
+  const { error: vErr } = await supabase
+    .from("vehicles")
+    .update({ status: "in_auction", listed_price_eur: starting, reserve_price_eur: reserve, buy_now_price_eur: buyNow })
+    .eq("id", input.vehicleId);
+  if (vErr) return { ok: false, error: vErr.message };
+
+  revalidateAdmin(input.vehicleId);
+  revalidatePath("/admin/auctions");
+  revalidatePath("/marketplace");
+  revalidatePath("/auctions");
+  const auctionId = (data as { id: string }).id;
+  revalidatePath(`/auction/${auctionId}`);
+  return { ok: true, auctionId };
 }

@@ -9,6 +9,8 @@ export type VehicleStatus =
   | "draft"
   | "inspection_scheduled"
   | "inspected"
+  | "pending_review"
+  | "changes_requested"
   | "listed"
   | "in_auction"
   | "sold"
@@ -71,6 +73,7 @@ export interface Vehicle {
   inspector_id: string | null;
   inspection_date: string | null;
   inspection_notes: string | null;
+  review_notes: string | null;
   listed_price_eur: number | null;
   reserve_price_eur: number | null;
   buy_now_price_eur: number | null;
