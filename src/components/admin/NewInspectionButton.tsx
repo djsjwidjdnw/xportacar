@@ -38,19 +38,30 @@ export function NewInspectionButton({
   const [pending, start] = useTransition();
 
   const [mode, setMode] = useState<"existing" | "new">(availableVehicles.length > 0 ? "existing" : "new");
-  const [vehicleId, setVehicleId] = useState<string>("");
-  const [inspectorId, setInspectorId] = useState<string>("");
+  // Selects use `null` for "nothing chosen" — base-ui's Select crashes if it is
+  // given a controlled value (e.g. "") that matches none of its items.
+  const [vehicleId, setVehicleId] = useState<string | null>(null);
+  const [inspectorId, setInspectorId] = useState<string | null>(null);
   const [form, setForm] = useState(EMPTY_VEHICLE);
 
-  const set = (k: keyof typeof EMPTY_VEHICLE) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm((f) => ({ ...f, [k]: e.currentTarget.value }));
+  // Defensive: read the value whether base-ui hands us a native event or a
+  // raw string, and never let an onChange throw and unmount the dialog.
+  const set = (k: keyof typeof EMPTY_VEHICLE) =>
+    (e: React.ChangeEvent<HTMLInputElement> | string) => {
+      try {
+        const value = typeof e === "string" ? e : (e?.currentTarget?.value ?? e?.target?.value ?? "");
+        setForm((f) => ({ ...f, [k]: value }));
+      } catch (err) {
+        console.error("NewInspectionButton input onChange failed", err);
+      }
+    };
 
   const newVehicleValid = !!form.make.trim() && !!form.model.trim() && !!form.vin.trim() && !!form.year.trim();
   const canAssign = !!inspectorId && (mode === "existing" ? !!vehicleId : newVehicleValid);
 
   const reset = () => {
     setMode(availableVehicles.length > 0 ? "existing" : "new");
-    setVehicleId(""); setInspectorId(""); setForm(EMPTY_VEHICLE);
+    setVehicleId(null); setInspectorId(null); setForm(EMPTY_VEHICLE);
   };
 
   const inspectorLabel = useMemo(() => {
@@ -69,7 +80,7 @@ export function NewInspectionButton({
               sellerName: form.sellerName, sellerPhone: form.sellerPhone,
             }
           : undefined,
-        inspectorId,
+        inspectorId: inspectorId ?? "",
       });
       if (!res.ok) { toast.err("Couldn't schedule inspection", res.error); return; }
       toast.ok("Inspection scheduled", `Assigned to ${inspectorLabel || "inspector"}.`);
@@ -122,7 +133,7 @@ export function NewInspectionButton({
                   No un-inspected vehicles. Switch to “New vehicle” to add one.
                 </p>
               ) : (
-                <Select value={vehicleId} onValueChange={(v) => setVehicleId(v ?? "")} disabled={pending}>
+                <Select value={vehicleId} onValueChange={(v) => setVehicleId((v as string | null) ?? null)} disabled={pending}>
                   <SelectTrigger className="h-9 w-full">
                     <SelectValue placeholder="Select a vehicle" />
                   </SelectTrigger>
@@ -160,7 +171,7 @@ export function NewInspectionButton({
                 No inspectors yet. Create an inspector account in Users first.
               </p>
             ) : (
-              <Select value={inspectorId} onValueChange={(v) => setInspectorId(v ?? "")} disabled={pending}>
+              <Select value={inspectorId} onValueChange={(v) => setInspectorId((v as string | null) ?? null)} disabled={pending}>
                 <SelectTrigger className="h-9 w-full">
                   <SelectValue placeholder="Select an inspector" />
                 </SelectTrigger>

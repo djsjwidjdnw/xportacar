@@ -28,7 +28,8 @@ export function AddVehicleButton({ inspectors = [] }: { inspectors?: Inspector[]
   // After a successful create we switch to an "assign inspector" step instead
   // of closing, so the new vehicle doesn't get stranded without an inspector.
   const [created, setCreated] = useState<{ id: string; label: string } | null>(null);
-  const [inspectorId, setInspectorId] = useState("");
+  // null = nothing selected; base-ui Select crashes on an unmatched value like "".
+  const [inspectorId, setInspectorId] = useState<string | null>(null);
 
   const set = (k: keyof typeof EMPTY) => (e: React.ChangeEvent<HTMLInputElement>) =>
     setForm((f) => ({ ...f, [k]: e.currentTarget.value }));
@@ -36,7 +37,7 @@ export function AddVehicleButton({ inspectors = [] }: { inspectors?: Inspector[]
   const valid = !!form.make.trim() && !!form.model.trim() && !!form.vin.trim() && !!form.year.trim();
 
   const close = () => {
-    setForm(EMPTY); setCreated(null); setInspectorId(""); setOpen(false);
+    setForm(EMPTY); setCreated(null); setInspectorId(null); setOpen(false);
   };
 
   const submit = () => {
@@ -102,7 +103,7 @@ export function AddVehicleButton({ inspectors = [] }: { inspectors?: Inspector[]
               ) : (
                 <label className="block">
                   <span className="mb-1 block text-xs font-medium text-grey-700">Inspector</span>
-                  <Select value={inspectorId} onValueChange={(v) => setInspectorId(v ?? "")} disabled={pending}>
+                  <Select value={inspectorId} onValueChange={(v) => setInspectorId((v as string | null) ?? null)} disabled={pending}>
                     <SelectTrigger className="h-9 w-full">
                       <SelectValue placeholder="Select an inspector" />
                     </SelectTrigger>
