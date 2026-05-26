@@ -21,14 +21,26 @@ export function MarketValueBar({
   const { format } = useCurrency();
   const { minEur, avgEur, maxEur } = valuation;
   const span = Math.max(1, maxEur - minEur);
-  const clampPct = (v: number) => Math.min(98, Math.max(2, v));
-  const avgPct = clampPct(((avgEur - minEur) / span) * 100);
+  const clamp = (v: number) => Math.min(100, Math.max(0, v));
+  const avgPct = clamp(((avgEur - minEur) / span) * 100);
   const pos = pricePosition(priceEur, valuation);
-  const pricePct = priceEur != null ? clampPct(((priceEur - minEur) / span) * 100) : null;
+  // Cap the marker at the bar edges: price > max sticks to the right edge,
+  // price < min sticks to the left edge.
+  const pricePct = priceEur != null ? clamp(((priceEur - minEur) / span) * 100) : null;
   const posColor =
     pos === "fair" ? "bg-success-600" : pos === "below" ? "bg-warning-500" : pos === "above" ? "bg-error-600" : "bg-grey-400";
   const posText =
     pos === "fair" ? "text-success-700" : pos === "below" ? "text-warning-700" : pos === "above" ? "text-error-700" : "text-grey-500";
+
+  // Keep the price label inside the card: anchor it left near the start,
+  // right near the end, centered in the middle — never overflowing the edge.
+  const labelStyle: React.CSSProperties =
+    pricePct == null ? {}
+    : pricePct <= 12 ? { left: 0 }
+    : pricePct >= 88 ? { right: 0 }
+    : { left: `${pricePct}%`, transform: "translateX(-50%)" };
+  const labelAlign =
+    pricePct == null ? "" : pricePct <= 12 ? "text-left" : pricePct >= 88 ? "text-right" : "text-center";
 
   return (
     <div className="rounded-2xl border border-grey-200 bg-white p-5 shadow-xs">
@@ -47,20 +59,32 @@ export function MarketValueBar({
       <p className="mt-3 text-2xl font-extrabold tabular-nums text-grey-900">{format(avgEur)}</p>
       <p className="text-[11px] text-grey-500">average market value</p>
 
-      {/* Track */}
-      <div className="relative mt-5 mb-7 h-2 rounded-full bg-gradient-to-r from-warning-200 via-success-200 to-error-200">
+      {/* Gradient track: green (min) → yellow (avg) → red (max) */}
+      <div className="relative mt-6 h-3 rounded-full bg-gradient-to-r from-success-500 via-warning-500 to-error-500">
+        {/* min / max edge ticks */}
+        <div className="absolute top-1/2 left-0 h-3.5 w-0.5 -translate-y-1/2 rounded-full bg-white/70" />
+        <div className="absolute top-1/2 right-0 h-3.5 w-0.5 -translate-y-1/2 rounded-full bg-white/70" />
         {/* avg tick */}
-        <div className="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-grey-500 ring-2 ring-white" style={{ left: `${avgPct}%` }} />
-        {/* current price marker */}
+        <div className="absolute top-1/2 size-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-grey-700 ring-2 ring-white" style={{ left: `${avgPct}%` }} />
+        {/* current price marker — capped within [0,100] */}
         {pricePct != null && (
-          <div className="absolute -top-1 flex -translate-x-1/2 flex-col items-center" style={{ left: `${pricePct}%` }}>
-            <div className={cn("size-4 rounded-full ring-2 ring-white shadow", posColor)} />
-            <span className={cn("mt-1 whitespace-nowrap text-[10px] font-bold", posText)}>{priceLabel} {format(priceEur)}</span>
-          </div>
+          <div
+            className={cn("absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full ring-2 ring-white shadow", posColor)}
+            style={{ left: `${pricePct}%` }}
+          />
         )}
       </div>
 
-      <div className="flex items-center justify-between text-[11px] font-semibold text-grey-600">
+      {/* Price label row — positioned so it never overflows the container */}
+      {pricePct != null && (
+        <div className="relative mt-1.5 h-4">
+          <span className={cn("absolute max-w-full truncate text-[11px] font-bold", posText, labelAlign)} style={labelStyle}>
+            {priceLabel} {format(priceEur)}
+          </span>
+        </div>
+      )}
+
+      <div className="mt-2 flex items-center justify-between text-[11px] font-semibold text-grey-600">
         <span>Min {format(minEur)}</span>
         <span>Max {format(maxEur)}</span>
       </div>

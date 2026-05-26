@@ -25,11 +25,11 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-grey-50 dark">
+    <div className="min-h-screen bg-grey-50">
       <AdminSidebar profile={profile} />
       <AdminTopBar profile={profile} />
       <main className="lg:pl-64">
-        <div className="bg-white text-grey-900 dark:bg-grey-50 min-h-[calc(100vh-4rem)] lg:min-h-screen">
+        <div className="min-h-[calc(100vh-4rem)] bg-grey-50 text-grey-900 lg:min-h-screen">
           {children}
         </div>
       </main>

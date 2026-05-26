@@ -70,7 +70,7 @@ export function VehicleReviewPanel({
   });
 
   return (
-    <div className="rounded-2xl border border-brand-200 bg-brand-50/50 p-5 shadow-xs">
+    <div className="relative isolate rounded-2xl border border-brand-200 bg-brand-50/50 p-5 shadow-xs">
       <p className="text-sm font-bold text-grey-900">Review actions</p>
       <p className="mt-0.5 text-xs text-grey-600">Approve to publish, request changes, or edit then list.</p>
 
@@ -105,6 +105,7 @@ export function VehicleReviewPanel({
             value={notes}
             onChange={(e) => setNotes(e.currentTarget.value)}
             rows={3}
+            className="border-grey-300 bg-white"
             placeholder="e.g. Re-take the engine bay photo, confirm the mileage, lower the starting price…"
           />
           <div className="flex justify-end gap-2">
@@ -119,12 +120,12 @@ export function VehicleReviewPanel({
       {mode === "edit" && (
         <div className="mt-4 space-y-3 rounded-xl border border-grey-200 bg-white p-3">
           <div className="grid grid-cols-3 gap-2">
-            <Field label="Listed (€)"><Input value={listed} onChange={(e) => setListed(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" /></Field>
-            <Field label="Reserve (€)"><Input value={reserve} onChange={(e) => setReserve(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" /></Field>
-            <Field label="Buy now (€)"><Input value={buyNow} onChange={(e) => setBuyNow(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" /></Field>
+            <Field label="Listed (€)"><Input value={listed} onChange={(e) => setListed(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" className="border-grey-300 bg-white" /></Field>
+            <Field label="Reserve (€)"><Input value={reserve} onChange={(e) => setReserve(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" className="border-grey-300 bg-white" /></Field>
+            <Field label="Buy now (€)"><Input value={buyNow} onChange={(e) => setBuyNow(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" className="border-grey-300 bg-white" /></Field>
           </div>
           <Field label="Description">
-            <Textarea value={desc} onChange={(e) => setDesc(e.currentTarget.value)} rows={3} placeholder="Buyer-facing description…" />
+            <Textarea value={desc} onChange={(e) => setDesc(e.currentTarget.value)} rows={3} className="border-grey-300 bg-white" placeholder="Buyer-facing description…" />
           </Field>
           <div className="flex justify-end gap-2">
             <Button variant="ghost" size="sm" onClick={() => setMode(null)} disabled={pending}>Cancel</Button>

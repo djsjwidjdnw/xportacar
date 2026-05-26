@@ -5,11 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
-import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
 import { AddVehicleButton } from "@/components/admin/AddVehicleButton";
-import { InspectorAssign } from "@/components/admin/InspectorAssign";
 import { AutoAssignButton } from "@/components/admin/AutoAssignButton";
-import { CreateAuctionButton } from "@/components/admin/CreateAuctionButton";
 import { LoadMoreLink } from "@/components/admin/LoadMoreLink";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
@@ -68,10 +65,8 @@ export default async function AdminVehiclesPage({
   let countQuery = supabase.from("vehicles").select("id", { count: "exact", head: true });
   if (sp.status) countQuery = countQuery.eq("status", sp.status);
 
-  const inspectorsQuery = supabase.from("profiles").select("id, full_name, email").eq("role", "inspector");
-  const [{ data: vehicles, error }, { count: totalRaw }, { data: inspectorsRaw }] = await Promise.all([query, countQuery, inspectorsQuery]);
+  const [{ data: vehicles, error }, { count: totalRaw }] = await Promise.all([query, countQuery]);
   const total = totalRaw ?? 0;
-  const inspectors = (inspectorsRaw ?? []) as { id: string; full_name: string | null; email: string | null }[];
 
   // deno-lint-ignore no-explicit-any
   const list = (vehicles ?? []) as (Vehicle & { auctions: any[] })[];
@@ -112,16 +107,16 @@ export default async function AdminVehiclesPage({
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-grey-200 bg-white shadow-xs">
-          <Table className="min-w-[960px]">
+          <Table className="min-w-[820px]">
             <TableHeader>
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Vehicle</TableHead>
                 <TableHead>VIN</TableHead>
                 <TableHead>Mileage</TableHead>
                 <TableHead>Price</TableHead>
+                <TableHead>Market</TableHead>
                 <TableHead>Auction</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -130,7 +125,7 @@ export default async function AdminVehiclesPage({
                 const val = estimateValuation({ make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km });
                 const pos = pricePosition(v.listed_price_eur, val);
                 return (
-                  <TableRow key={v.id} className="[&>td]:px-5 [&>td]:py-3.5">
+                  <TableRow key={v.id} className="cursor-pointer transition-colors hover:bg-grey-50 [&>td]:px-5 [&>td]:py-3.5">
                     <TableCell>
                       <Link href={`/admin/vehicles/${v.id}`} className="font-medium text-grey-900 hover:text-brand-700">
                         {v.year} {v.make} {v.model}
@@ -146,8 +141,8 @@ export default async function AdminVehiclesPage({
                           {VS_MARKET_LABEL[pos]}
                         </span>
                       )}
-                      <p className="text-[10px] text-grey-400">Market {formatEur(val.avgEur)}</p>
                     </TableCell>
+                    <TableCell className="tabular-nums text-sm text-grey-600">{formatEur(val.avgEur)}</TableCell>
                     <TableCell>
                       {auction ? (
                         <Link href={`/auction/${auction.id}`} className="text-xs font-medium text-brand-700 hover:underline">
@@ -157,7 +152,7 @@ export default async function AdminVehiclesPage({
                         <span className="text-xs text-grey-400">—</span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="text-right">
                       {v.status === "pending_review" ? (
                         <Badge className="gap-1 bg-warning-600 font-bold text-white ring-1 ring-warning-700">
                           <span className="inline-block size-1.5 rounded-full bg-white" /> Review
@@ -167,34 +162,6 @@ export default async function AdminVehiclesPage({
                           {v.status.replace(/_/g, " ")}
                         </Badge>
                       )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="inline-flex w-48 flex-col gap-1.5 text-left">
-                        <VehicleStatusSelect vehicleId={v.id} currentStatus={v.status} compact />
-                        <InspectorAssign
-                          vehicleId={v.id}
-                          currentInspectorId={v.inspector_id ?? null}
-                          inspectors={inspectors}
-                          compact
-                        />
-                        {v.status === "pending_review" && (
-                          <Link
-                            href={`/admin/vehicles/${v.id}`}
-                            className="inline-flex items-center justify-center gap-1 rounded-md bg-warning-600 px-2 py-1 text-xs font-bold text-white hover:bg-warning-700"
-                          >
-                            Review now
-                          </Link>
-                        )}
-                        {v.status === "listed" && (
-                          <CreateAuctionButton
-                            vehicleId={v.id}
-                            listedPriceEur={v.listed_price_eur}
-                            reservePriceEur={v.reserve_price_eur}
-                            buyNowPriceEur={v.buy_now_price_eur}
-                            size="xs"
-                          />
-                        )}
-                      </div>
                     </TableCell>
                   </TableRow>
                 );
