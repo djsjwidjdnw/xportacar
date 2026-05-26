@@ -65,8 +65,10 @@ export default async function AdminVehiclesPage({
   let countQuery = supabase.from("vehicles").select("id", { count: "exact", head: true });
   if (sp.status) countQuery = countQuery.eq("status", sp.status);
 
-  const [{ data: vehicles, error }, { count: totalRaw }] = await Promise.all([query, countQuery]);
+  const inspectorsQuery = supabase.from("profiles").select("id, full_name, email").eq("role", "inspector");
+  const [{ data: vehicles, error }, { count: totalRaw }, { data: inspectorsRaw }] = await Promise.all([query, countQuery, inspectorsQuery]);
   const total = totalRaw ?? 0;
+  const inspectors = (inspectorsRaw ?? []) as { id: string; full_name: string | null; email: string | null }[];
 
   // deno-lint-ignore no-explicit-any
   const list = (vehicles ?? []) as (Vehicle & { auctions: any[] })[];
@@ -85,7 +87,7 @@ export default async function AdminVehiclesPage({
         </div>
         <div className="flex items-center gap-3">
           <AutoAssignButton />
-          <AddVehicleButton />
+          <AddVehicleButton inspectors={inspectors} />
           <Link
             href="/admin/dashboard"
             className="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800"

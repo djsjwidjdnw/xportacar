@@ -10,6 +10,7 @@ import {
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { InspectorAssign } from "@/components/admin/InspectorAssign";
 import { AutoAssignButton } from "@/components/admin/AutoAssignButton";
+import { NewInspectionButton } from "@/components/admin/NewInspectionButton";
 import { createClient } from "@/lib/supabase/server";
 import { formatRelativeTime } from "@/lib/utils";
 
@@ -37,6 +38,7 @@ export default async function AdminInspectionsPage() {
     { data: rowsRaw, error },
     { data: inspectorsRaw },
     { data: photoCountsRaw },
+    { data: candidatesRaw },
   ] = await Promise.all([
     supabase
       .from("vehicles")
@@ -48,10 +50,17 @@ export default async function AdminInspectionsPage() {
       .order("updated_at", { ascending: false }),
     supabase.from("profiles").select("id, full_name, email").eq("role", "inspector"),
     supabase.from("vehicle_photos").select("vehicle_id"),
+    // Un-inspected vehicles available to schedule (draft / listed).
+    supabase
+      .from("vehicles")
+      .select("id, year, make, model, vin, status")
+      .in("status", ["draft", "listed"])
+      .order("created_at", { ascending: false }),
   ]);
 
   const rows = (rowsRaw ?? []) as unknown as Row[];
   const inspectors = (inspectorsRaw ?? []) as Inspector[];
+  const candidates = (candidatesRaw ?? []) as { id: string; year: number; make: string; model: string; vin: string; status: string }[];
 
   const photoCount = new Map<string, number>();
   for (const r of (photoCountsRaw ?? []) as { vehicle_id: string }[]) {
@@ -78,7 +87,10 @@ export default async function AdminInspectionsPage() {
             {rows.length} vehicles in the pipeline · {unassigned.length} unassigned · {pendingReview.length} awaiting review
           </p>
         </div>
-        <AutoAssignButton />
+        <div className="flex items-center gap-3">
+          <AutoAssignButton />
+          <NewInspectionButton inspectors={inspectors} availableVehicles={candidates} />
+        </div>
       </header>
 
       {error ? (

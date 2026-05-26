@@ -267,6 +267,91 @@ export async function createVehicleAction(input: {
 }
 
 // --------------------------------------------------------------------
+// Schedule a new inspection (admin → "New Inspection"): pick an existing
+// un-inspected vehicle OR create one inline, then assign it to an inspector
+// and move it into status inspection_scheduled — in one step.
+// --------------------------------------------------------------------
+export interface NewVehicleInput {
+  make: string;
+  model: string;
+  year: number;
+  vin: string;
+  sellerName?: string;
+  sellerPhone?: string;
+}
+export async function scheduleInspectionAction(input: {
+  mode: "existing" | "new";
+  vehicleId?: string | null;
+  newVehicle?: NewVehicleInput;
+  inspectorId: string;
+}): Promise<AdminResult & { id?: string }> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+
+  if (!input.inspectorId) return { ok: false, error: "Select an inspector." };
+  const { data: insp } = await supabase
+    .from("profiles").select("id, role").eq("id", input.inspectorId).maybeSingle();
+  if (!insp || (insp as { role?: string }).role !== "inspector") {
+    return { ok: false, error: "The selected user is not an inspector." };
+  }
+
+  let vehicleId = input.vehicleId ?? null;
+
+  if (input.mode === "new") {
+    const nv = input.newVehicle;
+    const make = nv?.make?.trim();
+    const model = nv?.model?.trim();
+    const vin = nv?.vin?.trim().toUpperCase();
+    const year = Number(nv?.year);
+    if (!make || !model || !vin || !Number.isFinite(year) || year < 1950 || year > 2100) {
+      return { ok: false, error: "Make, model, VIN and a valid year are required." };
+    }
+    const { data: { user } } = await supabase.auth.getUser();
+    const { data, error } = await supabase
+      .from("vehicles")
+      .insert({
+        vin, make, model, year,
+        mileage_km: 0,
+        fuel_type: "petrol",
+        transmission: "automatic",
+        location_city: "Dubai",
+        location_country: "UAE",
+        status: "inspection_scheduled",
+        seller_name: nv?.sellerName?.trim() || "Walk-in",
+        seller_phone: nv?.sellerPhone?.trim() || null,
+        inspector_id: input.inspectorId,
+        created_by: user?.id,
+      })
+      .select("id")
+      .single();
+    if (error) return { ok: false, error: error.message };
+    vehicleId = (data as { id: string }).id;
+  } else {
+    if (!vehicleId) return { ok: false, error: "Select a vehicle to inspect." };
+    const { error } = await supabase
+      .from("vehicles")
+      .update({ inspector_id: input.inspectorId, status: "inspection_scheduled" })
+      .eq("id", vehicleId);
+    if (error) return { ok: false, error: error.message };
+  }
+
+  const { data: v } = await supabase
+    .from("vehicles").select("year, make, model").eq("id", vehicleId).single();
+  await supabase.from("notifications").insert({
+    user_id: input.inspectorId,
+    type: "status_update",
+    title: "New inspection assigned",
+    body: v
+      ? `Inspection scheduled: ${v.year} ${v.make} ${v.model}`
+      : "An inspection has been scheduled for you.",
+    data: { vehicle_id: vehicleId },
+  });
+
+  revalidateAdmin(vehicleId ?? undefined);
+  return { ok: true, id: vehicleId ?? undefined };
+}
+
+// --------------------------------------------------------------------
 // User role assignment (admin → admin/buyer/inspector/superadmin)
 // --------------------------------------------------------------------
 const ALLOWED_ROLES = ["buyer", "inspector", "admin", "superadmin"] as const;
