@@ -1,10 +1,12 @@
 import {
   Settings as SettingsIcon, Building2, Mail, CreditCard, HardDrive,
-  CheckCircle2, AlertCircle, Database,
+  CheckCircle2, AlertCircle, Database, Ship,
 } from "lucide-react";
 
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { PlatformSettingsForm } from "@/components/admin/PlatformSettingsForm";
+import { ShippingRatesEditor } from "@/components/admin/ShippingRatesEditor";
+import type { ShippingRate } from "@/lib/shipping";
 import { isStripeConfigured } from "@/lib/stripe";
 import { loadPlatformSettings } from "@/lib/platform-settings";
 import { createClient } from "@/lib/supabase/server";
@@ -31,6 +33,14 @@ export default async function AdminSettingsPage() {
     .from("kyc_submissions")
     .select("*", { count: "exact", head: true });
 
+  // Live shipping rates (empty if the migration hasn't been applied yet — the
+  // editor then shows the seeded defaults as a starting point).
+  const { data: shippingRatesRaw } = await supabase
+    .from("shipping_rates")
+    .select("*")
+    .order("sort_order", { ascending: true });
+  const shippingRates = (shippingRatesRaw ?? []) as ShippingRate[];
+
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
       <Breadcrumbs className="mb-5" items={[{ label: "Settings" }]} />
@@ -56,6 +66,20 @@ export default async function AdminSettingsPage() {
           These values are persisted under <code className="rounded bg-grey-100 px-1 py-0.5 text-[11px]">_internal/platform-settings.json</code> in Supabase Storage. Reads happen on every server render so changes take effect immediately.
         </p>
         <PlatformSettingsForm initial={settings} />
+      </section>
+
+      {/* Live shipping rates — edits hit the shipping_rates table and reflect
+          immediately on buyer-facing pages. */}
+      <section className="mt-6 rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
+        <h2 className="mb-1 flex items-center gap-2 text-base font-bold text-grey-900">
+          <Ship className="size-4 text-brand-600" />
+          Shipping rates
+        </h2>
+        <p className="mb-5 text-xs text-grey-500">
+          Dubai (Jebel Ali) → EU ports + service fees. Edit a price or transit window and hit Save;
+          toggle a route off to hide it. Changes take effect immediately across web + mobile.
+        </p>
+        <ShippingRatesEditor initialRates={shippingRates} />
       </section>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">

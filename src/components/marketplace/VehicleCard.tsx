@@ -12,6 +12,7 @@ import { useCurrency } from "@/lib/currency";
 import {
   auctionPhase, cn, formatKm, formatTimeRemaining, isEndingSoon, thumb,
 } from "@/lib/utils";
+import { estimateValuation } from "@/lib/valuation";
 import type { Vehicle, Auction } from "@/types";
 
 interface VehicleCardData extends Vehicle {
@@ -65,6 +66,10 @@ export function VehicleCard({
   const headlinePrice = live || ended
     ? (auction?.current_bid_eur ?? auction?.starting_price_eur ?? vehicle.listed_price_eur)
     : vehicle.listed_price_eur;
+
+  const marketAvg = estimateValuation({
+    make: vehicle.make, model: vehicle.model, year: vehicle.year, mileageKm: vehicle.mileage_km,
+  }).avgEur;
 
   const startLabel = auction?.start_time
     ? new Date(auction.start_time).toLocaleDateString(intlLocale, { day: "numeric", month: "short" })
@@ -140,6 +145,9 @@ export function VehicleCard({
               </p>
               <p className="text-base font-extrabold text-grey-900 tabular-nums">
                 {format(headlinePrice ?? 0)}
+              </p>
+              <p className="mt-0.5 text-[10px] font-medium text-grey-500 tabular-nums">
+                Market {format(marketAvg)}
               </p>
             </div>
           </div>

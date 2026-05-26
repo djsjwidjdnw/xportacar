@@ -1,11 +1,10 @@
 "use client";
 
-// Shipping/delivery options selector — radio-style picker covering
-// warehouse pickup, the 4 EU port options, door-to-door delivery, and the
-// optional German TÜV / papers service.  The selected option's cost is
-// summed with the vehicle price and shown as a live total estimate.
+// Shipping/delivery selector. Prices come LIVE from the admin-editable
+// shipping_rates table (src/lib/shipping.ts, 1-hour cached) with a seeded
+// fallback. Warehouse pickup, the EU RoRo ports, door-to-door, and German TÜV.
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { Ship, Home, FileText, Box } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -14,47 +13,19 @@ import { toast } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
 import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
+import {
+  getShippingRates, portRoutes, serviceRate, getShippingPriceEur, describeShipping,
+  FALLBACK_RATES, type ShippingChoice, type ShippingRate,
+} from "@/lib/shipping";
 
-export type ShippingChoice =
-  | { kind: "warehouse" }
-  | { kind: "port"; port: string }
-  | { kind: "door" }
-  | { kind: "tuv" };
+// Re-export so existing consumers (WonInvoice) keep importing from here.
+export { getShippingPriceEur, describeShipping };
+export type { ShippingChoice };
 
-export interface PortOption {
-  port: string;
-  country: string;
-  priceEur: number;
-  days: number;
-}
-
-export const PORT_OPTIONS: PortOption[] = [
-  { port: "Hamburg",   country: "Germany",     priceEur: 1800, days: 28 },
-  { port: "Rotterdam", country: "Netherlands", priceEur: 1600, days: 25 },
-  { port: "Genoa",     country: "Italy",       priceEur: 2100, days: 22 },
-  { port: "Barcelona", country: "Spain",       priceEur: 2200, days: 24 },
-];
-
-export const DOOR_RANGE_EUR = { min: 2800, max: 4500 };
-export const TUV_PRICE_EUR = 750;
-
-export function getShippingPriceEur(choice: ShippingChoice): number {
-  switch (choice.kind) {
-    case "warehouse": return 0;
-    case "port":      return PORT_OPTIONS.find((p) => p.port === choice.port)?.priceEur ?? 0;
-    case "door":      return DOOR_RANGE_EUR.min;
-    case "tuv":       return TUV_PRICE_EUR;
-  }
-}
-
-export function describeShipping(choice: ShippingChoice): string {
-  switch (choice.kind) {
-    case "warehouse": return "Warehouse Pickup (Dubai)";
-    case "port":      return `Nearest Port — ${choice.port}`;
-    case "door":      return "Door-to-Door Delivery";
-    case "tuv":       return "German TÜV / Papers Service";
-  }
-}
+const PORT_COUNTRY: Record<string, string> = {
+  Hamburg: "Germany", Rotterdam: "Netherlands", Bremerhaven: "Germany",
+  Antwerp: "Belgium", Genoa: "Italy", Barcelona: "Spain",
+};
 
 export function ShippingOptions({
   vehicleId,
@@ -66,53 +37,48 @@ export function ShippingOptions({
 }: {
   vehicleId: string;
   vehiclePriceEur: number | null;
-  // Optional controlled mode — when present, the selector becomes a
-  // controlled component and the parent owns the choice (used by the
-  // won-screen invoice so its totals update with this picker).
   value?: ShippingChoice;
   onChange?: (next: ShippingChoice) => void;
   hideTotal?: boolean;
   hideSaveQuote?: boolean;
 }) {
   const { format } = useCurrency();
+  const [rates, setRates] = useState<ShippingRate[]>(FALLBACK_RATES);
   const [internal, setInternal] = useState<ShippingChoice>({ kind: "port", port: "Hamburg" });
   const choice = value ?? internal;
-  const setChoice = (next: ShippingChoice) => {
-    if (onChange) onChange(next);
-    else setInternal(next);
-  };
+  const setChoice = (next: ShippingChoice) => { if (onChange) onChange(next); else setInternal(next); };
   const [saving, startSave] = useTransition();
 
-  const shippingEur = getShippingPriceEur(choice);
+  // Live rates (cached 1h) — falls back to the seed while loading / offline.
+  useEffect(() => { let on = true; getShippingRates().then((r) => { if (on) setRates(r); }); return () => { on = false; }; }, []);
+
+  const roro = useMemo(() => portRoutes(rates, "roro"), [rates]);
+  const doorPrice = serviceRate(rates, "door_to_door_eu")?.base_price_eur ?? 800;
+  const tuvPrice = serviceRate(rates, "service_tuv")?.base_price_eur ?? 750;
+
+  const shippingEur = getShippingPriceEur(choice, rates);
   const total = (vehiclePriceEur ?? 0) + shippingEur;
-  const doorRange = useMemo(
-    () => `${format(DOOR_RANGE_EUR.min)} – ${format(DOOR_RANGE_EUR.max)} estimated`,
-    [format],
-  );
 
   const saveQuote = () => {
     if (choice.kind !== "port") {
       toast.err("Choose a port", "Quote saving is only available for port delivery options.");
       return;
     }
-    const port = PORT_OPTIONS.find((p) => p.port === choice.port);
-    if (!port) return;
+    const route = roro.find((p) => p.destination_port === choice.port);
+    if (!route) return;
     startSave(async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
       const { error } = await supabase.from("shipping_quotes").insert({
         vehicle_id: vehicleId,
         buyer_id:   user?.id ?? null,
-        destination: port.port,
-        cost_eur:    port.priceEur,
-        transit_days: port.days,
-        carrier:     `RoRo · ${port.port}`,
+        destination: route.destination_port,
+        cost_eur:    route.base_price_eur,
+        transit_days: route.transit_days_min,
+        carrier:     `RoRo · ${route.destination_port}`,
       });
-      if (error) {
-        toast.err("Couldn't save quote", error.message);
-        return;
-      }
-      toast.ok("Quote saved", `${port.port} · ${format(port.priceEur)}`);
+      if (error) { toast.err("Couldn't save quote", error.message); return; }
+      toast.ok("Quote saved", `${route.destination_port} · ${format(route.base_price_eur)}`);
     });
   };
 
@@ -127,9 +93,7 @@ export function ShippingOptions({
         </div>
         <CurrencyPills />
       </div>
-      <p className="mt-2 text-xs text-grey-500">
-        Choose how the vehicle reaches you. Prices reflect the selected currency.
-      </p>
+      <p className="mt-2 text-xs text-grey-500">Live rates · prices reflect the selected currency.</p>
 
       <div className="mt-5 space-y-3">
         <OptionRow
@@ -141,37 +105,34 @@ export function ShippingOptions({
           priceLabel="Free"
         />
 
-        <div className={cn(
-          "rounded-lg border bg-grey-50/50 p-3",
-          choice.kind === "port" ? "border-brand-300" : "border-grey-200",
-        )}>
+        <div className={cn("rounded-lg border bg-grey-50/50 p-3", choice.kind === "port" ? "border-brand-300" : "border-grey-200")}>
           <div className="flex items-center gap-2 px-1 pb-2 text-[11px] font-bold uppercase tracking-wide text-grey-500">
             <Ship className="size-3.5" />
             Nearest Port Delivery (RoRo from Jebel Ali)
           </div>
           <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-            {PORT_OPTIONS.map((p) => {
-              const active = choice.kind === "port" && choice.port === p.port;
+            {roro.map((p) => {
+              const active = choice.kind === "port" && choice.port === p.destination_port;
               return (
                 <button
-                  key={p.port}
+                  key={p.route_key}
                   type="button"
-                  onClick={() => setChoice({ kind: "port", port: p.port })}
+                  onClick={() => setChoice({ kind: "port", port: p.destination_port! })}
                   className={cn(
                     "flex items-center justify-between gap-3 rounded-lg border bg-white px-3 py-2.5 text-left transition-colors",
-                    active
-                      ? "border-brand-500 ring-1 ring-brand-200"
-                      : "border-grey-200 hover:border-grey-300",
+                    active ? "border-brand-500 ring-1 ring-brand-200" : "border-grey-200 hover:border-grey-300",
                   )}
                 >
                   <div className="flex items-center gap-2.5">
                     <Radio active={active} />
                     <div>
-                      <p className="text-sm font-semibold text-grey-900">{p.port}, {p.country}</p>
-                      <p className="text-[11px] text-grey-500">{p.days} days</p>
+                      <p className="text-sm font-semibold text-grey-900">
+                        {p.destination_port}{PORT_COUNTRY[p.destination_port ?? ""] ? `, ${PORT_COUNTRY[p.destination_port!]}` : ""}
+                      </p>
+                      <p className="text-[11px] text-grey-500">{p.transit_days_min}–{p.transit_days_max} days</p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold tabular-nums text-grey-900">{format(p.priceEur)}</p>
+                  <p className="text-sm font-bold tabular-nums text-grey-900">{format(p.base_price_eur)}</p>
                 </button>
               );
             })}
@@ -183,8 +144,8 @@ export function ShippingOptions({
           onClick={() => setChoice({ kind: "door" })}
           icon={<Home className="size-4" />}
           title="Door-to-Door Delivery"
-          subtitle="30–45 days · varies by destination"
-          priceLabel={doorRange}
+          subtitle="Added on top of the port rate · 30–45 days"
+          priceLabel={`from ${format(doorPrice)}`}
         />
 
         <OptionRow
@@ -193,11 +154,10 @@ export function ShippingOptions({
           icon={<FileText className="size-4" />}
           title="German TÜV / Papers Service"
           subtitle="Inspection for DE registration, CoC, customs paperwork"
-          priceLabel={`+ ${format(TUV_PRICE_EUR)}`}
+          priceLabel={`+ ${format(tuvPrice)}`}
         />
       </div>
 
-      {/* Live total */}
       {!hideTotal && (
         <div className="mt-5 rounded-xl border border-brand-100 bg-brand-50/60 p-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -209,13 +169,7 @@ export function ShippingOptions({
           </p>
           {!hideSaveQuote && choice.kind === "port" && (
             <div className="mt-3 flex justify-end">
-              <Button
-                onClick={saveQuote}
-                disabled={saving}
-                variant="ghost"
-                size="sm"
-                className="h-7 text-[11px] font-semibold text-brand-700 hover:underline"
-              >
+              <Button onClick={saveQuote} disabled={saving} variant="ghost" size="sm" className="h-7 text-[11px] font-semibold text-brand-700 hover:underline">
                 {saving ? "Saving…" : "Save this quote"}
               </Button>
             </div>
@@ -226,32 +180,16 @@ export function ShippingOptions({
   );
 }
 
-function OptionRow({
-  active, onClick, icon, title, subtitle, priceLabel,
-}: {
-  active: boolean;
-  onClick: () => void;
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  priceLabel: string;
+function OptionRow({ active, onClick, icon, title, subtitle, priceLabel }: {
+  active: boolean; onClick: () => void; icon: React.ReactNode; title: string; subtitle: string; priceLabel: string;
 }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-lg border bg-white px-4 py-3 text-left transition-colors",
-        active
-          ? "border-brand-500 ring-1 ring-brand-200 bg-brand-50/40"
-          : "border-grey-200 hover:border-grey-300",
-      )}
-    >
+    <button type="button" onClick={onClick} className={cn(
+      "flex w-full items-center gap-3 rounded-lg border bg-white px-4 py-3 text-left transition-colors",
+      active ? "border-brand-500 ring-1 ring-brand-200 bg-brand-50/40" : "border-grey-200 hover:border-grey-300",
+    )}>
       <Radio active={active} />
-      <span className={cn(
-        "grid size-8 place-items-center rounded-lg text-brand-700",
-        active ? "bg-brand-600 text-white" : "bg-brand-50 ring-1 ring-brand-100",
-      )}>
+      <span className={cn("grid size-8 place-items-center rounded-lg text-brand-700", active ? "bg-brand-600 text-white" : "bg-brand-50 ring-1 ring-brand-100")}>
         {icon}
       </span>
       <span className="flex-1">
@@ -265,10 +203,7 @@ function OptionRow({
 
 function Radio({ active }: { active: boolean }) {
   return (
-    <span className={cn(
-      "grid size-4 place-items-center rounded-full border-2",
-      active ? "border-brand-600" : "border-grey-300",
-    )}>
+    <span className={cn("grid size-4 place-items-center rounded-full border-2", active ? "border-brand-600" : "border-grey-300")}>
       {active && <span className="size-2 rounded-full bg-brand-600" />}
     </span>
   );

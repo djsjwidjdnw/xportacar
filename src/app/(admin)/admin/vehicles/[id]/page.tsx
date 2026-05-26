@@ -6,10 +6,12 @@ import { Badge } from "@/components/ui/badge";
 import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
+import { MarketValueBar } from "@/components/vehicle/MarketValueBar";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
 import { InspectorAssignSelect } from "@/components/admin/InspectorAssignSelect";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
+import { getVehicleValuation } from "@/lib/valuation-server";
 import { formatEur, formatRelativeTime } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
 
@@ -42,6 +44,10 @@ export default async function AdminVehicleDetailPage({
   const { data: inspectorsRaw } = await supabase
     .from("profiles").select("id, full_name, email").eq("role", "inspector");
   const inspectors = (inspectorsRaw ?? []) as { id: string; full_name: string | null; email: string | null }[];
+
+  const valuation = await getVehicleValuation({
+    make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km, vehicleId: v.id,
+  });
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
@@ -109,6 +115,8 @@ export default async function AdminVehicleDetailPage({
               <Row label="Seller phone" value={v.seller_phone} />
             </dl>
           </div>
+
+          <MarketValueBar valuation={valuation} priceEur={v.listed_price_eur} title="Market valuation" priceLabel="Listed" />
 
           {auction && (
             <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">

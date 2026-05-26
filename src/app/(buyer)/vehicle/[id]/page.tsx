@@ -9,12 +9,14 @@ import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { ShippingOptions } from "@/components/vehicle/ShippingOptions";
+import { MarketValueBar } from "@/components/vehicle/MarketValueBar";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { VehiclePriceCard } from "@/components/vehicle/VehiclePriceCard";
 import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
+import { getVehicleValuation } from "@/lib/valuation-server";
 import { auctionPhase, cn, formatEur } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
 
@@ -108,6 +110,10 @@ export default async function VehicleDetailPage({
   const headlinePrice = phase === "live" || phase === "ended"
     ? (auction.current_bid_eur ?? auction.starting_price_eur)
     : v.listed_price_eur;
+
+  const valuation = await getVehicleValuation({
+    make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km, vehicleId: v.id,
+  });
 
   // JSON-LD Vehicle structured data — Google enriches listings with
   // mileage / fuel / price when this is present.
@@ -291,6 +297,8 @@ export default async function VehicleDetailPage({
                 inspectionDate={v.inspection_date}
               />
             </section>
+
+            <MarketValueBar valuation={valuation} priceEur={headlinePrice ?? v.listed_price_eur} />
 
             <ShippingOptions vehicleId={v.id} vehiclePriceEur={headlinePrice ?? null} />
 

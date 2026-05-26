@@ -7,11 +7,20 @@ import {
 } from "@/components/ui/table";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
 import { AddVehicleButton } from "@/components/admin/AddVehicleButton";
+import { InspectorAssignSelect } from "@/components/admin/InspectorAssignSelect";
 import { LoadMoreLink } from "@/components/admin/LoadMoreLink";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
 import { formatEur, formatKm } from "@/lib/utils";
+import { estimateValuation, pricePosition } from "@/lib/valuation";
 import type { Vehicle, VehicleStatus } from "@/types";
+
+const VS_MARKET_STYLE: Record<string, string> = {
+  fair:  "bg-success-50 text-success-700 ring-success-100",
+  below: "bg-warning-50 text-warning-700 ring-warning-100",
+  above: "bg-error-50 text-error-700 ring-error-100",
+};
+const VS_MARKET_LABEL: Record<string, string> = { fair: "Fair", below: "Below", above: "Above" };
 
 export const metadata = { title: "Vehicles" };
 
@@ -55,8 +64,10 @@ export default async function AdminVehiclesPage({
   let countQuery = supabase.from("vehicles").select("id", { count: "exact", head: true });
   if (sp.status) countQuery = countQuery.eq("status", sp.status);
 
-  const [{ data: vehicles, error }, { count: totalRaw }] = await Promise.all([query, countQuery]);
+  const inspectorsQuery = supabase.from("profiles").select("id, full_name, email").eq("role", "inspector");
+  const [{ data: vehicles, error }, { count: totalRaw }, { data: inspectorsRaw }] = await Promise.all([query, countQuery, inspectorsQuery]);
   const total = totalRaw ?? 0;
+  const inspectors = (inspectorsRaw ?? []) as { id: string; full_name: string | null; email: string | null }[];
 
   // deno-lint-ignore no-explicit-any
   const list = (vehicles ?? []) as (Vehicle & { auctions: any[] })[];
@@ -111,6 +122,8 @@ export default async function AdminVehiclesPage({
             <TableBody>
               {list.map((v) => {
                 const auction = Array.isArray(v.auctions) ? v.auctions[0] : v.auctions;
+                const val = estimateValuation({ make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km });
+                const pos = pricePosition(v.listed_price_eur, val);
                 return (
                   <TableRow key={v.id} className="[&>td]:px-5 [&>td]:py-3.5">
                     <TableCell>
@@ -121,8 +134,14 @@ export default async function AdminVehiclesPage({
                     </TableCell>
                     <TableCell className="font-mono text-xs text-grey-600">{v.vin}</TableCell>
                     <TableCell className="text-sm text-grey-700">{formatKm(v.mileage_km)}</TableCell>
-                    <TableCell className="font-semibold tabular-nums text-grey-900">
-                      {formatEur(v.listed_price_eur)}
+                    <TableCell className="tabular-nums">
+                      <span className="font-semibold text-grey-900">{formatEur(v.listed_price_eur)}</span>
+                      {pos !== "unknown" && (
+                        <span className={`ml-2 inline-block rounded-full px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase ring-1 ${VS_MARKET_STYLE[pos]}`}>
+                          {VS_MARKET_LABEL[pos]}
+                        </span>
+                      )}
+                      <p className="text-[10px] text-grey-400">Market {formatEur(val.avgEur)}</p>
                     </TableCell>
                     <TableCell>
                       {auction ? (
@@ -139,8 +158,14 @@ export default async function AdminVehiclesPage({
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="inline-block w-44 text-left">
+                      <div className="inline-flex w-48 flex-col gap-1.5 text-left">
                         <VehicleStatusSelect vehicleId={v.id} currentStatus={v.status} compact />
+                        <InspectorAssignSelect
+                          vehicleId={v.id}
+                          currentInspectorId={v.inspector_id ?? null}
+                          inspectors={inspectors}
+                          compact
+                        />
                       </div>
                     </TableCell>
                   </TableRow>

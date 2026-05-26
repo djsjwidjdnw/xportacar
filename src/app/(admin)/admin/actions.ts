@@ -67,16 +67,26 @@ export async function assignInspectorAction(
     return { ok: false, error: "Admin only." };
   }
 
+  // Load current status so we can promote the vehicle into the inspector's
+  // queue. Without this the inspector_id was set but a "listed"/"draft"
+  // vehicle never showed on the inspector dashboard (which filters on
+  // status in inspection_scheduled/draft) — the "assignment doesn't work" bug.
+  const { data: vehicle } = await supabase
+    .from("vehicles").select("status, year, make, model").eq("id", vehicleId).single();
+
+  const update: { inspector_id: string | null; status?: string } = { inspector_id: inspectorId };
+  if (inspectorId && vehicle && (vehicle.status === "listed" || vehicle.status === "draft")) {
+    update.status = "inspection_scheduled";
+  }
+
   const { error } = await supabase
     .from("vehicles")
-    .update({ inspector_id: inspectorId })
+    .update(update)
     .eq("id", vehicleId);
   if (error) return { ok: false, error: error.message };
 
   // Notify the inspector if assignment changed.
   if (inspectorId) {
-    const { data: vehicle } = await supabase
-      .from("vehicles").select("year, make, model").eq("id", vehicleId).single();
     await supabase.from("notifications").insert({
       user_id: inspectorId,
       type:    "status_update",
