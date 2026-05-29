@@ -1,0 +1,13 @@
+{
+  "name": "xportacar-screenshots",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Isolated tooling to capture/frame App Store screenshots (does not affect the web app deps).",
+  "type": "module",
+  "scripts": {
+    "capture": "node capture-web.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}
