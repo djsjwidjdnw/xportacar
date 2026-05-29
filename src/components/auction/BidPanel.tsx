@@ -81,24 +81,32 @@ export function BidPanel({
   const currentBid = auction.current_bid_eur ?? auction.starting_price_eur;
   const minNext = currentBid + bidIncrement(currentBid);
 
-  const [amount, setAmount] = useState<number>(minNext);
+  // Numeric inputs are held as STRINGS so the field can be cleared completely
+  // while typing (a number-typed value snaps an empty field back to "0", which
+  // is the "can't delete the zero" bug). We coerce to a number on use/submit.
+  const [amountStr, setAmountStr] = useState<string>(String(minNext));
   const [submitting, setSubmitting] = useState(false);
   const [buying, setBuying] = useState(false);
   const [buyOpen, setBuyOpen] = useState(false);
 
   // Proxy / counter-offer state
   const [proxyOn, setProxyOn] = useState(false);
-  const [proxyMax, setProxyMax] = useState<number>(minNext + 5_000);
+  const [proxyMaxStr, setProxyMaxStr] = useState<string>(String(minNext + 5_000));
   const [counterOpen, setCounterOpen] = useState(false);
-  const [counterAmount, setCounterAmount] = useState<number>(currentBid);
+  const [counterAmountStr, setCounterAmountStr] = useState<string>(String(currentBid));
   const [counterMessage, setCounterMessage] = useState("");
   const [counterSubmitting, setCounterSubmitting] = useState(false);
 
-  // Whenever the live current_bid jumps, ensure our input is still legal.
+  const amount = Number(amountStr);
+  const proxyMax = Number(proxyMaxStr);
+  const counterAmount = Number(counterAmountStr);
+
+  // When a live bid raises the minimum, keep a *non-empty* input legal — but
+  // never clobber an empty field the user is mid-edit on.
   useEffect(() => {
-    setAmount((a) => (a < minNext ? minNext : a));
-    setProxyMax((p) => (p < minNext + 1000 ? minNext + 5_000 : p));
-    setCounterAmount((c) => (c < currentBid ? currentBid : c));
+    setAmountStr((s) => (s !== "" && Number(s) < minNext ? String(minNext) : s));
+    setProxyMaxStr((s) => (s !== "" && Number(s) < minNext + 1000 ? String(minNext + 5_000) : s));
+    setCounterAmountStr((s) => (s !== "" && Number(s) < currentBid ? String(currentBid) : s));
   }, [minNext, currentBid]);
 
   const isWinning = useMemo(
@@ -189,7 +197,10 @@ export function BidPanel({
   };
 
   const adjust = (delta: 1 | -1) => {
-    setAmount((a) => Math.max(minNext, a + delta * bidIncrement(a)));
+    setAmountStr((s) => {
+      const base = Number(s) || minNext;
+      return String(Math.max(minNext, base + delta * bidIncrement(base)));
+    });
   };
 
   return (
@@ -281,10 +292,10 @@ export function BidPanel({
               className="flex-1"
               type="number"
               inputMode="numeric"
-              value={amount}
+              value={amountStr}
               min={minNext}
               step={bidIncrement(currentBid)}
-              onChange={(e) => setAmount(Math.max(0, Number(e.currentTarget.value || 0)))}
+              onChange={(e) => setAmountStr(e.currentTarget.value)}
               disabled={!isAuthenticated || submitting || auctionEnded}
             />
             <Button variant="outline" size="icon-lg" aria-label="Increase" onClick={() => adjust(1)} disabled={!isAuthenticated || submitting || auctionEnded}>
@@ -313,10 +324,10 @@ export function BidPanel({
                     textClass="text-sm"
                     type="number"
                     inputMode="numeric"
-                    value={proxyMax}
+                    value={proxyMaxStr}
                     min={amount}
                     step={500}
-                    onChange={(e) => setProxyMax(Math.max(amount, Number(e.currentTarget.value || 0)))}
+                    onChange={(e) => setProxyMaxStr(e.currentTarget.value)}
                     disabled={submitting}
                   />
                   <p className="mt-1 text-[11px] text-grey-500">
@@ -401,10 +412,10 @@ export function BidPanel({
                     <EuroInput
                       type="number"
                       inputMode="numeric"
-                      value={counterAmount}
+                      value={counterAmountStr}
                       min={1}
                       step={500}
-                      onChange={(e) => setCounterAmount(Math.max(0, Number(e.currentTarget.value || 0)))}
+                      onChange={(e) => setCounterAmountStr(e.currentTarget.value)}
                     />
                   </label>
                   <label className="block text-sm">

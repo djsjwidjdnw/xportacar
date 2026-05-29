@@ -63,19 +63,22 @@ export default async function AuctionWonPage({
     after(() => settleEndedAuctions([a.id]));
   }
 
-  // Pull the auto-generated invoice (if any) so we can offer Pay Now.
-  let invoiceId: string | null = null;
+  // Pull the auto-generated invoice (if any) so we can offer confirm / Pay Now.
+  let invoice: {
+    id: string; status: string; invoice_number: string | null;
+    created_at: string; payment_confirmed_at: string | null;
+  } | null = null;
   if (isWinner) {
     const { data: inv } = await supabase
       .from("invoices")
-      .select("id, status")
+      .select("id, status, invoice_number, created_at, payment_confirmed_at")
       .eq("auction_id", a.id)
       .eq("buyer_id", user.id)
-      .single();
-    if (inv && (inv as { status: string }).status !== "paid") {
-      invoiceId = (inv as { id: string }).id;
-    }
+      .maybeSingle();
+    // deno-lint-ignore no-explicit-any
+    invoice = (inv as any) ?? null;
   }
+  const invoiceId = invoice && invoice.status !== "paid" ? invoice.id : null;
 
   return (
     <div className="bg-grey-50 py-12 sm:py-16">
@@ -95,7 +98,7 @@ export default async function AuctionWonPage({
           )}
           {isWinner && (
             <p className="mt-2 text-sm text-white/90">
-              We&apos;ll guide you through payment and shipping next.
+              Confirm your payment within 36 hours to secure this vehicle.
             </p>
           )}
         </div>
@@ -112,6 +115,10 @@ export default async function AuctionWonPage({
             }}
             hammerEur={hammerEur}
             userEmail={user.email ?? null}
+            invoiceId={invoice?.id ?? null}
+            invoiceNumber={invoice?.invoice_number ?? null}
+            createdAtIso={invoice?.created_at ?? null}
+            confirmedAtIso={invoice?.payment_confirmed_at ?? null}
           />
         )}
 

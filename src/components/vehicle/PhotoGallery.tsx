@@ -158,16 +158,17 @@ export function PhotoGallery({
             </>
           )}
 
-          {/* Image */}
+          {/* Image — flex child of the centered overlay; no asymmetric padding
+              so it sits perfectly centred both axes. */}
           <div
-            className="max-h-full max-w-full px-16 py-12"
+            className="flex max-h-[90vh] max-w-[92vw] flex-col items-center justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={active.url}
               alt={active.caption ?? alt}
-              className="max-h-[85vh] max-w-[90vw] rounded-lg object-contain"
+              className="max-h-[82vh] max-w-[88vw] rounded-lg object-contain"
             />
             {active.caption && (
               <p className="mt-3 text-center text-sm text-white/80">{active.caption}</p>

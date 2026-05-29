@@ -101,7 +101,10 @@ export default async function VehicleDetailPage({
   }
 
   const v: VehicleWithMedia = normalizeVehicleRow(vehicle as unknown as Record<string, unknown>);
+  const paintThicknessUrl =
+    v.vehicle_photos.find((p) => p.category === "paint_thickness")?.url ?? null;
   const photos = v.vehicle_photos
+    .filter((p) => p.category !== "paint_thickness")
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((p) => ({ url: p.url, caption: p.caption }));
   const auction = v.auctions[0];
@@ -295,6 +298,7 @@ export default async function VehicleDetailPage({
                 photos={photos}
                 inspectionNotes={v.inspection_notes}
                 inspectionDate={v.inspection_date}
+                paintThicknessUrl={paintThicknessUrl}
               />
             </section>
 

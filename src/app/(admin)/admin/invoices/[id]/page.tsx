@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { ChevronLeft, Printer } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { InvoicePrintTrigger } from "@/components/admin/InvoicePrintTrigger";
+import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
 import { createClient } from "@/lib/supabase/server";
 import { formatEur } from "@/lib/utils";
 
@@ -121,7 +121,7 @@ export default async function AdminInvoiceDetailPage({
             <tr className="border-b border-grey-100">
               <td className="py-3">
                 <p className="font-medium">Platform fee</p>
-                <p className="text-xs text-grey-500">5% of hammer price</p>
+                <p className="text-xs text-grey-500">2.9% of hammer price</p>
               </td>
               <td className="py-3 text-right tabular-nums">{formatEur(inv.platform_fee_eur)}</td>
             </tr>
@@ -133,8 +133,9 @@ export default async function AdminInvoiceDetailPage({
         </table>
 
         <section className="mt-8 border-t border-grey-100 pt-6 text-xs text-grey-500">
-          <p>Payment terms: net 7 days from invoice date.</p>
-          <p>Bank transfer details will be issued by our finance team. Logistics & customs clearance handled by XportACar UAE.</p>
+          <p>Payment terms: confirm within 36 hours of winning, then complete the wire transfer within 5 working days.</p>
+          <p>Bank transfer details will be issued by our finance team.</p>
+          <CustomsDisclaimer className="mt-4" />
         </section>
       </article>
     </div>

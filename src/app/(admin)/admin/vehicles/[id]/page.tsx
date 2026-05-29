@@ -40,7 +40,11 @@ export default async function AdminVehicleDetailPage({
 
   if (error || !vehicle) notFound();
   const v: VehicleWithMedia = normalizeVehicleRow(vehicle as unknown as Record<string, unknown>);
-  const photos = v.vehicle_photos.sort((a, b) => a.sort_order - b.sort_order).map((p) => ({ url: p.url, caption: p.caption }));
+  const paintThicknessUrl = v.vehicle_photos.find((p) => p.category === "paint_thickness")?.url ?? null;
+  const photos = v.vehicle_photos
+    .filter((p) => p.category !== "paint_thickness")
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((p) => ({ url: p.url, caption: p.caption }));
   const auction = v.auctions[0];
 
   const { data: inspectorsRaw } = await supabase
@@ -110,7 +114,13 @@ export default async function AdminVehicleDetailPage({
 
           <section className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
             <h2 className="mb-4 text-lg font-bold text-grey-900">Condition report</h2>
-            <ConditionReport damages={v.vehicle_damages ?? []} />
+            <ConditionReport
+              damages={v.vehicle_damages ?? []}
+              photos={photos}
+              inspectionNotes={v.inspection_notes}
+              inspectionDate={v.inspection_date}
+              paintThicknessUrl={paintThicknessUrl}
+            />
           </section>
 
           {v.description && (

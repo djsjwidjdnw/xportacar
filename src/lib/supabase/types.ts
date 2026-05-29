@@ -20,7 +20,7 @@ export type VehicleStatus =
   | "shipped"
   | "delivered";
 export type PhotoCategory =
-  | "exterior" | "interior" | "engine" | "undercarriage" | "documents" | "damage";
+  | "exterior" | "interior" | "engine" | "undercarriage" | "documents" | "damage" | "paint_thickness";
 export type DamageSeverity = "cosmetic" | "minor" | "moderate" | "major";
 export type AuctionStatus =
   | "scheduled" | "active" | "ended" | "sold" | "cancelled";

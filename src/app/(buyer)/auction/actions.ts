@@ -137,7 +137,7 @@ export async function buyNowAction(input: {
   // RLS on `auctions` only allows staff to UPDATE, so we use the service-
   // role admin client to close the auction.  Same for the vehicle.
   const admin = createAdminClient();
-  await admin
+  const { error: aupErr } = await admin
     .from("auctions")
     .update({
       status: "sold",
@@ -146,11 +146,32 @@ export async function buyNowAction(input: {
       current_bid_eur: price,
     })
     .eq("id", auction.id);
+  // Surface the failure instead of silently sending the buyer to a "closed"
+  // page — this is what made Buy Now appear broken.
+  if (aupErr) return { ok: false, error: `Could not close the auction: ${aupErr.message}` };
 
   await admin
     .from("vehicles")
     .update({ status: "sold" })
     .eq("id", auction.vehicle_id);
+
+  // The DB trigger creates the invoice when status flips to sold. Defensively
+  // ensure one exists (idempotent on the unique auction_id) so the won page can
+  // always offer confirm + Pay Now even if the trigger isn't deployed.
+  const fee = Math.round(price * 0.029 * 100) / 100;
+  const { data: existingInvoice } = await admin
+    .from("invoices").select("id").eq("auction_id", auction.id).maybeSingle();
+  if (!existingInvoice) {
+    await admin.from("invoices").insert({
+      auction_id: auction.id,
+      buyer_id:   user.id,
+      vehicle_id: auction.vehicle_id,
+      amount_eur: price,
+      platform_fee_eur: fee,
+      total_eur: price + fee,
+      status: "pending",
+    });
+  }
 
   // "You won" notification.
   await supabase.from("notifications").insert({

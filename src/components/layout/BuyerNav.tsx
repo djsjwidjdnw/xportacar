@@ -6,11 +6,6 @@ import { Gavel, Heart, LayoutDashboard, Menu, ShoppingBag, TrendingUp, X } from 
 import { useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger,
 } from "@/components/ui/sheet";
@@ -18,8 +13,9 @@ import {
 import { Logo } from "@/components/shared/Logo";
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { useTranslations } from "@/i18n/provider";
-import { cn, initials } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { Notification, Profile } from "@/types";
 
 interface NavLink {
@@ -87,62 +83,7 @@ export function BuyerNav({
           )}
           <LanguageSwitcher />
           {profile ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger render={
-                <Button variant="ghost" size="sm" className="gap-2">
-                  <Avatar className="size-7">
-                    <AvatarImage src={profile.avatar_url ?? undefined} alt={profile.full_name ?? ""} />
-                    <AvatarFallback className="bg-brand-100 text-xs font-semibold text-brand-700">
-                      {initials(profile.full_name ?? profile.email)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="hidden text-sm font-medium text-grey-700 sm:inline">
-                    {profile.full_name ?? profile.email}
-                  </span>
-                </Button>
-              } />
-              <DropdownMenuContent align="end" className="min-w-56">
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-grey-900">
-                      {profile.full_name ?? profile.email}
-                    </span>
-                    {profile.company_name && (
-                      <span className="text-xs text-grey-500">{profile.company_name}</span>
-                    )}
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-
-                {/* Plain <Link> wrappers — earlier `render={<Link>}` lost
-                    children in base-ui's slot, which is why dropdown
-                    items appeared blank for some users. */}
-                <DropdownMenuItem>
-                  <Link href="/dashboard" className="flex w-full items-center gap-2">
-                    <LayoutDashboard className="size-4 text-grey-500" />
-                    {t("dashboard")}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/profile" className="flex w-full items-center gap-2">
-                    {t("profile")}
-                  </Link>
-                </DropdownMenuItem>
-                {(profile.role === "admin" || profile.role === "superadmin") && (
-                  <DropdownMenuItem>
-                    <Link href="/admin/dashboard" className="flex w-full items-center gap-2">
-                      Admin
-                    </Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-error-600">
-                  <Link href="/api/auth/sign-out" className="flex w-full items-center gap-2">
-                    {t("signOut")}
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <UserMenu profile={profile} variant="buyer" />
           ) : (
             <div className="hidden items-center gap-2 sm:flex">
               <Link href="/login" className={cn(buttonVariants({ variant: "ghost", size: "sm" }))}>

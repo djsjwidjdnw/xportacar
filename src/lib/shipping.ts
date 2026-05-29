@@ -23,22 +23,22 @@ export interface ShippingRate {
 
 // Mirrors supabase/migrations/004 seed. Used until the migration is applied.
 export const FALLBACK_RATES: ShippingRate[] = [
-  r("roro_hamburg", "Hamburg", "roro", 1800, 28, 35, 10),
-  r("roro_rotterdam", "Rotterdam", "roro", 1600, 25, 30, 11),
-  r("roro_bremerhaven", "Bremerhaven", "roro", 1750, 28, 35, 12),
-  r("roro_antwerp", "Antwerp", "roro", 1650, 25, 32, 13),
-  r("roro_genoa", "Genoa", "roro", 2000, 20, 25, 14),
-  r("roro_barcelona", "Barcelona", "roro", 2100, 22, 28, 15),
-  r("container_hamburg", "Hamburg", "container", 2400, 28, 35, 20),
-  r("container_rotterdam", "Rotterdam", "container", 2200, 25, 30, 21),
-  r("container_bremerhaven", "Bremerhaven", "container", 2350, 28, 35, 22),
-  r("container_genoa", "Genoa", "container", 2600, 20, 25, 23),
+  r("roro_hamburg", "Hamburg", "roro", 1450, 28, 35, 10),
+  r("roro_rotterdam", "Rotterdam", "roro", 1350, 25, 30, 11),
+  r("roro_bremerhaven", "Bremerhaven", "roro", 1450, 28, 35, 12),
+  r("roro_antwerp", "Antwerp", "roro", 1400, 25, 32, 13),
+  r("roro_genoa", "Genoa", "roro", 1550, 20, 25, 14),
+  r("roro_barcelona", "Barcelona", "roro", 1650, 22, 28, 15),
+  r("container_hamburg", "Hamburg", "container", 2100, 28, 35, 20),
+  r("container_rotterdam", "Rotterdam", "container", 1950, 25, 30, 21),
+  r("container_bremerhaven", "Bremerhaven", "container", 2100, 28, 35, 22),
+  r("container_genoa", "Genoa", "container", 2300, 20, 25, 23),
   svc("warehouse_dubai", "warehouse", 0, "Warehouse pickup — available immediately after payment", 1),
-  svc("door_to_door_eu", "door_to_door", 800, "Door-to-door delivery in the EU — +€800–1,500 by distance", 30, 30, 45),
+  svc("door_to_door_eu", "door_to_door", 950, "Door-to-door delivery in the EU — added on top of the port rate", 30, 30, 45),
   svc("service_tuv", "service", 750, "German TÜV / papers: DE registration, CoC, customs paperwork", 40),
   { ...svc("service_marine_insurance", "service", 150, "Marine insurance: 1.5% of declared value (min €150)", 41), rate_pct: 1.5 },
-  svc("service_customs_export_uae", "service", 200, "UAE export customs clearance", 42),
-  svc("service_customs_import_eu", "service", 350, "EU import customs + VAT processing", 43),
+  svc("service_customs_export_uae", "service", 250, "UAE export customs clearance", 42),
+  svc("service_customs_import_eu", "service", 400, "EU import customs + VAT processing", 43),
 ];
 
 function r(route_key: string, dest: string, method: string, price: number, dmin: number, dmax: number, sort: number): ShippingRate {
@@ -83,29 +83,47 @@ export const portRoutes = (rates: ShippingRate[], method: "roro" | "container") 
 export const serviceRate = (rates: ShippingRate[], key: string) =>
   rates.find((x) => x.route_key === key) ?? null;
 
-export type ShippingChoice =
+// The shipping METHOD is a single choice (warehouse / port / door). German TÜV
+// is an ADD-ON service (+€750) that can be combined with any method, so it lives
+// as a separate boolean rather than being one of the mutually-exclusive methods.
+export type ShippingMethod =
   | { kind: "warehouse" }
   | { kind: "port"; port: string }       // destination_port of a roro route
-  | { kind: "door" }
-  | { kind: "tuv" };
+  | { kind: "door" };
 
-export function getShippingPriceEur(choice: ShippingChoice, rates: ShippingRate[] = FALLBACK_RATES): number {
-  switch (choice.kind) {
+export interface ShippingChoice {
+  method: ShippingMethod;
+  tuv: boolean;
+}
+
+export function tuvPriceEur(rates: ShippingRate[] = FALLBACK_RATES): number {
+  return serviceRate(rates, "service_tuv")?.base_price_eur ?? 750;
+}
+
+export function getMethodPriceEur(method: ShippingMethod, rates: ShippingRate[] = FALLBACK_RATES): number {
+  switch (method.kind) {
     case "warehouse": return serviceRate(rates, "warehouse_dubai")?.base_price_eur ?? 0;
     case "door":      return serviceRate(rates, "door_to_door_eu")?.base_price_eur ?? 800;
-    case "tuv":       return serviceRate(rates, "service_tuv")?.base_price_eur ?? 750;
     case "port": {
-      const route = portRoutes(rates, "roro").find((x) => x.destination_port === choice.port);
+      const route = portRoutes(rates, "roro").find((x) => x.destination_port === method.port);
       return route?.base_price_eur ?? 0;
     }
   }
 }
 
-export function describeShipping(choice: ShippingChoice): string {
-  switch (choice.kind) {
+export function getShippingPriceEur(choice: ShippingChoice, rates: ShippingRate[] = FALLBACK_RATES): number {
+  return getMethodPriceEur(choice.method, rates) + (choice.tuv ? tuvPriceEur(rates) : 0);
+}
+
+export function describeMethod(method: ShippingMethod): string {
+  switch (method.kind) {
     case "warehouse": return "Warehouse Pickup (Dubai)";
-    case "port":      return `Nearest Port — ${choice.port}`;
+    case "port":      return `Nearest Port — ${method.port}`;
     case "door":      return "Door-to-Door Delivery";
-    case "tuv":       return "German TÜV / Papers Service";
   }
+}
+
+export function describeShipping(choice: ShippingChoice): string {
+  const base = describeMethod(choice.method);
+  return choice.tuv ? `${base} + German TÜV` : base;
 }

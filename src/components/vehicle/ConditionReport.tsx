@@ -24,18 +24,38 @@ export function ConditionReport({
   photos,
   inspectionNotes,
   inspectionDate,
+  paintThicknessUrl,
 }: {
   damages: VehicleDamage[];
   photos?: ReportPhoto[];
   inspectionNotes?: string | null;
   inspectionDate?: string | null;
+  paintThicknessUrl?: string | null;
 }) {
   const t = useTranslations("vehicle");
 
   // The full report is worth opening when there are photos, inspector notes,
-  // or damage photos the buyer can drill into.
+  // a paint-thickness reading, or damage photos the buyer can drill into.
   const hasFullReport =
-    (photos?.length ?? 0) > 0 || !!inspectionNotes || damages.some((d) => d.photo_url);
+    (photos?.length ?? 0) > 0 || !!inspectionNotes || !!paintThicknessUrl || damages.some((d) => d.photo_url);
+
+  // Paint-thickness reading card — always shown (inside or outside the dialog)
+  // when an inspector captured a gauge photo.
+  const paintBlock = paintThicknessUrl ? (
+    <div className="flex items-center gap-3 rounded-xl border border-grey-200 bg-white p-3">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={paintThicknessUrl}
+        alt="Paint thickness gauge reading"
+        loading="lazy"
+        className="size-16 shrink-0 rounded-lg object-cover ring-1 ring-grey-200"
+      />
+      <div>
+        <p className="text-sm font-semibold text-grey-900">Paint thickness test</p>
+        <p className="text-xs text-grey-500">Gauge reading captured during inspection</p>
+      </div>
+    </div>
+  ) : null;
 
   const summary =
     damages.length === 0 ? (
@@ -65,10 +85,11 @@ export function ConditionReport({
       </ul>
     );
 
-  if (!hasFullReport) return summary;
+  if (!hasFullReport) return <div className="space-y-3">{paintBlock}{summary}</div>;
 
   return (
     <div className="space-y-3">
+      {paintBlock}
       {summary}
       <Dialog>
         <DialogTrigger render={
@@ -103,6 +124,20 @@ export function ConditionReport({
             <section>
               <h3 className="mb-2 text-sm font-bold text-grey-900">{t("inspectorNotes")}</h3>
               <p className="rounded-lg bg-grey-50 p-4 text-sm leading-relaxed text-grey-700">{inspectionNotes}</p>
+            </section>
+          )}
+
+          {/* Paint thickness reading */}
+          {paintThicknessUrl && (
+            <section>
+              <h3 className="mb-2 text-sm font-bold text-grey-900">Paint thickness test</h3>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={paintThicknessUrl}
+                alt="Paint thickness gauge reading"
+                loading="lazy"
+                className="max-h-72 w-full rounded-lg object-contain ring-1 ring-grey-200"
+              />
             </section>
           )}
 

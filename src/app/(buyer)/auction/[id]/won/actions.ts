@@ -1,11 +1,48 @@
 "use server";
 
-// Server actions for the post-auction confirmation page — currently
-// Stripe Checkout creation for the winning invoice.
+// Server actions for the post-auction confirmation page — payment-intent
+// confirmation (36h window) and Stripe Checkout creation for the invoice.
 
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
+
+// Step 1 of the two-step win flow: the buyer confirms (within 36h of winning)
+// that they intend to pay. This starts the 5-working-day wire-transfer clock.
+export async function confirmPaymentAction(input: {
+  invoiceId: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sign in to confirm payment." };
+
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("id, buyer_id, auction_id, payment_confirmed_at")
+    .eq("id", input.invoiceId)
+    .single();
+
+  if (!invoice || (invoice as { buyer_id: string }).buyer_id !== user.id) {
+    return { ok: false, error: "Invoice not found." };
+  }
+  if ((invoice as { payment_confirmed_at: string | null }).payment_confirmed_at) {
+    return { ok: true }; // already confirmed — idempotent
+  }
+
+  // Use the service-role client: RLS on invoices does not grant buyers UPDATE.
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("invoices")
+    .update({ payment_confirmed_at: new Date().toISOString() })
+    .eq("id", input.invoiceId);
+  if (error) return { ok: false, error: error.message };
+
+  const auctionId = (invoice as { auction_id: string }).auction_id;
+  revalidatePath(`/auction/${auctionId}/won`);
+  revalidatePath("/dashboard");
+  return { ok: true };
+}
 
 export interface CheckoutResult {
   ok: boolean;

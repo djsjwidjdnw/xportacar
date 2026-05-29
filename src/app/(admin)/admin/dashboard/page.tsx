@@ -1,7 +1,6 @@
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -192,7 +191,13 @@ export default async function AdminDashboardPage() {
         <div className="rounded-2xl border border-grey-200 bg-white shadow-xs">
           <header className="flex items-center justify-between px-5 py-4">
             <h2 className="text-lg font-bold text-grey-900">{t("activityTitle")}</h2>
-            <Badge variant="outline" className="border-grey-200 text-grey-600">last 24h</Badge>
+            <Link
+              href="/admin/activity"
+              className="inline-flex items-center gap-1 text-sm font-semibold text-brand-700 hover:text-brand-800"
+            >
+              View all activity
+              <ChevronRight className="size-4" />
+            </Link>
           </header>
           <div className="border-t border-grey-100">
             <Table>

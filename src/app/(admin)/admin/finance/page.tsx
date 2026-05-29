@@ -64,7 +64,7 @@ export default async function AdminFinancePage() {
           value={formatEur(platformFeesEarned)}
           iconName="badge-euro"
           accent="brand"
-          delta={{ value: "5% of hammer", positive: true }}
+          delta={{ value: "2.9% of hammer", positive: true }}
         />
         <StatCard
           label="Outstanding invoices"

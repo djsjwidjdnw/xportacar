@@ -5,10 +5,11 @@
 // fallback. Warehouse pickup, the EU RoRo ports, door-to-door, and German TÜV.
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { Ship, Home, FileText, Box } from "lucide-react";
+import { Check, Ship, Home, FileText, Box } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
+import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
 import { toast } from "@/components/ui/toast";
 import { createClient } from "@/lib/supabase/client";
 import { useCurrency } from "@/lib/currency";
@@ -44,9 +45,11 @@ export function ShippingOptions({
 }) {
   const { format } = useCurrency();
   const [rates, setRates] = useState<ShippingRate[]>(FALLBACK_RATES);
-  const [internal, setInternal] = useState<ShippingChoice>({ kind: "port", port: "Hamburg" });
+  const [internal, setInternal] = useState<ShippingChoice>({ method: { kind: "port", port: "Hamburg" }, tuv: false });
   const choice = value ?? internal;
   const setChoice = (next: ShippingChoice) => { if (onChange) onChange(next); else setInternal(next); };
+  const setMethod = (method: ShippingChoice["method"]) => setChoice({ ...choice, method });
+  const toggleTuv = () => setChoice({ ...choice, tuv: !choice.tuv });
   const [saving, startSave] = useTransition();
 
   // Live rates (cached 1h) — falls back to the seed while loading / offline.
@@ -60,11 +63,12 @@ export function ShippingOptions({
   const total = (vehiclePriceEur ?? 0) + shippingEur;
 
   const saveQuote = () => {
-    if (choice.kind !== "port") {
+    if (choice.method.kind !== "port") {
       toast.err("Choose a port", "Quote saving is only available for port delivery options.");
       return;
     }
-    const route = roro.find((p) => p.destination_port === choice.port);
+    const port = choice.method.port;
+    const route = roro.find((p) => p.destination_port === port);
     if (!route) return;
     startSave(async () => {
       const supabase = createClient();
@@ -95,29 +99,30 @@ export function ShippingOptions({
       </div>
       <p className="mt-2 text-xs text-grey-500">Live rates · prices reflect the selected currency.</p>
 
-      <div className="mt-5 space-y-3">
+      <p className="mt-4 text-[11px] font-bold uppercase tracking-wide text-grey-500">Delivery method</p>
+      <div className="mt-2 space-y-3">
         <OptionRow
-          active={choice.kind === "warehouse"}
-          onClick={() => setChoice({ kind: "warehouse" })}
+          active={choice.method.kind === "warehouse"}
+          onClick={() => setMethod({ kind: "warehouse" })}
           icon={<Box className="size-4" />}
           title="Warehouse Pickup (Dubai)"
           subtitle="Available immediately after payment"
           priceLabel="Free"
         />
 
-        <div className={cn("rounded-lg border bg-grey-50/50 p-3", choice.kind === "port" ? "border-brand-300" : "border-grey-200")}>
+        <div className={cn("rounded-lg border bg-grey-50/50 p-3", choice.method.kind === "port" ? "border-brand-300" : "border-grey-200")}>
           <div className="flex items-center gap-2 px-1 pb-2 text-[11px] font-bold uppercase tracking-wide text-grey-500">
             <Ship className="size-3.5" />
             Nearest Port Delivery (RoRo from Jebel Ali)
           </div>
           <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {roro.map((p) => {
-              const active = choice.kind === "port" && choice.port === p.destination_port;
+              const active = choice.method.kind === "port" && choice.method.port === p.destination_port;
               return (
                 <button
                   key={p.route_key}
                   type="button"
-                  onClick={() => setChoice({ kind: "port", port: p.destination_port! })}
+                  onClick={() => setMethod({ kind: "port", port: p.destination_port! })}
                   className={cn(
                     "flex items-center justify-between gap-3 rounded-lg border bg-white px-3 py-2.5 text-left transition-colors",
                     active ? "border-brand-500 ring-1 ring-brand-200" : "border-grey-200 hover:border-grey-300",
@@ -140,23 +145,42 @@ export function ShippingOptions({
         </div>
 
         <OptionRow
-          active={choice.kind === "door"}
-          onClick={() => setChoice({ kind: "door" })}
+          active={choice.method.kind === "door"}
+          onClick={() => setMethod({ kind: "door" })}
           icon={<Home className="size-4" />}
           title="Door-to-Door Delivery"
           subtitle="Added on top of the port rate · 30–45 days"
           priceLabel={`from ${format(doorPrice)}`}
         />
-
-        <OptionRow
-          active={choice.kind === "tuv"}
-          onClick={() => setChoice({ kind: "tuv" })}
-          icon={<FileText className="size-4" />}
-          title="German TÜV / Papers Service"
-          subtitle="Inspection for DE registration, CoC, customs paperwork"
-          priceLabel={`+ ${format(tuvPrice)}`}
-        />
       </div>
+
+      <p className="mt-5 text-[11px] font-bold uppercase tracking-wide text-grey-500">Add-on service</p>
+      {/* TÜV is an additive checkbox — combinable with ANY delivery method. */}
+      <button
+        type="button"
+        onClick={toggleTuv}
+        className={cn(
+          "mt-2 flex w-full items-center gap-3 rounded-lg border bg-white px-4 py-3 text-left transition-colors",
+          choice.tuv ? "border-brand-500 ring-1 ring-brand-200 bg-brand-50/40" : "border-grey-200 hover:border-grey-300",
+        )}
+      >
+        <span className={cn(
+          "grid size-5 shrink-0 place-items-center rounded border-2",
+          choice.tuv ? "border-brand-600 bg-brand-600 text-white" : "border-grey-300",
+        )}>
+          {choice.tuv && <Check className="size-3.5" />}
+        </span>
+        <span className="grid size-8 place-items-center rounded-lg bg-brand-50 text-brand-700 ring-1 ring-brand-100">
+          <FileText className="size-4" />
+        </span>
+        <span className="flex-1">
+          <span className="block text-sm font-semibold text-grey-900">German TÜV / Papers Service</span>
+          <span className="block text-[11px] text-grey-500">Inspection for DE registration, CoC, customs paperwork</span>
+        </span>
+        <span className="text-sm font-bold text-brand-700">+ {format(tuvPrice)}</span>
+      </button>
+
+      <CustomsDisclaimer className="mt-4" />
 
       {!hideTotal && (
         <div className="mt-5 rounded-xl border border-brand-100 bg-brand-50/60 p-4">
@@ -167,7 +191,7 @@ export function ShippingOptions({
           <p className="mt-1 text-xs text-grey-600">
             {format(vehiclePriceEur ?? 0)} vehicle + {format(shippingEur)} {describeShipping(choice)}
           </p>
-          {!hideSaveQuote && choice.kind === "port" && (
+          {!hideSaveQuote && choice.method.kind === "port" && (
             <div className="mt-3 flex justify-end">
               <Button onClick={saveQuote} disabled={saving} variant="ghost" size="sm" className="h-7 text-[11px] font-semibold text-brand-700 hover:underline">
                 {saving ? "Saving…" : "Save this quote"}

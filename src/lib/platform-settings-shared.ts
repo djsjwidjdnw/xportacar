@@ -14,7 +14,7 @@ export interface PlatformSettings {
 
 export const DEFAULT_PLATFORM_SETTINGS: PlatformSettings = {
   platformName:        "XportACar",
-  feePercentage:       5,
+  feePercentage:       2.9,
   defaultAuctionDays:  7,
   minBidIncrementEur:  100,
   reserveEnforced:     true,
