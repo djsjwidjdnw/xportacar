@@ -50,3 +50,6 @@ supabase/.branches/
 
 
 .vercel
+
+# eas.json belongs in the mobile repos, not this Next.js/Vercel app
+eas.json
