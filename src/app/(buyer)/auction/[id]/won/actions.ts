@@ -44,6 +44,93 @@ export async function confirmPaymentAction(input: {
   return { ok: true };
 }
 
+// Payment proof upload — files + optional note. Uploads server-side with the
+// service-role client (bypasses storage RLS), records the URLs + note on the
+// invoice, marks payment_confirmed_at, and notifies admins to verify receipt.
+const PROOF_ALLOWED_TYPES = new Set(["application/pdf", "image/png", "image/jpeg", "image/jpg"]);
+const PROOF_ALLOWED_EXT = /\.(pdf|png|jpe?g)$/i;
+const PROOF_MAX_FILES = 5;
+const PROOF_MAX_BYTES = 10 * 1024 * 1024;
+
+export async function submitPaymentProofAction(
+  formData: FormData,
+): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sign in to submit payment proof." };
+
+  const invoiceId = String(formData.get("invoiceId") ?? "");
+  const note = String(formData.get("note") ?? "").trim();
+  const files = formData.getAll("files").filter((f): f is File => f instanceof File && f.size > 0);
+
+  if (!invoiceId) return { ok: false, error: "Missing invoice." };
+  if (files.length === 0) return { ok: false, error: "Attach at least one file." };
+  if (files.length > PROOF_MAX_FILES) return { ok: false, error: `Attach at most ${PROOF_MAX_FILES} files.` };
+  for (const f of files) {
+    if (f.size > PROOF_MAX_BYTES) return { ok: false, error: `${f.name} is larger than 10MB.` };
+    if (!PROOF_ALLOWED_TYPES.has(f.type) && !PROOF_ALLOWED_EXT.test(f.name)) {
+      return { ok: false, error: `${f.name}: only PDF, PNG and JPG files are allowed.` };
+    }
+  }
+
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("id, buyer_id, auction_id")
+    .eq("id", invoiceId)
+    .single();
+  // deno-lint-ignore no-explicit-any
+  const inv = invoice as any;
+  if (!inv || inv.buyer_id !== user.id) return { ok: false, error: "Invoice not found." };
+
+  const admin = createAdminClient();
+  const proofs: { url: string; filename: string; uploaded_at: string }[] = [];
+  for (const f of files) {
+    const safe = f.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
+    const key = `invoices/${invoiceId}/payment_proof/${Date.now()}-${safe}`;
+    const buf = Buffer.from(await f.arrayBuffer());
+    const { error: upErr } = await admin.storage
+      .from("vehicle-photos")
+      .upload(key, buf, { contentType: f.type || "application/octet-stream", upsert: false });
+    if (upErr) return { ok: false, error: `Upload failed: ${upErr.message}` };
+    const { data: pub } = admin.storage.from("vehicle-photos").getPublicUrl(key);
+    proofs.push({ url: pub.publicUrl, filename: f.name, uploaded_at: new Date().toISOString() });
+  }
+
+  const { error: updErr } = await admin
+    .from("invoices")
+    .update({
+      payment_proof_urls: proofs,
+      payment_proof_note: note || null,
+      payment_confirmed_at: new Date().toISOString(),
+    })
+    .eq("id", invoiceId);
+  if (updErr) return { ok: false, error: updErr.message };
+
+  // Notify all admins that proof was submitted (to verify receipt).
+  const { data: profile } = await supabase
+    .from("profiles").select("full_name, company_name, email").eq("id", user.id).single();
+  // deno-lint-ignore no-explicit-any
+  const p = profile as any;
+  const who = p?.company_name ?? p?.full_name ?? p?.email ?? "A buyer";
+  const { data: admins } = await admin.from("profiles").select("id").in("role", ["admin", "superadmin"]);
+  if (admins && admins.length) {
+    await admin.from("notifications").insert(
+      (admins as { id: string }[]).map((a) => ({
+        user_id: a.id,
+        type: "status_update",
+        title: "Payment proof submitted",
+        body: `${who} submitted payment proof for invoice ${invoiceId.slice(0, 8)}.`,
+        data: { invoice_id: invoiceId, auction_id: inv.auction_id },
+      })),
+    );
+  }
+
+  revalidatePath(`/auction/${inv.auction_id}/won`);
+  revalidatePath("/admin/invoices");
+  revalidatePath(`/admin/invoices/${invoiceId}`);
+  return { ok: true };
+}
+
 export interface CheckoutResult {
   ok: boolean;
   url?: string;

@@ -6,15 +6,12 @@
 // Lives client-side so the currency selector, live countdown and the confirm
 // action can update without a full server round-trip.
 
-import { useEffect, useMemo, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import { Building2, CheckCircle2, Clock, Download, Receipt } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
-import { toast } from "@/components/ui/toast";
-import { confirmPaymentAction } from "@/app/(buyer)/auction/[id]/won/actions";
+import { PaymentProofDialog } from "@/components/buyer/PaymentProofDialog";
 import {
   ShippingOptions, type ShippingChoice,
 } from "@/components/vehicle/ShippingOptions";
@@ -68,10 +65,8 @@ export function WonInvoice({
   confirmedAtIso: string | null;
 }) {
   const { format } = useCurrency();
-  const router = useRouter();
   const [shipping, setShipping] = useState<ShippingChoice>({ method: { kind: "port", port: "Hamburg" }, tuv: false });
   const [now, setNow] = useState(() => new Date());
-  const [confirming, startConfirm] = useTransition();
 
   useEffect(() => {
     const i = setInterval(() => setNow(new Date()), 30_000);
@@ -104,16 +99,6 @@ export function WonInvoice({
       }).toString()
     : null;
 
-  const confirm = () => {
-    if (!invoiceId) return;
-    startConfirm(async () => {
-      const res = await confirmPaymentAction({ invoiceId });
-      if (!res.ok) { toast.err("Couldn't confirm", res.error ?? "Try again."); return; }
-      toast.ok("Payment confirmed", `Complete your wire transfer within ${PAYMENT_WORKING_DAYS} working days.`);
-      router.refresh();
-    });
-  };
-
   return (
     <div className="space-y-6">
       {/* STEP 1 — confirm intent to pay within 36 hours */}
@@ -140,10 +125,7 @@ export function WonInvoice({
                     <span className="font-semibold text-grey-900">{PAYMENT_WORKING_DAYS} working days</span>{" "}
                     to complete the wire transfer.
                   </p>
-                  <Button onClick={confirm} disabled={confirming || !invoiceId} className="mt-4 h-11">
-                    <CheckCircle2 className="size-4" />
-                    {confirming ? "Confirming…" : "Confirm payment"}
-                  </Button>
+                  {invoiceId && <PaymentProofDialog invoiceId={invoiceId} />}
                 </>
               )}
             </div>

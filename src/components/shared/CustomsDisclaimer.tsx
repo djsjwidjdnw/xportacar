@@ -17,7 +17,7 @@ export function CustomsDisclaimer({ className }: { className?: string }) {
       role="note"
     >
       <AlertTriangle className="mt-0.5 size-5 shrink-0 text-error-600" />
-      <p className="text-sm font-bold text-error-700">{CUSTOMS_DISCLAIMER_TEXT}</p>
+      <p className="min-w-0 flex-1 break-words text-sm font-bold text-error-700">{CUSTOMS_DISCLAIMER_TEXT}</p>
     </div>
   );
 }

@@ -138,13 +138,13 @@ export function BuyerNav({
                     >
                       {t("profile")}
                     </Link>
-                    <Link
+                    <a
                       href="/api/auth/sign-out"
                       onClick={() => setOpen(false)}
                       className="rounded-md px-3 py-2.5 text-sm font-medium text-error-600 hover:bg-error-50"
                     >
                       {t("signOut")}
-                    </Link>
+                    </a>
                   </>
                 )}
                 {!profile && (

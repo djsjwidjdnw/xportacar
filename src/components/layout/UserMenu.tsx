@@ -105,14 +105,16 @@ export function UserMenu({
             )}
 
             <div className="my-1 h-px bg-grey-100" />
-            <Link
+            {/* Plain anchor (not next/link) so the browser performs a full GET
+                to the sign-out route and processes the Set-Cookie clearing. */}
+            <a
               href="/api/auth/sign-out"
               className={cn(item, "text-error-600 hover:bg-error-50 hover:text-error-700")}
               onClick={() => setOpen(false)}
             >
               <LogOut className="size-4" />
               {t("signOut")}
-            </Link>
+            </a>
           </div>
         </>
       )}

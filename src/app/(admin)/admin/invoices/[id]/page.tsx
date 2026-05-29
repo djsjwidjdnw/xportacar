@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { ChevronLeft, Printer } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { InvoicePrintTrigger } from "@/components/admin/InvoicePrintTrigger";
 import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
 import { createClient } from "@/lib/supabase/server";
 import { formatEur } from "@/lib/utils";
+import { verifyPaymentAction } from "./actions";
 
 export default async function AdminInvoiceDetailPage({
   params,
@@ -20,6 +22,7 @@ export default async function AdminInvoiceDetailPage({
     .from("invoices")
     .select(`
       id, invoice_number, amount_eur, platform_fee_eur, total_eur, status, created_at, paid_at,
+      payment_confirmed_at, payment_verified_at, payment_proof_urls, payment_proof_note,
       buyer:profiles!buyer_id ( id, full_name, company_name, country, email, phone, company_registration ),
       vehicle:vehicles!vehicle_id ( id, year, make, model, vin, exterior_color, mileage_km ),
       auction:auctions!auction_id ( id, end_time )
@@ -138,6 +141,58 @@ export default async function AdminInvoiceDetailPage({
           <CustomsDisclaimer className="mt-4" />
         </section>
       </article>
+
+      {/* Payment proof + admin verification (not part of the printed invoice) */}
+      <section className="mx-auto mt-6 max-w-3xl rounded-2xl border border-grey-200 bg-white p-6 shadow-xs print:hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-bold text-grey-900">Payment proof</h2>
+          <div className="flex items-center gap-2">
+            {inv.payment_confirmed_at && (
+              <Badge className="bg-brand-50 text-brand-700 ring-1 ring-brand-100">
+                Buyer confirmed {new Date(inv.payment_confirmed_at).toLocaleDateString("en-GB")}
+              </Badge>
+            )}
+            {inv.payment_verified_at ? (
+              <Badge className="bg-success-50 text-success-700 ring-1 ring-success-100">
+                Verified {new Date(inv.payment_verified_at).toLocaleDateString("en-GB")}
+              </Badge>
+            ) : (
+              <Badge className="bg-grey-100 text-grey-600 ring-1 ring-grey-200">Not verified</Badge>
+            )}
+          </div>
+        </div>
+
+        {Array.isArray(inv.payment_proof_urls) && inv.payment_proof_urls.length > 0 ? (
+          <ul className="mt-4 space-y-2">
+            {inv.payment_proof_urls.map((p: { url: string; filename: string; uploaded_at: string }, i: number) => (
+              <li key={i} className="flex items-center justify-between gap-3 rounded-lg border border-grey-200 px-3 py-2">
+                <a href={p.url} target="_blank" rel="noopener noreferrer" className="min-w-0 flex-1 truncate text-sm font-medium text-brand-700 hover:underline">
+                  {p.filename}
+                </a>
+                <span className="shrink-0 text-xs text-grey-500">
+                  {p.uploaded_at ? new Date(p.uploaded_at).toLocaleDateString("en-GB") : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-4 text-sm text-grey-500">No payment proof submitted yet.</p>
+        )}
+
+        {inv.payment_proof_note && (
+          <div className="mt-4 rounded-lg bg-grey-50 px-4 py-3 ring-1 ring-grey-200">
+            <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">Buyer note</p>
+            <p className="mt-1 text-sm text-grey-700">{inv.payment_proof_note}</p>
+          </div>
+        )}
+
+        {!inv.payment_verified_at && (
+          <form action={verifyPaymentAction} className="mt-5">
+            <input type="hidden" name="invoiceId" value={inv.id} />
+            <Button type="submit" className="h-10">Verify payment received</Button>
+          </form>
+        )}
+      </section>
     </div>
   );
 }
