@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { InvoicePrintTrigger } from "@/components/admin/InvoicePrintTrigger";
 import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { formatEur } from "@/lib/utils";
 import { verifyPaymentAction } from "./actions";
 
@@ -33,6 +34,25 @@ export default async function AdminInvoiceDetailPage({
   if (!invoice) notFound();
   // deno-lint-ignore no-explicit-any
   const inv = invoice as any;
+
+  // Payment proofs live in the PRIVATE "payment-proofs" bucket — generate a
+  // 7-day signed URL per file (newer entries store { path }; older/mobile
+  // entries may store a plain { url }).
+  const adminStorage = createAdminClient();
+  const rawProofs: { path?: string; url?: string; filename?: string; uploaded_at?: string }[] =
+    Array.isArray(inv.payment_proof_urls) ? inv.payment_proof_urls : [];
+  const proofLinks = await Promise.all(
+    rawProofs.map(async (p) => {
+      let href: string | null = p.url ?? null;
+      if (p.path) {
+        const { data } = await adminStorage.storage
+          .from("payment-proofs")
+          .createSignedUrl(p.path, 60 * 60 * 24 * 7);
+        href = data?.signedUrl ?? null;
+      }
+      return { filename: p.filename ?? "Payment proof", href, uploaded_at: p.uploaded_at };
+    }),
+  );
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10 print:p-0">
@@ -162,13 +182,17 @@ export default async function AdminInvoiceDetailPage({
           </div>
         </div>
 
-        {Array.isArray(inv.payment_proof_urls) && inv.payment_proof_urls.length > 0 ? (
+        {proofLinks.length > 0 ? (
           <ul className="mt-4 space-y-2">
-            {inv.payment_proof_urls.map((p: { url: string; filename: string; uploaded_at: string }, i: number) => (
+            {proofLinks.map((p, i) => (
               <li key={i} className="flex items-center justify-between gap-3 rounded-lg border border-grey-200 px-3 py-2">
-                <a href={p.url} target="_blank" rel="noopener noreferrer" className="min-w-0 flex-1 truncate text-sm font-medium text-brand-700 hover:underline">
-                  {p.filename}
-                </a>
+                {p.href ? (
+                  <a href={p.href} target="_blank" rel="noopener noreferrer" className="min-w-0 flex-1 truncate text-sm font-medium text-brand-700 hover:underline">
+                    {p.filename}
+                  </a>
+                ) : (
+                  <span className="min-w-0 flex-1 truncate text-sm font-medium text-grey-500">{p.filename} (unavailable)</span>
+                )}
                 <span className="shrink-0 text-xs text-grey-500">
                   {p.uploaded_at ? new Date(p.uploaded_at).toLocaleDateString("en-GB") : ""}
                 </span>

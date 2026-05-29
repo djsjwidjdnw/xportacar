@@ -52,6 +52,18 @@ const PROOF_ALLOWED_EXT = /\.(pdf|png|jpe?g)$/i;
 const PROOF_MAX_FILES = 5;
 const PROOF_MAX_BYTES = 10 * 1024 * 1024;
 
+// The payment-proofs bucket only allows application/pdf, image/png, image/jpeg,
+// so normalise the content type (browsers occasionally send "" or image/jpg).
+function proofContentType(f: File): string {
+  const t = (f.type || "").toLowerCase();
+  if (t === "application/pdf" || t === "image/png" || t === "image/jpeg") return t;
+  if (t === "image/jpg") return "image/jpeg";
+  const ext = f.name.toLowerCase().split(".").pop();
+  if (ext === "pdf") return "application/pdf";
+  if (ext === "png") return "image/png";
+  return "image/jpeg";
+}
+
 export async function submitPaymentProofAction(
   formData: FormData,
 ): Promise<{ ok: boolean; error?: string }> {
@@ -83,17 +95,19 @@ export async function submitPaymentProofAction(
   if (!inv || inv.buyer_id !== user.id) return { ok: false, error: "Invoice not found." };
 
   const admin = createAdminClient();
-  const proofs: { url: string; filename: string; uploaded_at: string }[] = [];
+  // Private "payment-proofs" bucket. We store the storage KEY (path), not a URL —
+  // admins read via short-lived signed URLs (the bucket is not public).
+  // Path = {invoice_id}/{file} so the bucket RLS policies can scope by folder.
+  const proofs: { path: string; filename: string; uploaded_at: string }[] = [];
   for (const f of files) {
     const safe = f.name.replace(/[^a-zA-Z0-9._-]+/g, "_");
-    const key = `invoices/${invoiceId}/payment_proof/${Date.now()}-${safe}`;
+    const key = `${invoiceId}/${Date.now()}-${safe}`;
     const buf = Buffer.from(await f.arrayBuffer());
     const { error: upErr } = await admin.storage
-      .from("vehicle-photos")
-      .upload(key, buf, { contentType: f.type || "application/octet-stream", upsert: false });
+      .from("payment-proofs")
+      .upload(key, buf, { contentType: proofContentType(f), upsert: false });
     if (upErr) return { ok: false, error: `Upload failed: ${upErr.message}` };
-    const { data: pub } = admin.storage.from("vehicle-photos").getPublicUrl(key);
-    proofs.push({ url: pub.publicUrl, filename: f.name, uploaded_at: new Date().toISOString() });
+    proofs.push({ path: key, filename: f.name, uploaded_at: new Date().toISOString() });
   }
 
   const { error: updErr } = await admin
