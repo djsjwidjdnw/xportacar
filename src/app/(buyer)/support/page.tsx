@@ -1,4 +1,5 @@
-import { Mail, Building2, MapPin, Phone, Clock, ChevronDown, LifeBuoy } from "lucide-react";
+import Link from "next/link";
+import { Mail, Building2, MapPin, Phone, Clock, ChevronDown, LifeBuoy, FileText, ShieldCheck } from "lucide-react";
 
 import { getTranslations } from "@/i18n/server";
 
@@ -94,6 +95,18 @@ export default async function SupportPage() {
             {t("ctaButton")}
           </a>
         </section>
+
+        {/* Legal links — Privacy Policy and Terms of Service */}
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-3 border-t border-grey-100 pt-6 text-sm">
+          <Link href="/privacy" className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-grey-600 hover:bg-grey-50 hover:text-brand-700">
+            <ShieldCheck className="size-4" />
+            Privacy Policy
+          </Link>
+          <Link href="/terms" className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-grey-600 hover:bg-grey-50 hover:text-brand-700">
+            <FileText className="size-4" />
+            Terms of Service
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -59,8 +59,10 @@ PJ93UCU3CM**).
 - [ ] Complete the **App Privacy** questionnaire using the data types listed in
       `privacy-manifests.md` (buyer vs inspector sections).
 - [ ] **Tracking:** answer **No** — neither app tracks users or uses ad SDKs.
-- [ ] **Privacy Policy URL:** https://xportacar.vercel.app/support (placeholder —
-      replace with a dedicated `/privacy` page once legal text is available).
+- [ ] **Privacy Policy URL:** https://xportacar.vercel.app/privacy
+- [ ] **Terms of Service URL** (where the app prompts for it): https://xportacar.vercel.app/terms
+- [ ] Both legal pages are translated EN/DE/FR/AR. The in-page notice declares
+      English as the governing version in case of discrepancy.
 
 ## 5) App Review Information (per app)
 - [ ] **Sign-in required:** Yes → provide a demo account:
@@ -124,8 +126,10 @@ Finalize these once Simon provides the legal entity + contact details:
 - **Support page contact block** — company name, address, phone, support email
   are placeholders ("To be completed") in the `/support` page i18n (`support.*`
   keys in `src/i18n/*.json`). Fill in real values.
-- **Privacy policy** — `/support` is used as a placeholder Privacy Policy URL;
-  add a real `/privacy` page with legal text and update the URL.
+- **Legal pages** — `/privacy` and `/terms` are live with plain-English content
+  in 4 languages, parameterised with Simon's operating entity (Global Business
+  Consultancy L.L.C-FZ). **Have both reviewed by a UAE lawyer and an EU
+  privacy/consumer lawyer before going live with real money.**
 - **Privacy/Review contact email** — `privacy@xportacar.com` / `support@xportacar.com`
   are placeholders; confirm the real inboxes exist.
 - **App Review contact** — Simon's name / phone / email.
