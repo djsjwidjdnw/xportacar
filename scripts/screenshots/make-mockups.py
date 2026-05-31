@@ -7,11 +7,13 @@ App Store sizes. These convert far better than raw screenshots.
 
 WORKFLOW
   1. Capture raw screenshots from the iOS app (see docs/app-store/screenshots.md)
-     and drop them in scripts/screenshots/input/<app>/ as PNGs:
-       buyer/      marketplace.png vehicle.png auction.png bidding.png won.png
-       inspector/  list.png photos.png damage.png paint.png review.png
+     and drop them in scripts/screenshots/input/<app>/ (PNG or JPEG), named per
+     the SHOTS map below:
+       buyer/      1-browse.jpeg 2-bid-or-buy.jpeg 3-secure-wins.jpeg
+       inspector/  1-dashboard.jpeg 2-assignments.jpeg 3-details.jpeg
+                   4-photos.jpeg 5-submit.jpeg
   2. Run:  python scripts/screenshots/make-mockups.py
-  3. Find framed images in scripts/screenshots/output/<app>/<size>/
+  3. Find framed images in docs/app-store/screenshots/<app>/<size>/
 
 If a raw screenshot is missing, a clearly-labelled placeholder screen is drawn
 so the pipeline still produces a complete set you can preview.
@@ -20,14 +22,15 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(HERE))   # repo root (…/xportacar)
 IN = os.path.join(HERE, "input")
-OUT = os.path.join(HERE, "output")
+OUT = os.path.join(ROOT, "docs", "app-store", "screenshots")
 
-# App Store device sizes (portrait): name -> (width, height)
+# App Store device sizes (portrait): folder name -> (width, height)
 SIZES = {
-    "6.7-inch_1290x2796": (1290, 2796),
-    "6.5-inch_1284x2778": (1284, 2778),
-    "5.5-inch_1242x2208": (1242, 2208),
+    "6.7": (1290, 2796),   # iPhone 15/16 Pro Max          (REQUIRED)
+    "6.5": (1284, 2778),   # iPhone 11 Pro Max / XS Max     (REQUIRED)
+    "5.5": (1242, 2208),   # iPhone 8 Plus                  (REQUIRED)
 }
 
 BRAND = (21, 112, 239)      # #1570EF
@@ -38,18 +41,16 @@ WHITE = (255, 255, 255)
 # app -> [(screenshot filename, marketing headline), ...]
 SHOTS = {
     "buyer": [
-        ("marketplace.png", "Inspected UAE cars,\nready for Europe"),
-        ("vehicle.png", "Transparent condition\nreports on every car"),
-        ("auction.png", "Live auctions with\nreal-time bidding"),
-        ("bidding.png", "Bid or set a max —\nwe bid for you"),
-        ("won.png", "Win, pay and ship\nfrom one app"),
+        ("1-browse.jpeg",      "Browse Premium\nVehicles"),
+        ("2-bid-or-buy.jpeg",  "Bid or Buy\nInstantly"),
+        ("3-secure-wins.jpeg", "Secure Auction\nWins"),
     ],
     "inspector": [
-        ("list.png", "Your inspections,\norganised"),
-        ("photos.png", "Guided photo capture"),
-        ("damage.png", "Log damage by panel"),
-        ("paint.png", "Paint thickness\nreadings on file"),
-        ("review.png", "Review and submit\nfor listing"),
+        ("1-dashboard.jpeg",   "Inspector\nDashboard"),
+        ("2-assignments.jpeg", "Manage Your\nAssignments"),
+        ("3-details.jpeg",     "Capture Vehicle\nDetails"),
+        ("4-photos.jpeg",      "Document\nEvery Angle"),
+        ("5-submit.jpeg",      "Submit for\nListing"),
     ],
 }
 
