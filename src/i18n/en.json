@@ -130,6 +130,7 @@
     "exteriorColor": "Exterior",
     "interiorColor": "Interior",
     "bodyType": "Body type",
+    "marketSpec": "Market spec",
     "firstRegistration": "First registration",
     "location": "Location",
     "features": "Features & equipment",

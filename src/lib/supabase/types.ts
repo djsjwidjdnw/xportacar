@@ -63,6 +63,7 @@ export interface Vehicle {
   exterior_color: string | null;
   interior_color: string | null;
   body_type: string | null;
+  market_spec: string | null;
   first_registration: string | null;
   location_city: string;
   location_country: string;

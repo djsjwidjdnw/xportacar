@@ -130,6 +130,7 @@
     "exteriorColor": "Außen",
     "interiorColor": "Innen",
     "bodyType": "Karosserie",
+    "marketSpec": "Marktversion",
     "firstRegistration": "Erstzulassung",
     "location": "Standort",
     "features": "Ausstattung",

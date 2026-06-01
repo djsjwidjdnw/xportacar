@@ -130,6 +130,7 @@
     "exteriorColor": "اللون الخارجي",
     "interiorColor": "اللون الداخلي",
     "bodyType": "نوع الهيكل",
+    "marketSpec": "مواصفات السوق",
     "firstRegistration": "تاريخ التسجيل الأول",
     "location": "الموقع",
     "features": "المزايا والتجهيزات",

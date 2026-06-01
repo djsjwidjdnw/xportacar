@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  Barcode, BadgeCheck, Calendar, Car, Cog, Fuel, Gauge, MapPin, Palette,
+  Barcode, BadgeCheck, Calendar, Car, Cog, Fuel, Gauge, Globe, MapPin, Palette,
   Sparkles, Wrench, Zap, type LucideIcon,
 } from "lucide-react";
 
@@ -31,6 +31,7 @@ export function SpecsGrid({ vehicle }: { vehicle: Vehicle }) {
     { label: t("exteriorColor"),     value: vehicle.exterior_color ?? "—", icon: Palette },
     { label: t("interiorColor"),     value: vehicle.interior_color ?? "—", icon: Sparkles },
     { label: t("bodyType"),          value: vehicle.body_type ?? "—",      icon: Car },
+    { label: t("marketSpec"),        value: vehicle.market_spec ?? "—",    icon: Globe },
     { label: t("firstRegistration"), value: vehicle.first_registration
         ? new Intl.DateTimeFormat(intl, { dateStyle: "long" }).format(new Date(vehicle.first_registration))
         : "—",
