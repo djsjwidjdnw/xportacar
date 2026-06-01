@@ -59,9 +59,11 @@ export function VehicleCard({
   const endingSoon = isEndingSoon(auction, now);
   const remaining = auction?.end_time ? formatTimeRemaining(auction.end_time, new Date(now)) : "";
 
+  // Neutral local placeholder when a vehicle has no photos — never a random
+  // stock car (that caused the "Mustang on a Range Rover" mismatch).
   const photo =
     vehicle.vehicle_photos?.sort((a, b) => a.sort_order - b.sort_order)[0]?.url
-    ?? "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=1200&q=80";
+    ?? "/placeholder/no-photo.svg";
 
   const headlinePrice = live || ended
     ? (auction?.current_bid_eur ?? auction?.starting_price_eur ?? vehicle.listed_price_eur)

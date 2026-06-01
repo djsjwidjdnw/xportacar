@@ -4,7 +4,7 @@
 // the vehicle, lets the admin pick a duration + start time, then flips the
 // vehicle to in_auction so it goes live on the marketplace with a countdown.
 
-import { useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Gavel } from "lucide-react";
 
@@ -52,6 +52,19 @@ export function CreateAuctionButton({
   const [starting, setStarting] = useState(listedPriceEur != null ? String(listedPriceEur) : "");
   const [reserve, setReserve]   = useState(reservePriceEur != null ? String(reservePriceEur) : "");
   const [buyNow, setBuyNow]     = useState(buyNowPriceEur != null ? String(buyNowPriceEur) : "");
+  // Buy Now is mandatory. Auto-suggest it (matching the server formula:
+  // reserve*1.22, or starting*1.5 with no reserve) and keep it in sync until
+  // the admin types their own value.
+  const [buyNowTouched, setBuyNowTouched] = useState(buyNowPriceEur != null);
+  const suggestedBuyNow = useMemo(() => {
+    const s = Number(starting) || 0;
+    const r = Number(reserve) || 0;
+    if (s <= 0) return "";
+    return String(Math.round(r > 0 ? r * 1.22 : s * 1.5));
+  }, [starting, reserve]);
+  useEffect(() => {
+    if (!buyNowTouched) setBuyNow(suggestedBuyNow);
+  }, [suggestedBuyNow, buyNowTouched]);
   const [duration, setDuration] = useState("168");
   const [startMode, setStartMode] = useState<"now" | "schedule">("now");
   const [startAt, setStartAt]   = useState("");
@@ -98,8 +111,8 @@ export function CreateAuctionButton({
               <Input value={reserve} onChange={(e) => setReserve(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" placeholder="optional" />
             </Field>
           </div>
-          <Field label="Buy now (€) — optional">
-            <Input value={buyNow} onChange={(e) => setBuyNow(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" placeholder="e.g. 48000" />
+          <Field label="Buy now (€) — auto-filled, editable">
+            <Input value={buyNow} onChange={(e) => { setBuyNowTouched(true); setBuyNow(e.currentTarget.value.replace(/[^0-9]/g, "")); }} inputMode="numeric" placeholder="auto" />
           </Field>
 
           <Field label="Duration">

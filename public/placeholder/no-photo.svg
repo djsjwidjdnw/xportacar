@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-label="No photo available">
+  <rect width="1600" height="1000" fill="#F2F4F7"/>
+  <g fill="none" stroke="#98A2B3" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" transform="translate(620 360)">
+    <!-- camera body -->
+    <rect x="0" y="60" width="360" height="240" rx="28"/>
+    <path d="M120 60 l40 -52 h40 l40 52"/>
+    <circle cx="180" cy="185" r="74"/>
+    <circle cx="180" cy="185" r="30" fill="#98A2B3" stroke="none"/>
+    <!-- slash -->
+    <line x1="-20" y1="-10" x2="400" y2="360" stroke="#D0D5DD" stroke-width="22"/>
+  </g>
+  <text x="800" y="800" text-anchor="middle" font-family="'Plus Jakarta Sans', Arial, sans-serif" font-size="58" font-weight="700" fill="#667085">No photo available</text>
+</svg>

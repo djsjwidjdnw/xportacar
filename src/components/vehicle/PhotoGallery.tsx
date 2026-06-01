@@ -13,7 +13,8 @@ export function PhotoGallery({
 }) {
   const [index, setIndex] = useState(0);
   const [lightbox, setLightbox] = useState(false);
-  const safe = photos.length > 0 ? photos : [{ url: "https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=1600&q=80", caption: null }];
+  // Neutral local placeholder when there are no photos — never a random stock car.
+  const safe = photos.length > 0 ? photos : [{ url: "/placeholder/no-photo.svg", caption: null }];
   const active = safe[index] ?? safe[0];
 
   const prev = useCallback(() => setIndex((i) => (i - 1 + safe.length) % safe.length), [safe.length]);
