@@ -11,6 +11,8 @@ import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
 import { InspectorAssign } from "@/components/admin/InspectorAssign";
 import { CreateAuctionButton } from "@/components/admin/CreateAuctionButton";
 import { VehicleReviewPanel } from "@/components/admin/VehicleReviewPanel";
+import { EditVehicleDialog } from "@/components/admin/EditVehicleDialog";
+import { ReopenInspectionButton } from "@/components/admin/ReopenInspectionButton";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getVehicleValuation } from "@/lib/valuation-server";
@@ -133,6 +135,22 @@ export default async function AdminVehicleDetailPage({
 
         <aside className="space-y-4 lg:col-span-4">
           <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
+            <div className="mb-4">
+              <EditVehicleDialog
+                vehicleId={v.id}
+                vehicle={{
+                  vin: v.vin, make: v.make, model: v.model, year: v.year, mileage_km: v.mileage_km,
+                  fuel_type: v.fuel_type, transmission: v.transmission,
+                  drivetrain: v.drivetrain, engine: v.engine, body_type: v.body_type,
+                  market_spec: v.market_spec, exterior_color: v.exterior_color, interior_color: v.interior_color,
+                  location_city: v.location_city, location_country: v.location_country,
+                  inspection_notes: v.inspection_notes,
+                  listed_price_eur: v.listed_price_eur, reserve_price_eur: v.reserve_price_eur,
+                  buy_now_price_eur: v.buy_now_price_eur, status: v.status,
+                }}
+                auction={auction ? { id: auction.id, end_time: auction.end_time } : null}
+              />
+            </div>
             <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">Current status</p>
             <div className="mt-2">
               <VehicleStatusSelect vehicleId={v.id} currentStatus={v.status} />
@@ -156,6 +174,7 @@ export default async function AdminVehicleDetailPage({
                   reservePriceEur={v.reserve_price_eur}
                   buyNowPriceEur={v.buy_now_price_eur}
                 />
+                <ReopenInspectionButton vehicleId={v.id} />
               </div>
             )}
 

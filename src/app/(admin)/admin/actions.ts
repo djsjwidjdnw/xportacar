@@ -71,6 +71,142 @@ export async function setVehicleStatusAction(
   return { ok: true };
 }
 
+// ---- Task 5: admin edit on live listings ---------------------------------
+
+export interface VehicleEdit {
+  vin?: string; make?: string; model?: string; year?: number; mileage_km?: number;
+  fuel_type?: string; transmission?: string;
+  drivetrain?: string | null; engine?: string | null; body_type?: string | null;
+  market_spec?: string | null; exterior_color?: string | null; interior_color?: string | null;
+  location_city?: string; location_country?: string; inspection_notes?: string | null;
+  listed_price_eur?: number | null; reserve_price_eur?: number | null; buy_now_price_eur?: number | null;
+  status?: VehicleStatus;
+}
+
+const EDIT_FIELDS: (keyof VehicleEdit)[] = [
+  "vin", "make", "model", "year", "mileage_km", "fuel_type", "transmission",
+  "drivetrain", "engine", "body_type", "market_spec", "exterior_color", "interior_color",
+  "location_city", "location_country", "inspection_notes",
+  "listed_price_eur", "reserve_price_eur", "buy_now_price_eur", "status",
+];
+
+/**
+ * Edit any vehicle (in any state) plus its auction's pricing and end time.
+ * Price/reserve/buy-now/end-time changes on a LIVE/scheduled auction are
+ * recorded in admin_audit_log. Pricing is mirrored onto the auction row so the
+ * marketplace and bid panel stay consistent.
+ */
+export async function updateVehicleAction(
+  vehicleId: string,
+  edit: VehicleEdit,
+  auctionEndTimeISO?: string | null,
+): Promise<AdminResult> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (edit.status && !ALLOWED.includes(edit.status)) return { ok: false, error: "Invalid status." };
+
+  const { data: current, error: curErr } = await supabase
+    .from("vehicles")
+    .select("*, auctions ( id, status, end_time, starting_price_eur, reserve_price_eur, buy_now_price_eur )")
+    .eq("id", vehicleId)
+    .single();
+  if (curErr || !current) return { ok: false, error: "Vehicle not found." };
+
+  // Build the vehicle update from provided keys only.
+  const update: Record<string, unknown> = {};
+  for (const k of EDIT_FIELDS) if (edit[k] !== undefined) update[k] = edit[k];
+
+  // Validate pricing relationships against the effective (new-or-current) values.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cur = current as any;
+  const eff = (k: "listed_price_eur" | "reserve_price_eur" | "buy_now_price_eur") =>
+    (edit[k] !== undefined ? edit[k] : cur[k]) as number | null;
+  const sp = eff("listed_price_eur"), rv = eff("reserve_price_eur"), bn = eff("buy_now_price_eur");
+  if (rv != null && sp != null && rv < sp) return { ok: false, error: "Reserve cannot be below the listed price." };
+  if (bn != null && sp != null && bn < sp) return { ok: false, error: "Buy-now cannot be below the listed price." };
+
+  const auction = Array.isArray(cur.auctions) ? cur.auctions[0] : cur.auctions;
+  const liveAuction = auction && (auction.status === "active" || auction.status === "scheduled");
+
+  if (Object.keys(update).length > 0) {
+    const { error } = await supabase.from("vehicles").update(update).eq("id", vehicleId);
+    if (error) return { ok: false, error: error.message };
+  }
+
+  // Mirror pricing + end-time onto the auction row.
+  const auctionUpdate: Record<string, unknown> = {};
+  if (auction) {
+    if (edit.listed_price_eur !== undefined) auctionUpdate.starting_price_eur = edit.listed_price_eur;
+    if (edit.reserve_price_eur !== undefined) auctionUpdate.reserve_price_eur = edit.reserve_price_eur;
+    if (edit.buy_now_price_eur !== undefined) auctionUpdate.buy_now_price_eur = edit.buy_now_price_eur;
+    if (auctionEndTimeISO) {
+      const end = new Date(auctionEndTimeISO);
+      if (!Number.isNaN(end.getTime())) auctionUpdate.end_time = end.toISOString();
+    }
+    if (Object.keys(auctionUpdate).length > 0) {
+      const { error: aerr } = await supabase.from("auctions").update(auctionUpdate).eq("id", auction.id);
+      if (aerr) return { ok: false, error: aerr.message };
+    }
+  }
+
+  // Audit-log price/end-time changes on a live/scheduled auction.
+  if (liveAuction && user) {
+    const changes: Record<string, { from: unknown; to: unknown }> = {};
+    const track = (field: string, from: unknown, to: unknown) => { if (to !== undefined && to !== from) changes[field] = { from, to }; };
+    track("starting_price_eur", auction.starting_price_eur, edit.listed_price_eur);
+    track("reserve_price_eur", auction.reserve_price_eur, edit.reserve_price_eur);
+    track("buy_now_price_eur", auction.buy_now_price_eur, edit.buy_now_price_eur);
+    if (auctionUpdate.end_time) track("end_time", auction.end_time, auctionUpdate.end_time);
+    if (Object.keys(changes).length > 0) {
+      const { error: logErr } = await supabase.from("admin_audit_log").insert({
+        actor_id: user.id, entity_type: "auction", entity_id: auction.id,
+        action: "update_live_auction", changes,
+      });
+      if (logErr) console.error("[audit] insert failed:", logErr.message);
+    }
+  }
+
+  revalidateAdmin(vehicleId);
+  revalidatePath("/marketplace");
+  revalidatePath("/auctions");
+  if (auction) revalidatePath(`/auction/${auction.id}`);
+  return { ok: true };
+}
+
+/**
+ * Re-open a listed vehicle for inspection. Sets it back to 'changes_requested'
+ * — the status the inspector app already surfaces for edit + resubmission
+ * (which then returns it to pending_review). Logged to the audit trail.
+ */
+export async function reopenInspectionAction(vehicleId: string, note?: string): Promise<AdminResult> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const { data: current } = await supabase.from("vehicles").select("status").eq("id", vehicleId).single();
+  const prevStatus = (current as { status?: string } | null)?.status ?? null;
+
+  const reviewNote = note?.trim() || "Re-opened for inspection by admin.";
+  const { error } = await supabase
+    .from("vehicles")
+    .update({ status: "changes_requested", review_notes: reviewNote })
+    .eq("id", vehicleId);
+  if (error) return { ok: false, error: error.message };
+
+  if (user) {
+    const { error: logErr } = await supabase.from("admin_audit_log").insert({
+      actor_id: user.id, entity_type: "vehicle", entity_id: vehicleId,
+      action: "reopen_inspection", changes: { status: { from: prevStatus, to: "changes_requested" } }, note: reviewNote,
+    });
+    if (logErr) console.error("[audit] insert failed:", logErr.message);
+  }
+
+  revalidateAdmin(vehicleId);
+  return { ok: true };
+}
+
 type ServerClient = Awaited<ReturnType<typeof createClient>>;
 
 function revalidateAdmin(vehicleId?: string) {
