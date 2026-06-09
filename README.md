@@ -202,7 +202,7 @@ tracked example file — use the list below). In production they're set in
 | `RESEND_FROM` | for email | From address, e.g. `XportACar <noreply@xportacar.com>` |
 | `NEXT_PUBLIC_APP_DOWNLOAD_URL` | optional | Real App Store/Play URL; the "Download App" banner self-hides while unset |
 | `STRIPE_SECRET_KEY` / `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET` | optional | Enables Stripe payments; unset = "Payment coming soon" |
-| `VALUATION_API_KEY` | optional | Server-side auto.dev key for valuation (see security note) |
+| `AUTODEV_API_KEY` / `VALUATION_API_KEY` | optional | Server-side auto.dev key for valuation (read by `valuation-server.ts`). Mobile apps use it via the Supabase Edge Functions — see [`docs/SECURITY_autodev_key.md`](docs/SECURITY_autodev_key.md) |
 | `SUPABASE_PAT` | optional | Personal access token to apply schema via the API |
 
 ### Email (Resend)

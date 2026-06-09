@@ -12,11 +12,12 @@ has a script or command.
 
 ## 0. Blockers — do these FIRST
 
-- [ ] **[manual] Rotate the auto.dev API key.** It was committed in the mobile
-      repos (`src/lib/valuation.ts`) and is in git history. Rotate it at
-      auto.dev, then apply the proxy fix in
-      [`docs/SECURITY_autodev_key.md`](./SECURITY_autodev_key.md). Until then,
-      VIN decode + live valuation run on a leaked key.
+- [x] **auto.dev API key rotated + moved server-side** (done 2026-06-09 — the
+      mobile apps no longer carry the key; they call Edge Functions). Remaining
+      **[manual]** steps: `supabase secrets set AUTODEV_API_KEY=<rotated>`,
+      `supabase functions deploy valuation-proxy`,
+      `supabase functions deploy vin-decoder-proxy`, and add `AUTODEV_API_KEY`
+      to Vercel. See [`docs/SECURITY_autodev_key.md`](./SECURITY_autodev_key.md).
 - [ ] **Take a database backup** (Supabase → Database → Backups) before any
       cleanup.
 - [ ] **Set Resend up** (needed before the first real signup — see §5).
@@ -41,7 +42,9 @@ Optional / feature flags:
       `STRIPE_WEBHOOK_SECRET` — set to turn payments ON, or leave unset to keep
       the "Payment processing coming soon" state (a deliberate, disabled button,
       not a bug).
-- [ ] `VALUATION_API_KEY` — the **rotated** auto.dev key (server-side only).
+- [ ] `AUTODEV_API_KEY` (and/or `VALUATION_API_KEY`) — the **rotated** auto.dev
+      key, server-side only (never `NEXT_PUBLIC_`). Also set as a Supabase
+      Function secret for the proxies.
 
 ## 2. Pre-flight smoke test
 

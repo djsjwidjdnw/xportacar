@@ -1,123 +1,91 @@
-# Security remediation — leaked auto.dev API key
+# Security — auto.dev API key (rotated + moved server-side)
+
+**Status: RESOLVED (2026-06-09).** The key was rotated and the mobile apps no
+longer contain it — they call Supabase Edge Functions that hold the key
+server-side.
+
+> ⚠️ The live key value is intentionally **not** written in this file (this doc
+> is committed to git; putting the key here would re-leak it). The rotated key
+> lives only in: Supabase Function secrets, Vercel env vars, and each
+> developer's gitignored `.env.local`.
 
 ## What happened
-A **private** auto.dev API key (prefix `sk_ad_…`) was hardcoded in the two
-mobile repos:
+A **private** auto.dev key (`sk_ad_qp5H-…`, now **revoked**) was hardcoded in
+`xportacar-mobile/src/lib/valuation.ts` and `xportacar-inspection/src/lib/
+valuation.ts` (the latter also used by `vinDecoder.ts`). Anything in an Expo
+bundle ships to the device and is extractable, and the value is in git history.
+Rotating the key neutralised the exposure.
 
-- `xportacar-mobile/src/lib/valuation.ts` → `DEFAULT_API_KEY`
-- `xportacar-inspection/src/lib/valuation.ts` → `DEFAULT_API_KEY`
-  (also imported by `xportacar-inspection/src/lib/vinDecoder.ts` for VIN decode)
+## What was done
 
-Because everything in a React-Native / Expo bundle ships to the device, the key
-is extractable by anyone who downloads the app, and it is already in **git
-history** (committed). Unlike the Supabase *publishable* anon key (public by
-design), `sk_ad_` is a secret and must never live in a client.
+### 1. Rotated (manual)
+The old `sk_ad_qp5H-…` key was revoked at auto.dev and a new key issued. The new
+key is **not** stored in any committed file.
 
-Impact: a third party can exhaust the account's auto.dev quota / run up billing.
+### 2. Two Supabase Edge Functions (the proxy)
+`supabase/functions/` (web repo):
 
-## Step 1 — Rotate now (mandatory, human action)
-Rotating is the only thing that neutralises the already-leaked key; removing it
-from source does **not** un-leak history.
+| Function | Body | Calls |
+|----------|------|-------|
+| `valuation-proxy`  | `{ make, model, year, trim?, mileage? }` | auto.dev listings API |
+| `vin-decoder-proxy`| `{ vin }` (validated 17 chars) | auto.dev VIN API |
 
-1. Log in to auto.dev → API keys → **revoke** `sk_ad_qp5H-…` and issue a new key.
-2. Do **not** put the new key in any client repo. It goes server-side only.
+Both: require a valid Supabase JWT (`verify_jwt` on by default + an in-function
+`getUser` check), send CORS headers + answer OPTIONS (for the inspector web
+export), apply best-effort per-user rate limiting (`_shared/rateLimit.ts`), read
+the key from `Deno.env.get("AUTODEV_API_KEY")`, and **never** return or log the
+key. Shared helpers live in `supabase/functions/_shared/`.
 
-After rotation the embedded key is dead, so the mobile valuation/VIN features
-fall back to their offline behaviour (reference-table estimate / manual VIN
-entry) until the proxy below is in place.
+### 3. Mobile apps call the proxy (key removed)
+- `xportacar-mobile/src/lib/valuation.ts` and
+  `xportacar-inspection/src/lib/valuation.ts`: `DEFAULT_API_KEY` deleted;
+  `getMarketValuation()` now calls `supabase.functions.invoke("valuation-proxy", …)`
+  and aggregates the result, falling back to the offline `estimateValuation()`.
+- `xportacar-inspection/src/lib/vinDecoder.ts`: no longer imports the key;
+  `decodeVin()` calls `supabase.functions.invoke("vin-decoder-proxy", …)`,
+  falling back to manual entry on any failure.
+- UX is unchanged (same graceful fallbacks). Call-site signatures
+  (`getMarketValuation(input)`, `decodeVin(vin)`) are unchanged.
 
-## Step 2 — Proxy the API server-side (recommended: Supabase Edge Function)
-The mobile apps already talk to Supabase directly and carry the user's JWT, so a
-Supabase Edge Function is the lowest-friction proxy (no new base URL, auth for
-free). The web app already keeps the key server-side
-(`xportacar/src/lib/valuation-server.ts`, `process.env.VALUATION_API_KEY`).
+### 4. Web app
+Already server-side: `src/lib/valuation-server.ts` (`"server-only"`) reads
+`process.env.VALUATION_API_KEY ?? process.env.AUTODEV_API_KEY` and is only
+called from server components. No browser code path touches auto.dev, so no web
+code change was needed — just the env var.
 
-### 2a. Create the function `supabase/functions/market-proxy/index.ts`
-```ts
-// Deno Edge Function. Deploy:  supabase functions deploy market-proxy
-// Set the secret:  supabase secrets set AUTODEV_API_KEY=sk_ad_<rotated>
-import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
+## Commands to run (manual)
 
-const KEY = Deno.env.get("AUTODEV_API_KEY") ?? "";
+```bash
+# From the web repo (xportacar/), with the Supabase CLI linked to the project:
 
-serve(async (req) => {
-  // Supabase injects the caller's JWT; require a signed-in user.
-  const auth = req.headers.get("Authorization") ?? "";
-  if (!auth.startsWith("Bearer ")) return json({ error: "unauthorized" }, 401);
-  if (!KEY) return json({ error: "not configured" }, 503);
+# 1. Set the key as a Function secret (used by BOTH functions):
+supabase secrets set AUTODEV_API_KEY=sk_ad_<ROTATED_KEY>
 
-  const body = await req.json().catch(() => ({}));
-  try {
-    if (body.action === "vin" && body.vin) {
-      const r = await fetch(
-        `https://api.auto.dev/vin/${encodeURIComponent(body.vin)}`,
-        { headers: { Authorization: `Bearer ${KEY}`, Accept: "application/json" } },
-      );
-      return json(await r.json(), r.ok ? 200 : r.status);
-    }
-    if (body.action === "valuation" && body.make && body.model && body.year) {
-      const qs = new URLSearchParams({
-        make: body.make, model: body.model,
-        year_min: String(body.year), year_max: String(body.year),
-      });
-      const r = await fetch(`https://auto.dev/api/listings?${qs}`, {
-        headers: { Authorization: `Bearer ${KEY}`, Accept: "application/json" },
-      });
-      return json(await r.json(), r.ok ? 200 : r.status);
-    }
-    return json({ error: "bad request" }, 400);
-  } catch (e) {
-    return json({ error: String(e) }, 502);
-  }
-});
-
-function json(b: unknown, status = 200) {
-  return new Response(JSON.stringify(b), {
-    status, headers: { "Content-Type": "application/json" },
-  });
-}
+# 2. Deploy the two functions:
+supabase functions deploy valuation-proxy
+supabase functions deploy vin-decoder-proxy
 ```
+(`SUPABASE_URL` / `SUPABASE_ANON_KEY` are injected into functions automatically;
+no need to set them.)
 
-### 2b. Update the mobile apps to call it (remove the embedded key)
-In **both** `valuation.ts` files: delete `DEFAULT_API_KEY`, and rewrite
-`getMarketValuation` to invoke the function, keeping the offline fallback:
-```ts
-import { supabase } from "./supabase";
+## Env vars
 
-export async function getMarketValuation(input: ValuationInput): Promise<Valuation> {
-  try {
-    const { data } = await supabase.functions.invoke("market-proxy", {
-      body: { action: "valuation", make: input.make, model: input.model, year: input.year },
-    });
-    const live = parseListings(data, input); // reuse the price-aggregation logic
-    if (live) return live;
-  } catch { /* fall through */ }
-  return estimateValuation(input);
-}
-```
-In `xportacar-inspection/src/lib/vinDecoder.ts`: drop
-`import { DEFAULT_API_KEY }`, and fetch via
-`supabase.functions.invoke("market-proxy", { body: { action: "vin", vin } })`,
-then run the existing defensive parser on the returned JSON. Both paths already
-degrade gracefully (estimate / manual entry) if the function is unavailable —
-so this is safe to ship before the function is deployed.
+- **Local dev:** `xportacar/.env.local` (gitignored) — `AUTODEV_API_KEY` and
+  `VALUATION_API_KEY` both set to the rotated key.
+- **Vercel (production):** add **`AUTODEV_API_KEY`** (and/or `VALUATION_API_KEY`)
+  = the rotated key under Project → Settings → Environment Variables. Never use
+  `NEXT_PUBLIC_` for this — it must stay server-side only.
+- **Supabase:** `AUTODEV_API_KEY` set via `supabase secrets set` (above).
 
-These mobile changes are JS-only → shippable as an EAS OTA update (see each
-repo's `docs/OTA_UPDATES.md`), but they are **not** in the current TestFlight
-builds.
+## Git history
+The old key `sk_ad_qp5H-…` remains in git history. We **considered** rewriting
+history with `git filter-repo` / BFG and **chose not to**: the old key is
+already revoked (so history exposure is no longer a live risk), and a rewrite
+would change every commit hash and break all existing clones/forks/checkouts for
+no security benefit. The rotation is the fix; history rewrite is unnecessary.
 
-## Alternative — Next.js API route
-If you'd rather not use Edge Functions, add `src/app/api/market/route.ts` to the
-web app (validate the Supabase session via `createClient().auth.getUser()`, call
-`getVehicleValuation` / auto.dev with `process.env.VALUATION_API_KEY`), expose a
-public base URL to the apps (e.g. `extra.apiBaseUrl` in `app.json`), and have
-the mobile code `fetch` it with the user's access token. Same graceful fallback.
-
-## Checklist
-- [ ] Rotate the auto.dev key (revoke old, issue new).
-- [ ] Deploy the proxy (Edge Function or API route) + set `AUTODEV_API_KEY` /
-      `VALUATION_API_KEY` as a server secret.
-- [ ] Remove `DEFAULT_API_KEY` from both mobile `valuation.ts`; update
-      `vinDecoder.ts`.
-- [ ] Ship the mobile change (OTA or next build).
-- [ ] Confirm VIN decode + valuation still work end-to-end.
+## Verification
+- `sk_ad_…` (new key) appears in **no** committed file — only in gitignored
+  `.env.local`, Supabase secrets, and Vercel env.
+- The functions read the key from `Deno.env`; the literal is not in their source.
+- `grep` for the new key across the mobile repos returns nothing.
