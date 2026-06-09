@@ -188,7 +188,7 @@ export function EditVehicleDialog({
         </div>
 
         <DialogFooter>
-          <DialogClose render={<Button variant="outline">Cancel</Button>} />
+          <DialogClose render={<Button variant="outline" disabled={pending}>Cancel</Button>} />
           <Button onClick={submit} disabled={pending}>{pending ? "Saving…" : "Save changes"}</Button>
         </DialogFooter>
       </DialogContent>

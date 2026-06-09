@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sendKycApprovedEmail, sendKycRejectedEmail } from "@/lib/email";
 import type { VehicleStatus } from "@/types";
 
 export interface AdminResult {
@@ -531,6 +532,7 @@ type KycStatus = (typeof ALLOWED_KYC)[number];
 export async function setUserKycStatusAction(
   userId: string,
   kycStatus: KycStatus,
+  reason?: string,
 ): Promise<AdminResult> {
   if (!ALLOWED_KYC.includes(kycStatus)) return { ok: false, error: "Invalid KYC status." };
 
@@ -565,6 +567,18 @@ export async function setUserKycStatusAction(
         ? "Our compliance team rejected your submission. Please re-upload clear documents."
         : "Your account has been moved back to pending review.",
   });
+
+  // Email the buyer (no-ops if RESEND_API_KEY is unset). Best-effort.
+  if (kycStatus === "verified" || kycStatus === "rejected") {
+    const { data: target } = await supabase
+      .from("profiles").select("email, full_name").eq("id", userId).maybeSingle();
+    const to = (target as { email?: string | null } | null)?.email;
+    const name = (target as { full_name?: string | null } | null)?.full_name ?? "";
+    if (to) {
+      if (kycStatus === "verified") await sendKycApprovedEmail({ to, name });
+      else await sendKycRejectedEmail({ to, name, reason: reason ?? "" });
+    }
+  }
 
   revalidatePath("/admin/users");
   revalidatePath("/admin/kyc");
@@ -670,9 +684,9 @@ export async function createAuctionAction(
   if (reserve != null && reserve < starting) return { ok: false, error: "Reserve cannot be below the starting price." };
 
   // Buy Now is MANDATORY on every auction. If the admin leaves it blank we
-  // auto-calculate it: reserve * 1.22 when a reserve is set (≈22% margin, like
-  // the Porsche demo), otherwise starting * 1.5. Always rounded to whole euros
-  // and never below the starting price.
+  // auto-calculate it: reserve * 1.22 when a reserve is set (≈22% margin),
+  // otherwise starting * 1.5. Always rounded to whole euros and never below
+  // the starting price.
   let buyNow = input.buyNowPriceEur != null && Number(input.buyNowPriceEur) > 0 ? Number(input.buyNowPriceEur) : null;
   if (buyNow == null) buyNow = Math.round(reserve != null ? reserve * 1.22 : starting * 1.5);
   if (buyNow < starting) return { ok: false, error: "Buy-now cannot be below the starting price." };

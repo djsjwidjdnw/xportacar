@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { sendWelcomeEmail } from "@/lib/email";
 
 export type AuthFormState = {
   ok: boolean;
@@ -73,6 +74,12 @@ export async function signUpAction(
         },
         { onConflict: "id" },
       );
+  }
+
+  // Welcome email (best-effort; no-ops silently if RESEND_API_KEY is unset,
+  // and never throws). Sent before any redirect below since redirect() throws.
+  if (data.user) {
+    await sendWelcomeEmail({ to: email, name: fullName });
   }
 
   // If email confirmation is disabled the user is already a session — send

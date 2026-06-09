@@ -183,3 +183,56 @@ optional ones you've configured) from `.env.local.example`, hit deploy.
 
 In Supabase, add your Vercel URL to **Authentication → URL configuration →
 Site URL / Redirect URLs** so signup confirmation emails point at production.
+
+## Operations & launch
+
+### Environment variables (where keys live)
+All secrets live in environment variables — **never** in source. Locally they
+go in `.env.local` (gitignored; the whole `.env*` glob is ignored, so there's no
+tracked example file — use the list below). In production they're set in
+**Vercel → Project → Settings → Environment Variables**.
+
+| Var | Required | Purpose |
+|-----|----------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | yes | Supabase project URL (public) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | yes | Supabase publishable/anon key (public) |
+| `SUPABASE_SERVICE_ROLE_KEY` | yes | Server-only admin key (RLS bypass) — never sent to the client |
+| `NEXT_PUBLIC_SITE_URL` | yes | Canonical site URL, e.g. `https://xportacar.com` |
+| `RESEND_API_KEY` | for email | Resend API key (see below) |
+| `RESEND_FROM` | for email | From address, e.g. `XportACar <noreply@xportacar.com>` |
+| `NEXT_PUBLIC_APP_DOWNLOAD_URL` | optional | Real App Store/Play URL; the "Download App" banner self-hides while unset |
+| `STRIPE_SECRET_KEY` / `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET` | optional | Enables Stripe payments; unset = "Payment coming soon" |
+| `VALUATION_API_KEY` | optional | Server-side auto.dev key for valuation (see security note) |
+| `SUPABASE_PAT` | optional | Personal access token to apply schema via the API |
+
+### Email (Resend)
+Transactional email lives in `src/lib/email/` (`client.ts` = Resend transport,
+`templates/` = one builder per email, `index.ts` = the `send*` helpers). It
+**no-ops silently** when `RESEND_API_KEY` is unset (logging once in dev) and
+never throws, so dev/preview work without a key. Wired flows today: welcome on
+signup (`(auth)/actions.ts`), outbid/won (`(buyer)/auction/actions.ts`), KYC
+approve/reject (`(admin)/admin/actions.ts`). Ready-but-unwired templates:
+payment received (admin), payment verified (buyer), vehicle listed (seller).
+
+To turn it on:
+1. Create a [Resend](https://resend.com) account; verify your sending domain
+   (add the SPF/DKIM DNS records it gives you).
+2. Create an API key → set `RESEND_API_KEY` (and `RESEND_FROM`) in Vercel.
+3. Redeploy. Send a test signup and confirm the welcome email arrives.
+
+### Database / migrations
+Migration history and how to apply: [`docs/MIGRATIONS.md`](docs/MIGRATIONS.md)
+(001–012; the last three were the `vehicle-photos` bucket, `market_spec`, and
+the admin audit log).
+
+### Going to production
+- **Launch checklist:** [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md)
+- **Demo-data wipe (pre-launch):** [`supabase/cleanup_demo_data.sql`](supabase/cleanup_demo_data.sql)
+- **Pre-launch sanity check:** `python scripts/smoke_test.py`
+- **Security follow-up (must do):** [`docs/SECURITY_autodev_key.md`](docs/SECURITY_autodev_key.md)
+
+### Links
+- Web: production on **Vercel** (custom domains: xportacar.com / .app / .de / .net)
+- Supabase: project `klettmjnnttajdyajafn` ([dashboard](https://supabase.com/dashboard/project/klettmjnnttajdyajafn))
+- App Store Connect: buyer + inspector apps ([appstoreconnect.apple.com](https://appstoreconnect.apple.com))
+- Mobile repos: [`xportacar-mobile`](https://github.com/djsjwidjdnw/xportacar-mobile) (buyer) · [`xportacar-inspection`](https://github.com/djsjwidjdnw/xportacar-inspection) (inspector)

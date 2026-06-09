@@ -6,8 +6,7 @@
 
 /* ------------------------------------------------------------------
    XportACar design tokens
-   Brand palette is the same Plus Jakarta Sans / blue-600 system
-   used in the demo site we showed Simon.
+   Brand palette: Plus Jakarta Sans + blue-600 (#1570EF) system.
 ------------------------------------------------------------------- */
 @theme inline {
   /* shadcn semantic tokens */

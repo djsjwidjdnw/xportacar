@@ -10,9 +10,11 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
 const DISMISS_KEY = "xpc_app_banner_dismissed";
-// Placeholder until the TestFlight / App Store listing is live — update here
-// when the real download link is ready.
-const APP_DOWNLOAD_URL = "https://xportacar.com/app";
+// Real App Store / Play Store (or landing-page) URL, supplied via env so the
+// banner stays hidden until the apps are actually published. When
+// NEXT_PUBLIC_APP_DOWNLOAD_URL is unset the banner self-suppresses (returns
+// null below) so we never ship a "Download App" button to a dead link.
+const APP_DOWNLOAD_URL = process.env.NEXT_PUBLIC_APP_DOWNLOAD_URL ?? "";
 
 export function AppDownloadBanner() {
   const [show, setShow] = useState(false);
@@ -27,7 +29,7 @@ export function AppDownloadBanner() {
     if (!dismissed && isMobile) setShow(true);
   }, []);
 
-  if (!show) return null;
+  if (!show || !APP_DOWNLOAD_URL) return null;
 
   const dismiss = () => {
     try { localStorage.setItem(DISMISS_KEY, "1"); } catch { /* ignore */ }
