@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Car, Gavel, Users, BadgeDollarSign, Settings, ClipboardCheck,
-  MessageSquare, FileText, ShieldCheck,
+  MessageSquare, FileText, ShieldCheck, HardHat,
   ChevronRight, Menu,
 } from "lucide-react";
 import { useState } from "react";
@@ -26,6 +26,7 @@ const NAV = [
   { href: "/admin/kyc",             key: "navKyc",         icon: ShieldCheck },
   { href: "/admin/auctions",        key: "navAuctions",    icon: Gavel },
   { href: "/admin/inspections",     key: "navInspections", icon: ClipboardCheck },
+  { href: "/admin/inspectors",      key: "navInspectors",  icon: HardHat },
   { href: "/admin/users",           key: "navUsers",       icon: Users },
   { href: "/admin/finance",         key: "navFinance",     icon: BadgeDollarSign },
   { href: "/admin/settings",        key: "navSettings",    icon: Settings },

@@ -571,12 +571,14 @@ export async function setUserKycStatusAction(
   // Email the buyer (no-ops if RESEND_API_KEY is unset). Best-effort.
   if (kycStatus === "verified" || kycStatus === "rejected") {
     const { data: target } = await supabase
-      .from("profiles").select("email, full_name").eq("id", userId).maybeSingle();
-    const to = (target as { email?: string | null } | null)?.email;
-    const name = (target as { full_name?: string | null } | null)?.full_name ?? "";
+      .from("profiles").select("email, full_name, language").eq("id", userId).maybeSingle();
+    const tgt = target as { email?: string | null; full_name?: string | null; language?: string | null } | null;
+    const to = tgt?.email;
+    const name = tgt?.full_name ?? "";
+    const locale = tgt?.language ?? undefined;
     if (to) {
-      if (kycStatus === "verified") await sendKycApprovedEmail({ to, name });
-      else await sendKycRejectedEmail({ to, name, reason: reason ?? "" });
+      if (kycStatus === "verified") await sendKycApprovedEmail({ to, name, locale });
+      else await sendKycRejectedEmail({ to, name, reason: reason ?? "", locale });
     }
   }
 

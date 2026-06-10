@@ -4,9 +4,13 @@
 // no-ops (logging once in dev) when RESEND_API_KEY is unset and never throws.
 // To start sending for real, set RESEND_API_KEY (and optionally RESEND_FROM)
 // in the environment — see docs/README and .env.local.example.
+//
+// Every send* helper accepts an optional `locale` (any string); it is coerced
+// to a supported EmailLocale ("en" fallback) before being passed to templates.
 
 import "server-only";
 import { sendEmail } from "./client";
+import { toEmailLocale } from "./templates/layout";
 
 import { welcomeEmail } from "./templates/welcome";
 import { outbidEmail } from "./templates/outbid";
@@ -17,12 +21,25 @@ import { kycRejectedEmail } from "./templates/kycRejected";
 import { paymentReceivedAdminEmail } from "./templates/paymentReceivedAdmin";
 import { paymentVerifiedEmail } from "./templates/paymentVerified";
 import { vehicleListedEmail } from "./templates/vehicleListed";
+import { newInspectorApplicationEmail } from "./templates/newInspectorApplication";
 
-export type { EmailContent } from "./templates/layout";
+export type { EmailContent, EmailLocale } from "./templates/layout";
+export { toEmailLocale } from "./templates/layout";
 export { sendEmail } from "./client";
 
-export async function sendWelcomeEmail(args: { to: string; name: string }) {
-  await sendEmail(args.to, welcomeEmail({ name: args.name }));
+export { welcomeEmail } from "./templates/welcome";
+export { outbidEmail } from "./templates/outbid";
+export { auctionWonEmail } from "./templates/auctionWon";
+export { bidConfirmationEmail } from "./templates/bidConfirmation";
+export { kycApprovedEmail } from "./templates/kycApproved";
+export { kycRejectedEmail } from "./templates/kycRejected";
+export { paymentReceivedAdminEmail } from "./templates/paymentReceivedAdmin";
+export { paymentVerifiedEmail } from "./templates/paymentVerified";
+export { vehicleListedEmail } from "./templates/vehicleListed";
+export { newInspectorApplicationEmail } from "./templates/newInspectorApplication";
+
+export async function sendWelcomeEmail(args: { to: string; name: string; locale?: string }) {
+  await sendEmail(args.to, welcomeEmail({ name: args.name, locale: toEmailLocale(args.locale) }));
 }
 
 export async function sendOutbidEmail(args: {
@@ -31,10 +48,16 @@ export async function sendOutbidEmail(args: {
   vehicleTitle: string;
   newBidEur: number;
   auctionId: string;
+  locale?: string;
 }) {
   await sendEmail(
     args.to,
-    outbidEmail({ vehicleTitle: args.vehicleTitle, newBidEur: args.newBidEur, auctionId: args.auctionId }),
+    outbidEmail({
+      vehicleTitle: args.vehicleTitle,
+      newBidEur: args.newBidEur,
+      auctionId: args.auctionId,
+      locale: toEmailLocale(args.locale),
+    }),
   );
 }
 
@@ -44,10 +67,16 @@ export async function sendAuctionWonEmail(args: {
   auctionId: string;
   amountEur: number;
   invoiceNumber?: string;
+  locale?: string;
 }) {
   await sendEmail(
     args.to,
-    auctionWonEmail({ amountEur: args.amountEur, auctionId: args.auctionId, invoiceNumber: args.invoiceNumber }),
+    auctionWonEmail({
+      amountEur: args.amountEur,
+      auctionId: args.auctionId,
+      invoiceNumber: args.invoiceNumber,
+      locale: toEmailLocale(args.locale),
+    }),
   );
 }
 
@@ -57,19 +86,33 @@ export async function sendBidConfirmationEmail(args: {
   vehicleTitle: string;
   amountEur: number;
   auctionId: string;
+  locale?: string;
 }) {
   await sendEmail(
     args.to,
-    bidConfirmationEmail({ vehicleTitle: args.vehicleTitle, amountEur: args.amountEur, auctionId: args.auctionId }),
+    bidConfirmationEmail({
+      vehicleTitle: args.vehicleTitle,
+      amountEur: args.amountEur,
+      auctionId: args.auctionId,
+      locale: toEmailLocale(args.locale),
+    }),
   );
 }
 
-export async function sendKycApprovedEmail(args: { to: string; name: string }) {
-  await sendEmail(args.to, kycApprovedEmail({ name: args.name }));
+export async function sendKycApprovedEmail(args: { to: string; name: string; locale?: string }) {
+  await sendEmail(args.to, kycApprovedEmail({ name: args.name, locale: toEmailLocale(args.locale) }));
 }
 
-export async function sendKycRejectedEmail(args: { to: string; name: string; reason: string }) {
-  await sendEmail(args.to, kycRejectedEmail({ name: args.name, reason: args.reason }));
+export async function sendKycRejectedEmail(args: {
+  to: string;
+  name: string;
+  reason: string;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    kycRejectedEmail({ name: args.name, reason: args.reason, locale: toEmailLocale(args.locale) }),
+  );
 }
 
 export async function sendPaymentReceivedAdminEmail(args: {
@@ -78,6 +121,7 @@ export async function sendPaymentReceivedAdminEmail(args: {
   invoiceNumber: string;
   amountEur: number;
   invoiceId: string;
+  locale?: string;
 }) {
   await sendEmail(
     args.to,
@@ -86,6 +130,7 @@ export async function sendPaymentReceivedAdminEmail(args: {
       invoiceNumber: args.invoiceNumber,
       amountEur: args.amountEur,
       invoiceId: args.invoiceId,
+      locale: toEmailLocale(args.locale),
     }),
   );
 }
@@ -96,6 +141,7 @@ export async function sendPaymentVerifiedEmail(args: {
   invoiceNumber: string;
   amountEur: number;
   auctionId?: string;
+  locale?: string;
 }) {
   await sendEmail(
     args.to,
@@ -104,6 +150,7 @@ export async function sendPaymentVerifiedEmail(args: {
       invoiceNumber: args.invoiceNumber,
       amountEur: args.amountEur,
       auctionId: args.auctionId,
+      locale: toEmailLocale(args.locale),
     }),
   );
 }
@@ -113,9 +160,37 @@ export async function sendVehicleListedEmail(args: {
   sellerName: string;
   vehicleTitle: string;
   vehicleId?: string;
+  locale?: string;
 }) {
   await sendEmail(
     args.to,
-    vehicleListedEmail({ sellerName: args.sellerName, vehicleTitle: args.vehicleTitle, vehicleId: args.vehicleId }),
+    vehicleListedEmail({
+      sellerName: args.sellerName,
+      vehicleTitle: args.vehicleTitle,
+      vehicleId: args.vehicleId,
+      locale: toEmailLocale(args.locale),
+    }),
+  );
+}
+
+export async function sendNewInspectorApplicationEmail(args: {
+  to: string;
+  applicantName: string;
+  applicantEmail: string;
+  country?: string;
+  city?: string;
+  experience?: string;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    newInspectorApplicationEmail({
+      applicantName: args.applicantName,
+      applicantEmail: args.applicantEmail,
+      country: args.country,
+      city: args.city,
+      experience: args.experience,
+      locale: toEmailLocale(args.locale),
+    }),
   );
 }

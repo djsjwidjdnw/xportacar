@@ -32,6 +32,7 @@ export async function sendEmail(to: string, content: EmailContent): Promise<{ se
       to,
       subject: content.subject,
       html: content.html,
+      text: content.text,
     });
     if (error) {
       console.error(`[email] Resend rejected "${content.subject}" → ${to}: ${error.message ?? error}`);

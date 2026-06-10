@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
+import { sendPaymentReceivedAdminEmail } from "@/lib/email";
 
 // Step 1 of the two-step win flow: the buyer confirms (within 36h of winning)
 // that they intend to pay. This starts the 5-working-day wire-transfer clock.
@@ -87,7 +88,7 @@ export async function submitPaymentProofAction(
 
   const { data: invoice } = await supabase
     .from("invoices")
-    .select("id, buyer_id, auction_id")
+    .select("id, buyer_id, auction_id, invoice_number, total_eur")
     .eq("id", invoiceId)
     .single();
   // deno-lint-ignore no-explicit-any
@@ -126,7 +127,8 @@ export async function submitPaymentProofAction(
   // deno-lint-ignore no-explicit-any
   const p = profile as any;
   const who = p?.company_name ?? p?.full_name ?? p?.email ?? "A buyer";
-  const { data: admins } = await admin.from("profiles").select("id").in("role", ["admin", "superadmin"]);
+  const { data: admins } = await admin
+    .from("profiles").select("id, email, language").in("role", ["admin", "superadmin"]);
   if (admins && admins.length) {
     await admin.from("notifications").insert(
       (admins as { id: string }[]).map((a) => ({
@@ -137,6 +139,20 @@ export async function submitPaymentProofAction(
         data: { invoice_id: invoiceId, auction_id: inv.auction_id },
       })),
     );
+    // Email admins too (best-effort, localized to each admin's language).
+    try {
+      for (const a of admins as { email?: string; language?: string }[]) {
+        if (!a.email) continue;
+        await sendPaymentReceivedAdminEmail({
+          to: a.email,
+          buyerName: who,
+          invoiceNumber: inv.invoice_number ?? invoiceId.slice(0, 8),
+          amountEur: Number(inv.total_eur ?? 0),
+          invoiceId,
+          locale: a.language,
+        });
+      }
+    } catch { /* email is best-effort */ }
   }
 
   revalidatePath(`/auction/${inv.auction_id}/won`);

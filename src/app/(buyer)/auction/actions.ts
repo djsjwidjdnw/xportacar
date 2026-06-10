@@ -182,11 +182,17 @@ export async function buyNowAction(input: {
     data: { auction_id: auction.id, amount_eur: price },
   });
 
-  // Best-effort welcome email.
+  // Best-effort auction-won email (localized to the winner's language).
   const { data: profile } = await supabase
-    .from("profiles").select("email, full_name").eq("id", user.id).single();
+    .from("profiles").select("email, full_name, language").eq("id", user.id).single();
   if (profile?.email) {
-    await sendAuctionWonEmail({ to: profile.email, name: profile.full_name ?? "", auctionId: auction.id, amountEur: price });
+    await sendAuctionWonEmail({
+      to: profile.email,
+      name: profile.full_name ?? "",
+      auctionId: auction.id,
+      amountEur: price,
+      locale: (profile as { language?: string }).language,
+    });
   }
 
   revalidatePath(`/auction/${auction.id}`);
