@@ -175,6 +175,13 @@
     "outbidEnded": "Auction ended — you were outbid",
     "endedNoBid": "This auction has ended"
   },
+  "timeline": {
+    "orderStatus": "Order status",
+    "sold": "Sold",
+    "pickedUp": "Picked Up",
+    "inTransit": "In Transit",
+    "delivered": "Delivered"
+  },
   "auth": {
     "loginTitle": "Welcome back",
     "loginSubtitle": "Sign in to bid, watch and manage your XportACar trade account.",
@@ -359,5 +366,25 @@
     "s19Body": "These terms are governed by the laws of the United Arab Emirates. Mandatory consumer-protection rules of your country of residence (where applicable) continue to apply alongside this clause.",
     "s20Title": "Contact",
     "s20Body": "Questions about these terms? Email support@xportacar.com or write to Global Business Consultancy L.L.C-FZ, Meydan Grandstand, 6th floor, Meydan Road, Nad Al Sheba, Dubai, UAE."
+  },
+  "paint": {
+    "title": "Paint Thickness Report",
+    "reading": "Reading",
+    "notes": "Notes",
+    "microns": "microns",
+    "micronsShort": "µm",
+    "statusThin": "Possible respray or thin paint",
+    "statusNormal": "Normal factory",
+    "statusThick": "Thick paint — possible repair",
+    "panelFrontBumper": "Front bumper",
+    "panelHood": "Hood",
+    "panelFrontLeftFender": "Front left fender",
+    "panelFrontRightFender": "Front right fender",
+    "panelFrontLeftDoor": "Front left door",
+    "panelFrontRightDoor": "Front right door",
+    "panelRearLeftDoor": "Rear left door",
+    "panelRearRightDoor": "Rear right door",
+    "panelTrunk": "Trunk",
+    "panelRoof": "Roof"
   }
 }

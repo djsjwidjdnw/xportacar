@@ -10,6 +10,7 @@ import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { ShippingOptions } from "@/components/vehicle/ShippingOptions";
 import { MarketValueBar } from "@/components/vehicle/MarketValueBar";
+import { PaintThicknessReport } from "@/components/vehicle/PaintThicknessReport";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { VehiclePriceCard } from "@/components/vehicle/VehiclePriceCard";
 import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
@@ -99,6 +100,30 @@ export default async function VehicleDetailPage({
       .maybeSingle();
     watching = !!w;
   }
+
+  // Paint-thickness gauge readings, ordered front-to-back by canonical panel.
+  const PAINT_PANEL_ORDER = [
+    "front_bumper", "hood", "front_left_fender", "front_right_fender",
+    "front_left_door", "front_right_door", "rear_left_door", "rear_right_door",
+    "trunk", "roof",
+  ];
+  const { data: paintRows } = await supabase
+    .from("paint_thickness_readings")
+    .select("panel, reading_microns, photo_url, notes, created_at")
+    .eq("vehicle_id", id);
+  const paintReadings = (paintRows ?? [])
+    .map((r) => ({
+      panel: r.panel as string,
+      reading_microns: Number(r.reading_microns),
+      photo_url: (r.photo_url as string | null) ?? null,
+      notes: (r.notes as string | null) ?? null,
+    }))
+    .sort((a, b) => {
+      const ia = PAINT_PANEL_ORDER.indexOf(a.panel);
+      const ib = PAINT_PANEL_ORDER.indexOf(b.panel);
+      // Unknown panels sort to the end, preserving relative order.
+      return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
+    });
 
   const v: VehicleWithMedia = normalizeVehicleRow(vehicle as unknown as Record<string, unknown>);
   const paintThicknessUrl =
@@ -307,6 +332,8 @@ export default async function VehicleDetailPage({
                 paintThicknessUrl={paintThicknessUrl}
               />
             </section>
+
+            <PaintThicknessReport readings={paintReadings} />
 
             <MarketValueBar valuation={valuation} priceEur={headlinePrice ?? v.listed_price_eur} />
 

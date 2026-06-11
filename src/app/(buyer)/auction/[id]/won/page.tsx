@@ -6,9 +6,16 @@ import { CheckCircle2, ArrowRight, Trophy } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { PayNowButton } from "@/components/buyer/PayNowButton";
 import { WonInvoice } from "@/components/buyer/WonInvoice";
+import {
+  StatusTimeline,
+  TIMELINE_STEPS,
+  type StatusEvent,
+  type TimelineStatus,
+} from "@/components/buyer/StatusTimeline";
 import { createClient } from "@/lib/supabase/server";
 import { settleEndedAuctions } from "@/lib/auctions";
 import { isStripeConfigured } from "@/lib/stripe";
+import { getTranslations } from "@/i18n/server";
 import { auctionPhase, cn } from "@/lib/utils";
 
 export const metadata = { title: "Auction won" };
@@ -20,6 +27,7 @@ export default async function AuctionWonPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
+  const t = await getTranslations("timeline");
 
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(`/login?next=/auction/${id}/won`);
@@ -28,7 +36,7 @@ export default async function AuctionWonPage({
     .from("auctions")
     .select(`
       id, status, winner_id, start_time, end_time, current_bid_eur, buy_now_price_eur,
-      vehicle:vehicles!vehicle_id ( id, year, make, model, vin, location_city, location_country )
+      vehicle:vehicles!vehicle_id ( id, year, make, model, vin, status, sold_at, location_city, location_country )
     `)
     .eq("id", id)
     .single();
@@ -80,6 +88,24 @@ export default async function AuctionWonPage({
   }
   const invoiceId = invoice && invoice.status !== "paid" ? invoice.id : null;
 
+  // Order-lifecycle timeline (sold → picked_up → in_transit → delivered).
+  let statusEvents: StatusEvent[] = [];
+  if (isWinner && v) {
+    const { data: ev } = await supabase
+      .from("vehicle_status_events")
+      .select("status, note, created_at")
+      .eq("vehicle_id", v.id)
+      .in("status", TIMELINE_STEPS as unknown as string[])
+      .order("created_at", { ascending: true });
+    statusEvents = (ev as StatusEvent[] | null) ?? [];
+  }
+  const timelineLabels: Record<TimelineStatus, string> = {
+    sold: t("sold"),
+    picked_up: t("pickedUp"),
+    in_transit: t("inTransit"),
+    delivered: t("delivered"),
+  };
+
   return (
     <div className="bg-grey-50 py-12 sm:py-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 space-y-6">
@@ -102,6 +128,16 @@ export default async function AuctionWonPage({
             </p>
           )}
         </div>
+
+        {isWinner && v && (
+          <StatusTimeline
+            title={t("orderStatus")}
+            labels={timelineLabels}
+            currentStatus={v.status ?? null}
+            soldAtIso={v.sold_at ?? null}
+            events={statusEvents}
+          />
+        )}
 
         {isWinner && v && (
           <WonInvoice

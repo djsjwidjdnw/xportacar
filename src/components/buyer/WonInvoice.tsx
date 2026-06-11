@@ -7,7 +7,7 @@
 // action can update without a full server round-trip.
 
 import { useEffect, useMemo, useState } from "react";
-import { Building2, CheckCircle2, Clock, Download, Receipt } from "lucide-react";
+import { Building2, CheckCircle2, Clock, Download, Mail, Receipt } from "lucide-react";
 
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
@@ -90,7 +90,7 @@ export function WonInvoice({
   const tuvEur = shipping.tuv ? tuvPriceEur() : 0;
   const totalEur = hammerEur + feeEur + methodEur + tuvEur;
 
-  const pdfHref = invoiceId
+  const pdfPath = invoiceId
     ? `/api/invoice/${invoiceId}/pdf?` +
       new URLSearchParams({
         shipping: describeMethod(shipping.method),
@@ -98,6 +98,21 @@ export function WonInvoice({
         tuvEur: String(tuvEur),
       }).toString()
     : null;
+  const pdfHref = pdfPath;
+
+  // Absolute link to the PDF for the "Share via Email" mailto body. Prefer the
+  // configured site origin; fall back to the live origin in the browser.
+  const siteOrigin =
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    (typeof window !== "undefined" ? window.location.origin : "");
+  const absolutePdfHref = pdfPath ? `${siteOrigin}${pdfPath}` : null;
+  const mailtoHref =
+    invoiceNumber && absolutePdfHref
+      ? `mailto:?subject=${encodeURIComponent(`XportACar Invoice ${invoiceNumber}`)}` +
+        `&body=${encodeURIComponent(
+          `Here is the XportACar invoice ${invoiceNumber}.\n\nDownload the PDF: ${absolutePdfHref}`,
+        )}`
+      : null;
 
   return (
     <div className="space-y-6">
@@ -206,15 +221,26 @@ export function WonInvoice({
         <CustomsDisclaimer className="mt-5" />
 
         {pdfHref && (
-          <a
-            href={pdfHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-flex h-10 items-center gap-2 rounded-lg border border-grey-200 px-4 text-sm font-semibold text-grey-800 hover:bg-grey-50"
-          >
-            <Download className="size-4" />
-            Download PDF invoice
-          </a>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <a
+              href={pdfHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-10 items-center gap-2 rounded-lg border border-grey-200 px-4 text-sm font-semibold text-grey-800 hover:bg-grey-50"
+            >
+              <Download className="size-4" />
+              Download PDF invoice
+            </a>
+            {mailtoHref && (
+              <a
+                href={mailtoHref}
+                className="inline-flex h-10 items-center gap-2 rounded-lg border border-grey-200 px-4 text-sm font-semibold text-grey-800 hover:bg-grey-50"
+              >
+                <Mail className="size-4" />
+                Share via Email
+              </a>
+            )}
+          </div>
         )}
       </section>
 

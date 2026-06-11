@@ -22,6 +22,11 @@ import { paymentReceivedAdminEmail } from "./templates/paymentReceivedAdmin";
 import { paymentVerifiedEmail } from "./templates/paymentVerified";
 import { vehicleListedEmail } from "./templates/vehicleListed";
 import { newInspectorApplicationEmail } from "./templates/newInspectorApplication";
+import { statusPickedUpEmail } from "./templates/statusPickedUp";
+import { statusInTransitEmail } from "./templates/statusInTransit";
+import { statusDeliveredEmail } from "./templates/statusDelivered";
+import { watchlistMatchEmail } from "./templates/watchlistMatch";
+import { auctionEndingSoonEmail } from "./templates/auctionEndingSoon";
 
 export type { EmailContent, EmailLocale } from "./templates/layout";
 export { toEmailLocale } from "./templates/layout";
@@ -37,6 +42,11 @@ export { paymentReceivedAdminEmail } from "./templates/paymentReceivedAdmin";
 export { paymentVerifiedEmail } from "./templates/paymentVerified";
 export { vehicleListedEmail } from "./templates/vehicleListed";
 export { newInspectorApplicationEmail } from "./templates/newInspectorApplication";
+export { statusPickedUpEmail } from "./templates/statusPickedUp";
+export { statusInTransitEmail } from "./templates/statusInTransit";
+export { statusDeliveredEmail } from "./templates/statusDelivered";
+export { watchlistMatchEmail } from "./templates/watchlistMatch";
+export { auctionEndingSoonEmail } from "./templates/auctionEndingSoon";
 
 export async function sendWelcomeEmail(args: { to: string; name: string; locale?: string }) {
   await sendEmail(args.to, welcomeEmail({ name: args.name, locale: toEmailLocale(args.locale) }));
@@ -190,6 +200,104 @@ export async function sendNewInspectorApplicationEmail(args: {
       country: args.country,
       city: args.city,
       experience: args.experience,
+      locale: toEmailLocale(args.locale),
+    }),
+  );
+}
+
+export async function sendStatusPickedUpEmail(args: {
+  to: string;
+  name: string;
+  vehicleTitle: string;
+  note?: string;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    statusPickedUpEmail({
+      name: args.name,
+      vehicleTitle: args.vehicleTitle,
+      note: args.note,
+      locale: toEmailLocale(args.locale),
+    }),
+  );
+}
+
+export async function sendStatusInTransitEmail(args: {
+  to: string;
+  name: string;
+  vehicleTitle: string;
+  destination?: string;
+  note?: string;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    statusInTransitEmail({
+      name: args.name,
+      vehicleTitle: args.vehicleTitle,
+      destination: args.destination,
+      note: args.note,
+      locale: toEmailLocale(args.locale),
+    }),
+  );
+}
+
+export async function sendStatusDeliveredEmail(args: {
+  to: string;
+  name: string;
+  vehicleTitle: string;
+  note?: string;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    statusDeliveredEmail({
+      name: args.name,
+      vehicleTitle: args.vehicleTitle,
+      note: args.note,
+      locale: toEmailLocale(args.locale),
+    }),
+  );
+}
+
+export async function sendWatchlistMatchEmail(args: {
+  to: string;
+  name: string;
+  vehicleTitle: string;
+  priceEur?: number;
+  vehicleId: string;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    watchlistMatchEmail({
+      name: args.name,
+      vehicleTitle: args.vehicleTitle,
+      priceEur: args.priceEur,
+      vehicleId: args.vehicleId,
+      locale: toEmailLocale(args.locale),
+    }),
+  );
+}
+
+export async function sendAuctionEndingSoonEmail(args: {
+  to: string;
+  name: string;
+  vehicleTitle: string;
+  currentBidEur?: number;
+  auctionId: string;
+  outbid?: boolean;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    auctionEndingSoonEmail({
+      name: args.name,
+      vehicleTitle: args.vehicleTitle,
+      currentBidEur: args.currentBidEur,
+      auctionId: args.auctionId,
+      outbid: args.outbid,
       locale: toEmailLocale(args.locale),
     }),
   );

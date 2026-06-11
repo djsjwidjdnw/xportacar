@@ -175,6 +175,13 @@
     "outbidEnded": "Enchère terminée — vous avez été surenchéri",
     "endedNoBid": "Cette enchère est terminée"
   },
+  "timeline": {
+    "orderStatus": "Statut de la commande",
+    "sold": "Vendu",
+    "pickedUp": "Récupéré",
+    "inTransit": "En transit",
+    "delivered": "Livré"
+  },
   "auth": {
     "loginTitle": "Bon retour",
     "loginSubtitle": "Connectez-vous pour enchérir et gérer votre compte professionnel.",
@@ -359,5 +366,25 @@
     "s19Body": "Les présentes sont régies par le droit des Émirats arabes unis. Les règles impératives de protection des consommateurs de votre pays de résidence (le cas échéant) continuent de s'appliquer en parallèle de cette clause.",
     "s20Title": "Contact",
     "s20Body": "Questions ? Écrivez à support@xportacar.com ou à Global Business Consultancy L.L.C-FZ, Meydan Grandstand, 6e étage, Meydan Road, Nad Al Sheba, Dubaï, EAU."
+  },
+  "paint": {
+    "title": "Rapport d'épaisseur de peinture",
+    "reading": "Mesure",
+    "notes": "Notes",
+    "microns": "microns",
+    "micronsShort": "µm",
+    "statusThin": "Possible nouvelle peinture ou peinture fine",
+    "statusNormal": "Peinture d'usine normale",
+    "statusThick": "Peinture épaisse — réparation possible",
+    "panelFrontBumper": "Pare-chocs avant",
+    "panelHood": "Capot",
+    "panelFrontLeftFender": "Aile avant gauche",
+    "panelFrontRightFender": "Aile avant droite",
+    "panelFrontLeftDoor": "Porte avant gauche",
+    "panelFrontRightDoor": "Porte avant droite",
+    "panelRearLeftDoor": "Porte arrière gauche",
+    "panelRearRightDoor": "Porte arrière droite",
+    "panelTrunk": "Coffre",
+    "panelRoof": "Toit"
   }
 }

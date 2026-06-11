@@ -8,6 +8,7 @@ import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { MarketValueBar } from "@/components/vehicle/MarketValueBar";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
+import { LifecycleActions } from "@/components/admin/LifecycleActions";
 import { InspectorAssign } from "@/components/admin/InspectorAssign";
 import { CreateAuctionButton } from "@/components/admin/CreateAuctionButton";
 import { VehicleReviewPanel } from "@/components/admin/VehicleReviewPanel";
@@ -155,6 +156,10 @@ export default async function AdminVehicleDetailPage({
             <div className="mt-2">
               <VehicleStatusSelect vehicleId={v.id} currentStatus={v.status} />
             </div>
+
+            {["sold", "picked_up", "in_transit", "delivered"].includes(v.status) && (
+              <LifecycleActions vehicleId={v.id} currentStatus={v.status} />
+            )}
 
             <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-grey-500">Assigned inspector</p>
             <div className="mt-2">

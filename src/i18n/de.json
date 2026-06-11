@@ -175,6 +175,13 @@
     "outbidEnded": "Auktion beendet – Sie wurden überboten",
     "endedNoBid": "Diese Auktion ist beendet"
   },
+  "timeline": {
+    "orderStatus": "Bestellstatus",
+    "sold": "Verkauft",
+    "pickedUp": "Abgeholt",
+    "inTransit": "Im Transit",
+    "delivered": "Geliefert"
+  },
   "auth": {
     "loginTitle": "Willkommen zurück",
     "loginSubtitle": "Melden Sie sich an, um zu bieten und Ihr Händlerkonto zu verwalten.",
@@ -359,5 +366,25 @@
     "s19Body": "Diese Bedingungen unterliegen dem Recht der Vereinigten Arabischen Emirate. Zwingende Verbraucherschutzvorschriften Ihres Wohnsitzlandes gelten gegebenenfalls weiter neben dieser Klausel.",
     "s20Title": "Kontakt",
     "s20Body": "Fragen zu diesen Bedingungen? Schreiben Sie an support@xportacar.com oder an Global Business Consultancy L.L.C-FZ, Meydan Grandstand, 6. Etage, Meydan Road, Nad Al Sheba, Dubai, VAE."
+  },
+  "paint": {
+    "title": "Lackstärken-Bericht",
+    "reading": "Messwert",
+    "notes": "Notizen",
+    "microns": "Mikrometer",
+    "micronsShort": "µm",
+    "statusThin": "Mögliche Nachlackierung oder dünner Lack",
+    "statusNormal": "Werksstandard",
+    "statusThick": "Dicker Lack — mögliche Reparatur",
+    "panelFrontBumper": "Vordere Stoßstange",
+    "panelHood": "Motorhaube",
+    "panelFrontLeftFender": "Vorderer linker Kotflügel",
+    "panelFrontRightFender": "Vorderer rechter Kotflügel",
+    "panelFrontLeftDoor": "Vordere linke Tür",
+    "panelFrontRightDoor": "Vordere rechte Tür",
+    "panelRearLeftDoor": "Hintere linke Tür",
+    "panelRearRightDoor": "Hintere rechte Tür",
+    "panelTrunk": "Kofferraum",
+    "panelRoof": "Dach"
   }
 }

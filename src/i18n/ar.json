@@ -175,6 +175,13 @@
     "outbidEnded": "انتهى المزاد — تم تجاوز مزايدتك",
     "endedNoBid": "انتهى هذا المزاد"
   },
+  "timeline": {
+    "orderStatus": "حالة الطلب",
+    "sold": "تم البيع",
+    "pickedUp": "تم الاستلام",
+    "inTransit": "قيد الشحن",
+    "delivered": "تم التسليم"
+  },
   "auth": {
     "loginTitle": "مرحباً بعودتك",
     "loginSubtitle": "سجّل دخولك للمزايدة وإدارة حسابك.",
@@ -359,5 +366,25 @@
     "s19Body": "تخضع هذه الشروط لقوانين دولة الإمارات العربية المتحدة. وتظل قواعد حماية المستهلك الإلزامية في بلد إقامتك (حيثما انطبقت) سارية إلى جانب هذا البند.",
     "s20Title": "التواصل",
     "s20Body": "أسئلة؟ راسلنا على support@xportacar.com أو على Global Business Consultancy L.L.C-FZ، Meydan Grandstand، الطابق السادس، شارع ميدان، ند الشبا، دبي، الإمارات."
+  },
+  "paint": {
+    "title": "تقرير سماكة الطلاء",
+    "reading": "القراءة",
+    "notes": "ملاحظات",
+    "microns": "ميكرون",
+    "micronsShort": "ميكرومتر",
+    "statusThin": "احتمال إعادة طلاء أو طلاء رقيق",
+    "statusNormal": "طلاء المصنع الطبيعي",
+    "statusThick": "طلاء سميك — احتمال إصلاح",
+    "panelFrontBumper": "الصدام الأمامي",
+    "panelHood": "غطاء المحرك",
+    "panelFrontLeftFender": "الرفرف الأمامي الأيسر",
+    "panelFrontRightFender": "الرفرف الأمامي الأيمن",
+    "panelFrontLeftDoor": "الباب الأمامي الأيسر",
+    "panelFrontRightDoor": "الباب الأمامي الأيمن",
+    "panelRearLeftDoor": "الباب الخلفي الأيسر",
+    "panelRearRightDoor": "الباب الخلفي الأيمن",
+    "panelTrunk": "صندوق الأمتعة",
+    "panelRoof": "السقف"
   }
 }

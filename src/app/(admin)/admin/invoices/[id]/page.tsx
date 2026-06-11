@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Printer } from "lucide-react";
+import { ChevronLeft, Download } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,7 +63,17 @@ export default async function AdminInvoiceDetailPage({
         >
           <ChevronLeft className="size-4" /> All invoices
         </Link>
-        <InvoicePrintTrigger />
+        <div className="flex items-center gap-2">
+          <a
+            href={`/api/invoice/${inv.id}/pdf`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex h-9 items-center gap-2 rounded-lg border border-grey-200 bg-white px-3 text-sm font-semibold text-grey-800 hover:bg-grey-50"
+          >
+            <Download className="size-4" /> Download PDF
+          </a>
+          <InvoicePrintTrigger />
+        </div>
       </header>
 
       <article
