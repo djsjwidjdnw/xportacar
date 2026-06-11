@@ -54,9 +54,12 @@ Deno.serve(async (req) => {
     clearTimeout(timer);
 
     const text = await res.text();
+    // TEMPORARY: log auto.dev's status + a body snippet (never the key) so VIN
+    // decode behaviour is visible in the Supabase function logs. Safe to remove.
+    console.log(`[vin-decoder-proxy] vin=${vin} upstream=${res.status} body=${text.slice(0, 300)}`);
     if (!res.ok) {
-      console.error(`vin-decoder-proxy: upstream returned ${res.status}`);
-      // Pass the status through (404/422 = not found) so the client can branch.
+      // Pass the status through (400 invalid format, 404/422 = not found) so the
+      // client can branch and fall back to manual entry.
       return passthrough(text, res.status);
     }
     return passthrough(text, 200);
