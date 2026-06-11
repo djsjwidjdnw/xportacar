@@ -29,13 +29,20 @@ create or replace function public.sync_vehicle_eur_from_aed()
 returns trigger language plpgsql as $$
 declare rate constant numeric := 3.92;
 begin
-  if new.price_aed is not null then
+  -- Derive each _eur from its _aed source on INSERT, or on UPDATE only when that
+  -- _aed value actually CHANGED. This way a direct EUR edit (e.g. an admin
+  -- tweaking listed_price_eur / buy_now_price_eur via the admin panel) is never
+  -- clobbered. ('INSERT' is checked first so OLD is not referenced on insert.)
+  if new.price_aed is not null
+     and (tg_op = 'INSERT' or new.price_aed is distinct from old.price_aed) then
     new.listed_price_eur := round(new.price_aed / rate, 2);
   end if;
-  if new.reserve_price_aed is not null then
+  if new.reserve_price_aed is not null
+     and (tg_op = 'INSERT' or new.reserve_price_aed is distinct from old.reserve_price_aed) then
     new.reserve_price_eur := round(new.reserve_price_aed / rate, 2);
   end if;
-  if new.buy_now_price_aed is not null then
+  if new.buy_now_price_aed is not null
+     and (tg_op = 'INSERT' or new.buy_now_price_aed is distinct from old.buy_now_price_aed) then
     new.buy_now_price_eur := round(new.buy_now_price_aed / rate, 2);
   end if;
   return new;
