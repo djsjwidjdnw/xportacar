@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 
 import { Logo } from "@/components/shared/Logo";
 import { useTranslations } from "@/i18n/provider";
@@ -22,20 +22,16 @@ export function Footer() {
             </p>
             <ul className="mt-6 space-y-2.5 text-sm">
               <li>
-                <a href="mailto:hello@xportacar.com" className="inline-flex items-center gap-2 text-grey-700 transition-colors hover:text-brand-700">
+                <a href="mailto:simon@xportacar.com" className="inline-flex items-center gap-2 text-grey-700 transition-colors hover:text-brand-700">
                   <Mail className="size-4 text-grey-500" />
-                  hello@xportacar.com
+                  simon@xportacar.com
                 </a>
               </li>
-              <li>
-                <a href="tel:+97140000000" className="inline-flex items-center gap-2 text-grey-700 transition-colors hover:text-brand-700">
-                  <Phone className="size-4 text-grey-500" />
-                  +971 4 000 0000
-                </a>
-              </li>
-              <li className="inline-flex items-center gap-2 text-grey-700">
-                <MapPin className="size-4 text-grey-500" />
-                Dubai Investments Park, UAE
+              <li className="flex items-start gap-2 text-grey-700">
+                <MapPin className="mt-0.5 size-4 shrink-0 text-grey-500" />
+                <span className="max-w-xs leading-relaxed">
+                  Meydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.
+                </span>
               </li>
             </ul>
           </div>
