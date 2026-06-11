@@ -37,6 +37,7 @@ export async function GET(
     .from("invoices")
     .select(`
       id, invoice_number, amount_eur, platform_fee_eur, total_eur, status, created_at, payment_confirmed_at,
+      shipping_method, shipping_eur, shipping_distance_km, shipping_address, extras, extras_eur,
       buyer:profiles!buyer_id ( full_name, company_name, country, email, phone, company_registration ),
       vehicle:vehicles!vehicle_id ( year, make, model, vin, exterior_color, mileage_km )
     `)
@@ -47,14 +48,29 @@ export async function GET(
   // deno-lint-ignore no-explicit-any
   const inv = invoice as any;
 
+  // Prefer the PERSISTED breakdown (finalizeInvoiceShippingAction) when present;
+  // otherwise fall back to the query-param preview the won page passes.
   const sp = req.nextUrl.searchParams;
-  const shippingLabel = sp.get("shipping") ?? "Shipping";
-  const shippingEur = Number(sp.get("shippingEur") ?? 0) || 0;
-  const tuvEur = Number(sp.get("tuvEur") ?? 0) || 0;
+  const persistedShipping = inv.shipping_eur != null ? Number(inv.shipping_eur) : null;
+  const persistedExtras: { name: string; price_eur: number }[] = Array.isArray(inv.extras) ? inv.extras : [];
+
+  const shippingEur = persistedShipping ?? (Number(sp.get("shippingEur") ?? 0) || 0);
+  const shippingLabel = inv.shipping_method === "door_to_door"
+    ? `Door-to-Door Delivery${inv.shipping_distance_km != null ? ` (${inv.shipping_distance_km} km)` : ""}`
+    : inv.shipping_method === "standard"
+      ? "Standard Port Shipping"
+      : (sp.get("shipping") ?? "Shipping");
+  // Extras: persisted list, else the legacy single TÜV query param.
+  const extrasList = persistedExtras.length > 0
+    ? persistedExtras
+    : (Number(sp.get("tuvEur") ?? 0) > 0 ? [{ name: "German Registration (TUV)", price_eur: Number(sp.get("tuvEur")) }] : []);
+  const extrasEur = extrasList.reduce((s, e) => s + (Number(e.price_eur) || 0), 0);
 
   const hammer = Number(inv.amount_eur) || 0;
   const fee = Number(inv.platform_fee_eur) || Math.round(hammer * 0.029 * 100) / 100;
-  const total = hammer + fee + shippingEur + tuvEur;
+  const total = inv.total_eur != null && persistedShipping != null
+    ? Number(inv.total_eur)
+    : hammer + fee + shippingEur + extrasEur;
 
   const created = inv.created_at ? new Date(inv.created_at) : new Date();
   const confirmDeadline = new Date(created.getTime() + 36 * 3600_000);
@@ -129,7 +145,8 @@ export async function GET(
   line("Winning hammer bid", hammer);
   line("Platform fee (2.9%)", fee);
   line(shippingLabel, shippingEur);
-  if (tuvEur > 0) line("German Registration (TUV)", tuvEur);
+  // ü → u so pdf-lib's Helvetica can render the extra labels.
+  for (const e of extrasList) line((e.name || "Extra").replace(/ü/g, "u").replace(/Ü/g, "U"), Number(e.price_eur) || 0);
 
   // Total
   y -= 4;

@@ -6,8 +6,8 @@
 // Lives client-side so the currency selector, live countdown and the confirm
 // action can update without a full server round-trip.
 
-import { useEffect, useMemo, useState } from "react";
-import { Building2, CheckCircle2, Clock, Download, Mail, Receipt } from "lucide-react";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import { Building2, CheckCircle2, Clock, Download, Mail, MapPin, Receipt } from "lucide-react";
 
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
@@ -18,6 +18,11 @@ import {
 import {
   describeMethod, getMethodPriceEur, tuvPriceEur,
 } from "@/lib/shipping";
+import {
+  distanceFromHamburgKm, shippingCostEur, knownCountries, TUV_EUR,
+} from "@/lib/distance";
+import { finalizeInvoiceShippingAction } from "@/app/(buyer)/auction/[id]/won/actions";
+import { toast } from "@/components/ui/toast";
 import { useCurrency } from "@/lib/currency";
 
 export const PLATFORM_FEE_PCT = 0.029;
@@ -66,6 +71,10 @@ export function WonInvoice({
 }) {
   const { format } = useCurrency();
   const [shipping, setShipping] = useState<ShippingChoice>({ method: { kind: "port", port: "Hamburg" }, tuv: false });
+  const [country, setCountry] = useState("");
+  const [city, setCity] = useState("");
+  const [saved, setSaved] = useState(false);
+  const [savingOrder, startSave] = useTransition();
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
@@ -85,15 +94,45 @@ export function WonInvoice({
   );
   const confirmExpired = !confirmed && confirmDeadline.getTime() <= now.getTime();
 
+  // Door-to-door is priced from the delivery address: €4500 flat + €3.50/km
+  // from Hamburg. Standard port / warehouse keep their flat method price.
+  const isDoor = shipping.method.kind === "door";
+  const distanceKm = isDoor ? distanceFromHamburgKm(country, city) : null;
+
   const feeEur = hammerEur * PLATFORM_FEE_PCT;
-  const methodEur = getMethodPriceEur(shipping.method);
+  const methodEur = isDoor
+    ? shippingCostEur("door_to_door", distanceKm ?? 0)
+    : getMethodPriceEur(shipping.method);
   const tuvEur = shipping.tuv ? tuvPriceEur() : 0;
   const totalEur = hammerEur + feeEur + methodEur + tuvEur;
+
+  const extras = shipping.tuv ? [{ name: "German Registration (TÜV)", price_eur: TUV_EUR }] : [];
+
+  const saveOrder = () => {
+    if (!invoiceId) return;
+    if (isDoor && (!country.trim() || !city.trim())) {
+      toast.err("Add a delivery address", "Enter the country and city for door-to-door delivery.");
+      return;
+    }
+    startSave(async () => {
+      const res = await finalizeInvoiceShippingAction({
+        invoiceId,
+        shippingMethod: isDoor ? "door_to_door" : "standard",
+        shippingEur: methodEur,
+        distanceKm,
+        shippingAddress: isDoor ? `${city.trim()}, ${country.trim()}` : null,
+        extras,
+      });
+      if (!res.ok) { toast.err("Couldn't save order", res.error ?? "Try again."); return; }
+      setSaved(true);
+      toast.ok("Order details saved", "Your shipping and extras are confirmed on the invoice.");
+    });
+  };
 
   const pdfPath = invoiceId
     ? `/api/invoice/${invoiceId}/pdf?` +
       new URLSearchParams({
-        shipping: describeMethod(shipping.method),
+        shipping: isDoor ? `Door-to-Door (${distanceKm ?? 0} km)` : describeMethod(shipping.method),
         shippingEur: String(methodEur),
         tuvEur: String(tuvEur),
       }).toString()
@@ -179,6 +218,44 @@ export function WonInvoice({
         hideSaveQuote
       />
 
+      {/* Door-to-door delivery address → distance-based pricing */}
+      {isDoor && (
+        <section className="rounded-2xl border border-brand-100 bg-brand-50/40 p-5">
+          <div className="flex items-center gap-2">
+            <MapPin className="size-4 text-brand-600" />
+            <h3 className="text-sm font-bold text-grey-900">Delivery address (door-to-door)</h3>
+          </div>
+          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-grey-500">Country</label>
+              <input
+                list="dtd-countries"
+                value={country}
+                onChange={(e) => { setCountry(e.target.value); setSaved(false); }}
+                placeholder="Germany"
+                className="h-10 w-full rounded-lg border border-grey-200 px-3 text-sm"
+              />
+              <datalist id="dtd-countries">
+                {knownCountries().map((c) => <option key={c} value={c} />)}
+              </datalist>
+            </div>
+            <div>
+              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-grey-500">City</label>
+              <input
+                value={city}
+                onChange={(e) => { setCity(e.target.value); setSaved(false); }}
+                placeholder="Munich"
+                className="h-10 w-full rounded-lg border border-grey-200 px-3 text-sm"
+              />
+            </div>
+          </div>
+          <p className="mt-3 text-sm text-grey-700">
+            Distance from Hamburg: <span className="font-semibold text-grey-900">{distanceKm ?? 0} km</span>.
+            {" "}Shipping: {format(4500)} + {format(methodEur - 4500)} = <span className="font-semibold text-grey-900">{format(methodEur)}</span>
+          </p>
+        </section>
+      )}
+
       {/* Invoice */}
       <section className="rounded-2xl border border-grey-200 bg-white p-6 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -204,7 +281,7 @@ export function WonInvoice({
           <LineItem label="Hammer price" value={format(hammerEur)} />
           <LineItem label="Platform fee (2.9%)" value={format(feeEur)} />
           <LineItem
-            label={describeMethod(shipping.method)}
+            label={isDoor ? `Door-to-Door Delivery (${distanceKm ?? 0} km)` : describeMethod(shipping.method)}
             value={format(methodEur)}
             sub="Selected delivery method"
           />
@@ -217,6 +294,18 @@ export function WonInvoice({
           <span className="text-xs font-bold uppercase tracking-wide text-grey-500">Total due</span>
           <span className="text-3xl font-extrabold tabular-nums text-brand-700">{format(totalEur)}</span>
         </div>
+
+        {/* Confirm the shipping + extras selection onto the invoice (durable). */}
+        {invoiceId && (
+          <button
+            onClick={saveOrder}
+            disabled={savingOrder}
+            className="mt-4 inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-brand-600 px-4 text-sm font-bold text-white hover:bg-brand-700 disabled:opacity-50"
+          >
+            {saved ? <CheckCircle2 className="size-4" /> : null}
+            {savingOrder ? "Saving…" : saved ? "Order details saved" : "Confirm order details"}
+          </button>
+        )}
 
         <CustomsDisclaimer className="mt-5" />
 

@@ -225,3 +225,58 @@ export async function createCheckoutSessionAction(input: {
 
   return { ok: true, url: session.url ?? undefined };
 }
+
+// --------------------------------------------------------------------
+// Finalize the buyer's shipping + extras selection onto the invoice, so the
+// chosen breakdown is durable (dashboard, PDF, admin). Recomputes the total =
+// hammer + platform fee (2.9%) + shipping + extras. Owner-gated.
+// --------------------------------------------------------------------
+const PLATFORM_FEE_PCT = 0.029;
+
+export async function finalizeInvoiceShippingAction(input: {
+  invoiceId: string;
+  shippingMethod: "standard" | "door_to_door";
+  shippingEur: number;
+  distanceKm?: number | null;
+  shippingAddress?: string | null;
+  extras?: { name: string; price_eur: number }[];
+}): Promise<{ ok: boolean; error?: string; totalEur?: number }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sign in to confirm your order." };
+
+  const { data: inv } = await supabase
+    .from("invoices")
+    .select("id, buyer_id, amount_eur")
+    .eq("id", input.invoiceId)
+    .single();
+  // deno-lint-ignore no-explicit-any
+  const i = inv as any;
+  if (!i || i.buyer_id !== user.id) return { ok: false, error: "Invoice not found." };
+
+  const extras = Array.isArray(input.extras) ? input.extras : [];
+  const extrasEur = extras.reduce((s, e) => s + (Number(e.price_eur) || 0), 0);
+  const shippingEur = Math.max(0, Number(input.shippingEur) || 0);
+  const hammer = Number(i.amount_eur) || 0;
+  const feeEur = Math.round(hammer * PLATFORM_FEE_PCT * 100) / 100;
+  const totalEur = Math.round((hammer + feeEur + shippingEur + extrasEur) * 100) / 100;
+
+  // RLS does not grant buyers UPDATE on invoices → use the service-role client.
+  const admin = createAdminClient();
+  const { error } = await admin
+    .from("invoices")
+    .update({
+      shipping_method: input.shippingMethod,
+      shipping_eur: shippingEur,
+      shipping_distance_km: input.distanceKm ?? null,
+      shipping_address: input.shippingAddress?.trim() || null,
+      extras,
+      extras_eur: extrasEur,
+      total_eur: totalEur,
+    })
+    .eq("id", input.invoiceId);
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath("/dashboard");
+  return { ok: true, totalEur };
+}
