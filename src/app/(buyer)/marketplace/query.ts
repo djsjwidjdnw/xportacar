@@ -21,7 +21,7 @@ export interface MarketplaceSearchParams {
 
 const SELECT = `
   *,
-  vehicle_photos ( url, sort_order ),
+  vehicle_photos ( url, sort_order, caption, category ),
   auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, reserve_price_eur, bid_count, bidder_count )
 `;
 

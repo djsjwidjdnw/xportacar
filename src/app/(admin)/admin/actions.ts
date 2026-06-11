@@ -685,13 +685,11 @@ export async function createAuctionAction(
   const reserve = input.reservePriceEur != null && Number(input.reservePriceEur) > 0 ? Number(input.reservePriceEur) : null;
   if (reserve != null && reserve < starting) return { ok: false, error: "Reserve cannot be below the starting price." };
 
-  // Buy Now is MANDATORY on every auction. If the admin leaves it blank we
-  // auto-calculate it: reserve * 1.22 when a reserve is set (≈22% margin),
-  // otherwise starting * 1.5. Always rounded to whole euros and never below
-  // the starting price.
-  let buyNow = input.buyNowPriceEur != null && Number(input.buyNowPriceEur) > 0 ? Number(input.buyNowPriceEur) : null;
-  if (buyNow == null) buyNow = Math.round(reserve != null ? reserve * 1.22 : starting * 1.5);
-  if (buyNow < starting) return { ok: false, error: "Buy-now cannot be below the starting price." };
+  // Buy Now is OPTIONAL and is EXACTLY what the admin/inspector enters — no
+  // auto-calculation. Left blank ⇒ the auction has no Buy Now option and the
+  // button is hidden on the buyer side (it only renders when buy_now > 0).
+  const buyNow = input.buyNowPriceEur != null && Number(input.buyNowPriceEur) > 0 ? Number(input.buyNowPriceEur) : null;
+  if (buyNow != null && buyNow < starting) return { ok: false, error: "Buy-now cannot be below the starting price." };
 
   // Active when it starts now (or in the past); otherwise scheduled for later.
   const status = start.getTime() <= Date.now() + 60_000 ? "active" : "scheduled";

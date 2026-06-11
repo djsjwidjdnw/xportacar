@@ -16,7 +16,7 @@ import { useCurrency } from "@/lib/currency";
 import { cn } from "@/lib/utils";
 import {
   getShippingRates, portRoutes, serviceRate, getShippingPriceEur, describeShipping,
-  FALLBACK_RATES, type ShippingChoice, type ShippingRate,
+  PORT_FLAT_EUR, FALLBACK_RATES, type ShippingChoice, type ShippingRate,
 } from "@/lib/shipping";
 
 // Re-export so existing consumers (WonInvoice) keep importing from here.
@@ -57,7 +57,7 @@ export function ShippingOptions({
 
   const roro = useMemo(() => portRoutes(rates, "roro"), [rates]);
   const doorPrice = serviceRate(rates, "door_to_door_eu")?.base_price_eur ?? 800;
-  const tuvPrice = serviceRate(rates, "service_tuv")?.base_price_eur ?? 750;
+  const tuvPrice = serviceRate(rates, "service_tuv")?.base_price_eur ?? 3500;
 
   const shippingEur = getShippingPriceEur(choice, rates);
   const total = (vehiclePriceEur ?? 0) + shippingEur;
@@ -77,12 +77,12 @@ export function ShippingOptions({
         vehicle_id: vehicleId,
         buyer_id:   user?.id ?? null,
         destination: route.destination_port,
-        cost_eur:    route.base_price_eur,
+        cost_eur:    PORT_FLAT_EUR,
         transit_days: route.transit_days_min,
         carrier:     `RoRo · ${route.destination_port}`,
       });
       if (error) { toast.err("Couldn't save quote", error.message); return; }
-      toast.ok("Quote saved", `${route.destination_port} · ${format(route.base_price_eur)}`);
+      toast.ok("Quote saved", `${route.destination_port} · ${format(PORT_FLAT_EUR)}`);
     });
   };
 
@@ -137,7 +137,7 @@ export function ShippingOptions({
                       <p className="text-[11px] text-grey-500">{p.transit_days_min}–{p.transit_days_max} days</p>
                     </div>
                   </div>
-                  <p className="text-sm font-bold tabular-nums text-grey-900">{format(p.base_price_eur)}</p>
+                  <p className="text-sm font-bold tabular-nums text-grey-900">{format(PORT_FLAT_EUR)}</p>
                 </button>
               );
             })}
@@ -174,7 +174,7 @@ export function ShippingOptions({
           <FileText className="size-4" />
         </span>
         <span className="flex-1">
-          <span className="block text-sm font-semibold text-grey-900">German TÜV / Papers Service</span>
+          <span className="block text-sm font-semibold text-grey-900">German Registration (TÜV)</span>
           <span className="block text-[11px] text-grey-500">Inspection for DE registration, CoC, customs paperwork</span>
         </span>
         <span className="text-sm font-bold text-brand-700">+ {format(tuvPrice)}</span>

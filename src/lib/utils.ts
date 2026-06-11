@@ -26,6 +26,42 @@ export function formatKm(value: number | null | undefined, locale = "en-GB"): st
   return `${formatNumber(value, locale)} km`;
 }
 
+// ---------------------- Thumbnail photo selection ----------------------
+//
+// Pick the single best photo to represent a vehicle in a thumbnail. The
+// Front-right 3/4 exterior shot is the most flattering, recognisable framing,
+// so we prefer it. Falls back gracefully when captions/categories are missing.
+//
+// Priority:
+//   1. caption matches the front 3/4 / front-right framing,
+//   2. caption mentions "front",
+//   3. lowest sort_order exterior photo,
+//   4. lowest sort_order photo overall.
+export interface ThumbCandidate {
+  url: string;
+  sort_order?: number | null;
+  caption?: string | null;
+  category?: string | null;
+}
+
+const FRONT_THREE_QUARTER_RE = /front.*(three[- ]?quarter|3\/4|right)/i;
+const FRONT_RE = /front/i;
+
+export function pickThumbnailPhoto<T extends ThumbCandidate>(
+  photos: readonly T[] | null | undefined,
+): T | undefined {
+  if (!photos || photos.length === 0) return undefined;
+  const byOrder = [...photos].sort(
+    (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+  );
+  return (
+    byOrder.find((p) => p.caption && FRONT_THREE_QUARTER_RE.test(p.caption)) ??
+    byOrder.find((p) => p.caption && FRONT_RE.test(p.caption)) ??
+    byOrder.find((p) => p.category === "exterior") ??
+    byOrder[0]
+  );
+}
+
 // ---------------------- Image thumbnails ----------------------
 //
 // Listing/grid views must NOT download full-size photos — at 100k vehicles ×
@@ -164,4 +200,48 @@ export function initials(name: string | null | undefined): string {
     .map((p) => p[0]?.toUpperCase() ?? "")
     .slice(0, 2)
     .join("");
+}
+
+// ---------------------- Admin notification links ----------------------
+//
+// Resolve the admin-side destination for a `notifications` row (or any
+// notification-shaped activity item) from its type + jsonb `data`. Used by the
+// admin dashboard "Recent activity" feed and the /admin/activity page so each
+// card/row is a working link into the relevant admin record.
+//
+// Mapping (most-specific first):
+//   • status_update + data.vehicle_id (new listing / inspection) → vehicle
+//   • payment proof / invoice (data.invoice_id)                  → invoice
+//   • inspector application (title mentions "inspector", no id)  → inspectors
+//   • fallbacks: vehicle_id → vehicle; invoice_id → invoice;
+//     auction_id → auctions list; else null (no link).
+export function adminNotificationHref(
+  type: string | null | undefined,
+  data: Record<string, unknown> | null | undefined,
+  title?: string | null,
+): string | null {
+  const d = (data ?? {}) as {
+    vehicle_id?: unknown;
+    invoice_id?: unknown;
+    auction_id?: unknown;
+  };
+  const vehicleId = typeof d.vehicle_id === "string" ? d.vehicle_id : null;
+  const invoiceId = typeof d.invoice_id === "string" ? d.invoice_id : null;
+  const auctionId = typeof d.auction_id === "string" ? d.auction_id : null;
+  const mentionsInspector = !!title && /inspector/i.test(title);
+
+  // status_update tied to a vehicle (new listing / inspection submitted).
+  if (type === "status_update" && vehicleId) return `/admin/vehicles/${vehicleId}`;
+
+  // Payment proof / invoice notifications.
+  if (invoiceId) return `/admin/invoices/${invoiceId}`;
+
+  // New inspector application — no specific record id, route to the roster.
+  if (mentionsInspector && !vehicleId && !auctionId) return "/admin/inspectors";
+
+  // Generic fallbacks by available id.
+  if (vehicleId) return `/admin/vehicles/${vehicleId}`;
+  if (auctionId) return "/admin/auctions";
+
+  return null;
 }

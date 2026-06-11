@@ -10,13 +10,14 @@ import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
 import { useTranslations, useLocale } from "@/i18n/provider";
 import { useCurrency } from "@/lib/currency";
 import {
-  auctionPhase, cn, formatKm, formatTimeRemaining, isEndingSoon, thumb,
+  auctionPhase, cn, formatKm, formatTimeRemaining, isEndingSoon,
+  pickThumbnailPhoto, thumb,
 } from "@/lib/utils";
 import { estimateValuation } from "@/lib/valuation";
 import type { Vehicle, Auction } from "@/types";
 
 interface VehicleCardData extends Vehicle {
-  vehicle_photos: { url: string; sort_order: number }[];
+  vehicle_photos: { url: string; sort_order: number; caption?: string | null; category?: string | null }[];
   /** Always normalized to an array by `normalizeVehicleRow` before reaching the card. */
   auctions: Auction[];
 }
@@ -61,8 +62,9 @@ export function VehicleCard({
 
   // Neutral local placeholder when a vehicle has no photos — never a random
   // stock car (that caused the "Mustang on a Range Rover" mismatch).
+  // Prefer the front-right 3/4 exterior shot so the card framing is consistent.
   const photo =
-    vehicle.vehicle_photos?.sort((a, b) => a.sort_order - b.sort_order)[0]?.url
+    pickThumbnailPhoto(vehicle.vehicle_photos)?.url
     ?? "/placeholder/no-photo.svg";
 
   const headlinePrice = live || ended
@@ -86,7 +88,9 @@ export function VehicleCard({
             src={thumb(photo, 600)}
             alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
             className={cn(
-              "size-full max-w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]",
+              // contain (not cover) so the car is centred with whitespace,
+              // never zoomed/cropped. Neutral bg fills the letterbox area.
+              "size-full max-w-full object-contain transition-transform duration-500 group-hover:scale-[1.04]",
               ended && "opacity-90",
             )}
             loading="lazy"

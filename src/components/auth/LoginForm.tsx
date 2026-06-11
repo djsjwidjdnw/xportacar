@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +14,7 @@ const initialState: AuthFormState = { ok: false };
 export function LoginForm({ next }: { next: string }) {
   const t = useTranslations("auth");
   const [state, formAction, isPending] = useActionState(signInAction, initialState);
+  const [showPw, setShowPw] = useState(false);
 
   return (
     <form action={formAction} className="space-y-5">
@@ -28,7 +30,24 @@ export function LoginForm({ next }: { next: string }) {
           <Label htmlFor="password">{t("password")}</Label>
           <a href="#" className="text-xs font-medium text-brand-700 hover:underline">{t("forgotPassword")}</a>
         </div>
-        <Input id="password" name="password" type="password" required autoComplete="current-password" className="h-11" />
+        <div className="relative">
+          <Input
+            id="password"
+            name="password"
+            type={showPw ? "text" : "password"}
+            required
+            autoComplete="current-password"
+            className="h-11 pr-11"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPw((v) => !v)}
+            aria-label={showPw ? t("hidePassword") : t("showPassword")}
+            className="absolute right-0 top-0 flex h-11 w-11 items-center justify-center text-grey-500 hover:text-grey-700"
+          >
+            {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+          </button>
+        </div>
       </div>
 
       {state?.error && (

@@ -194,7 +194,7 @@ export function WonInvoice({
             sub="Selected delivery method"
           />
           {shipping.tuv && (
-            <LineItem label="German TÜV / Papers Service" value={format(tuvEur)} sub="Add-on service" />
+            <LineItem label="German Registration (TÜV)" value={format(tuvEur)} sub="Add-on service" />
           )}
         </div>
 

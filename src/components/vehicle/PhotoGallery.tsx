@@ -46,7 +46,9 @@ export function PhotoGallery({
           <img
             src={active.url}
             alt={active.caption ?? alt}
-            className="size-full cursor-zoom-in object-cover transition-transform hover:scale-105"
+            // contain (not cover) so the car is centred with whitespace on the
+            // neutral bg, never zoomed/cropped.
+            className="size-full cursor-zoom-in object-contain transition-transform hover:scale-105"
             onClick={() => setLightbox(true)}
           />
 

@@ -16,7 +16,7 @@ import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
-import { formatEur, formatRelativeTime } from "@/lib/utils";
+import { adminNotificationHref, formatEur, formatRelativeTime } from "@/lib/utils";
 import type { Vehicle, VehicleStatus } from "@/types";
 
 export const metadata = { title: "Operations dashboard" };
@@ -218,16 +218,37 @@ export default async function AdminDashboardPage() {
                   const r = row as any;
                   const v = r.auction?.vehicle;
                   const bidderName = r.bidder?.company_name ?? r.bidder?.full_name ?? "Anonymous";
+                  // Resolve the admin destination from the underlying vehicle —
+                  // same mapping the notifications feed uses.
+                  const href = v?.id ? adminNotificationHref("status_update", { vehicle_id: v.id }) : null;
                   return (
-                    <TableRow key={r.id} className="[&>td]:px-5 [&>td]:py-3.5">
+                    <TableRow
+                      key={r.id}
+                      className={`[&>td]:px-5 [&>td]:py-3.5 ${href ? "cursor-pointer transition-colors hover:bg-grey-50/70" : ""}`}
+                    >
                       <TableCell>
-                        <div className="max-w-[220px] truncate font-medium text-grey-900">
-                          {v ? `${v.year} ${v.make} ${v.model}` : "—"}
-                        </div>
+                        {href ? (
+                          <Link href={href} className="block max-w-[220px] truncate font-medium text-grey-900 hover:text-brand-700 hover:underline">
+                            {v ? `${v.year} ${v.make} ${v.model}` : "—"}
+                          </Link>
+                        ) : (
+                          <div className="max-w-[220px] truncate font-medium text-grey-900">
+                            {v ? `${v.year} ${v.make} ${v.model}` : "—"}
+                          </div>
+                        )}
                       </TableCell>
                       <TableCell className="hidden xl:table-cell max-w-[280px] truncate text-sm text-grey-700">
-                        New bid by{" "}
-                        <span className="font-medium text-grey-900">{bidderName}</span>
+                        {href ? (
+                          <Link href={href} className="block truncate hover:text-grey-900">
+                            New bid by{" "}
+                            <span className="font-medium text-grey-900">{bidderName}</span>
+                          </Link>
+                        ) : (
+                          <>
+                            New bid by{" "}
+                            <span className="font-medium text-grey-900">{bidderName}</span>
+                          </>
+                        )}
                       </TableCell>
                       <TableCell className="text-right font-semibold tabular-nums text-grey-900">
                         {formatEur(r.amount_eur)}

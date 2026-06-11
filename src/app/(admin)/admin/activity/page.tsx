@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import {
   Gavel, UserPlus, Car, FileText, TrendingUp,
 } from "lucide-react";
@@ -17,6 +19,7 @@ interface ActivityItem {
   detail: string;
   value?: number;
   at: string;
+  href?: string;
 }
 
 const META: Record<ActivityKind, { icon: typeof Gavel; label: string; accent: string }> = {
@@ -42,7 +45,7 @@ export default async function AdminActivityPage() {
       .select(`
         id, amount_eur, created_at,
         bidder:profiles!bidder_id(full_name, company_name),
-        auction:auctions!auction_id(vehicle:vehicles!vehicle_id(make, model, year))
+        auction:auctions!auction_id(vehicle:vehicles!vehicle_id(id, make, model, year))
       `)
       .order("created_at", { ascending: false })
       .limit(40),
@@ -55,7 +58,7 @@ export default async function AdminActivityPage() {
       .from("auctions")
       .select(`
         id, status, starting_price_eur, created_at,
-        vehicle:vehicles!vehicle_id(make, model, year)
+        vehicle:vehicles!vehicle_id(id, make, model, year)
       `)
       .order("created_at", { ascending: false })
       .limit(40),
@@ -84,6 +87,7 @@ export default async function AdminActivityPage() {
       detail: `New bid by ${who}`,
       value: b.amount_eur,
       at: b.created_at,
+      href: v?.id ? `/admin/vehicles/${v.id}` : undefined,
     });
   }
   for (const p of (registrations ?? []) as any[]) {
@@ -93,6 +97,7 @@ export default async function AdminActivityPage() {
       title: p.company_name ?? p.full_name ?? "New user",
       detail: `Registered${p.country ? ` · ${p.country}` : ""} · ${p.role}`,
       at: p.created_at,
+      href: p.role === "inspector" ? "/admin/inspectors" : "/admin/users",
     });
   }
   for (const a of (auctions ?? []) as any[]) {
@@ -104,6 +109,7 @@ export default async function AdminActivityPage() {
       detail: `Auction created (${a.status})`,
       value: a.starting_price_eur ?? undefined,
       at: a.created_at,
+      href: v?.id ? `/admin/vehicles/${v.id}` : "/admin/auctions",
     });
   }
   for (const v of (inspections ?? []) as any[]) {
@@ -113,6 +119,7 @@ export default async function AdminActivityPage() {
       title: `${v.year} ${v.make} ${v.model}`,
       detail: `Inspection ${v.status === "pending_review" ? "submitted for review" : "completed"}`,
       at: v.inspection_date ?? v.created_at,
+      href: `/admin/vehicles/${v.id}`,
     });
   }
   for (const inv of (invoices ?? []) as any[]) {
@@ -123,6 +130,7 @@ export default async function AdminActivityPage() {
       detail: `Invoice ${inv.status}`,
       value: inv.total_eur,
       at: inv.created_at,
+      href: `/admin/invoices/${inv.id}`,
     });
   }
 
@@ -150,8 +158,8 @@ export default async function AdminActivityPage() {
           {feed.map((it) => {
             const meta = META[it.kind];
             const Icon = meta.icon;
-            return (
-              <li key={it.id} className="flex items-center gap-4 px-5 py-3.5">
+            const inner = (
+              <>
                 <span className={`flex size-9 shrink-0 items-center justify-center rounded-full ${meta.accent}`}>
                   <Icon className="size-4" />
                 </span>
@@ -167,6 +175,23 @@ export default async function AdminActivityPage() {
                 <span className="w-24 shrink-0 text-right text-sm text-grey-500">
                   {formatRelativeTime(it.at)}
                 </span>
+                {it.href && (
+                  <ChevronRight className="size-4 shrink-0 text-grey-400 transition-colors group-hover:text-grey-600" />
+                )}
+              </>
+            );
+            return (
+              <li key={it.id}>
+                {it.href ? (
+                  <Link
+                    href={it.href}
+                    className="group flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-grey-50"
+                  >
+                    {inner}
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-4 px-5 py-3.5">{inner}</div>
+                )}
               </li>
             );
           })}

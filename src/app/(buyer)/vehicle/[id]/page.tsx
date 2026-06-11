@@ -17,7 +17,7 @@ import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
 import { getVehicleValuation } from "@/lib/valuation-server";
-import { auctionPhase, cn, formatEur } from "@/lib/utils";
+import { auctionPhase, cn, formatEur, pickThumbnailPhoto } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
 
 // Generate OG/Twitter metadata per vehicle so shared links render with
@@ -103,10 +103,16 @@ export default async function VehicleDetailPage({
   const v: VehicleWithMedia = normalizeVehicleRow(vehicle as unknown as Record<string, unknown>);
   const paintThicknessUrl =
     v.vehicle_photos.find((p) => p.category === "paint_thickness")?.url ?? null;
-  const photos = v.vehicle_photos
+  const galleryPhotos = v.vehicle_photos
     .filter((p) => p.category !== "paint_thickness")
-    .sort((a, b) => a.sort_order - b.sort_order)
-    .map((p) => ({ url: p.url, caption: p.caption }));
+    .sort((a, b) => a.sort_order - b.sort_order);
+  // Lead the gallery with the front-right 3/4 exterior shot so the hero
+  // matches the marketplace thumbnail framing; keep the rest in order.
+  const lead = pickThumbnailPhoto(galleryPhotos);
+  const photos = (lead
+    ? [lead, ...galleryPhotos.filter((p) => p !== lead)]
+    : galleryPhotos
+  ).map((p) => ({ url: p.url, caption: p.caption }));
   const auction = v.auctions[0];
   const phase = auctionPhase(auction);
   const auctionLive = phase === "live";

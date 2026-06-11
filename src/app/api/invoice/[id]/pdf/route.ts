@@ -129,7 +129,7 @@ export async function GET(
   line("Winning hammer bid", hammer);
   line("Platform fee (2.9%)", fee);
   line(shippingLabel, shippingEur);
-  if (tuvEur > 0) line("German TUV / Papers Service", tuvEur);
+  if (tuvEur > 0) line("German Registration (TUV)", tuvEur);
 
   // Total
   y -= 4;
@@ -137,8 +137,10 @@ export async function GET(
   right(eur(total), W - M - 8, y, 14, bold, BRAND);
   y -= 26;
 
-  // Customs disclaimer (red box)
-  const discLines = wrap(CUSTOMS_DISCLAIMER_TEXT, font, 9, W - 2 * M - 16);
+  // Customs disclaimer (red box) — wrap with the SAME bold font used to draw,
+  // otherwise lines measured in regular Helvetica render wider in bold and spill
+  // past the box's right border.
+  const discLines = wrap(CUSTOMS_DISCLAIMER_TEXT, bold, 9, W - 2 * M - 16);
   const boxH = discLines.length * 12 + 12;
   page.drawRectangle({ x: M, y: y - boxH + 6, width: W - 2 * M, height: boxH, color: rgb(0.996, 0.949, 0.949), borderColor: RED, borderWidth: 1 });
   let dy = y - 6;
