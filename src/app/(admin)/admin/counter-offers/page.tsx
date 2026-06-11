@@ -60,11 +60,11 @@ export default async function AdminCounterOffersPage() {
             <TableHeader>
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Vehicle</TableHead>
-                <TableHead>Bidder</TableHead>
+                <TableHead className="hidden 2xl:table-cell">Bidder</TableHead>
                 <TableHead>Offer</TableHead>
                 <TableHead>Current bid</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>When</TableHead>
+                <TableHead className="hidden lg:table-cell">When</TableHead>
                 <TableHead className="text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -80,11 +80,11 @@ export default async function AdminCounterOffersPage() {
                         </Link>
                       ) : "—"}
                       {r.message && (
-                        <p className="mt-1 max-w-md text-xs text-grey-500 italic">&ldquo;{r.message}&rdquo;</p>
+                        <p className="mt-1 max-w-[280px] truncate text-xs text-grey-500 italic">&ldquo;{r.message}&rdquo;</p>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <p className="font-medium text-grey-900">
+                    <TableCell className="hidden 2xl:table-cell">
+                      <p className="max-w-[180px] truncate font-medium text-grey-900">
                         {r.bidder?.company_name ?? r.bidder?.full_name ?? "—"}
                       </p>
                       <p className="text-[11px] text-grey-500">{r.bidder?.country}</p>
@@ -107,7 +107,7 @@ export default async function AdminCounterOffersPage() {
                         {r.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-grey-500">{formatRelativeTime(r.created_at)}</TableCell>
+                    <TableCell className="hidden lg:table-cell text-sm text-grey-500">{formatRelativeTime(r.created_at)}</TableCell>
                     <TableCell className="text-right">
                       <CounterOfferActions offerId={r.id} status={r.status} />
                     </TableCell>

@@ -189,7 +189,7 @@ function Section({
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Vehicle</TableHead>
                 <TableHead>{kind === "review" || kind === "changes" ? "Inspector" : "Assign inspector"}</TableHead>
-                <TableHead className="text-right">Photos</TableHead>
+                <TableHead className="hidden 2xl:table-cell text-right">Photos</TableHead>
                 <TableHead className="w-40 text-right">{kind === "changes" ? "Feedback" : kind === "review" ? "Action" : "Updated"}</TableHead>
               </TableRow>
             </TableHeader>
@@ -198,11 +198,11 @@ function Section({
                 const photos = photoCount.get(v.id) ?? 0;
                 return (
                   <TableRow key={v.id} className="[&>td]:px-5 [&>td]:py-3.5 align-top">
-                    <TableCell>
-                      <Link href={`/admin/vehicles/${v.id}`} className="block font-medium text-grey-900 hover:text-brand-700">
+                    <TableCell className="max-w-[260px]">
+                      <Link href={`/admin/vehicles/${v.id}`} className="block truncate font-medium text-grey-900 hover:text-brand-700">
                         {v.year} {v.make} {v.model}
                       </Link>
-                      <p className="text-[11px] text-grey-500">{v.location_city} · {v.vin}</p>
+                      <p className="truncate text-[11px] text-grey-500">{v.location_city} · {v.vin}</p>
                     </TableCell>
 
                     <TableCell className="w-56">
@@ -214,13 +214,13 @@ function Section({
                           compact
                         />
                       ) : (
-                        <span className="text-sm text-grey-700">
+                        <span className="block max-w-[180px] truncate text-sm text-grey-700">
                           {v.inspector?.full_name ?? v.inspector?.email ?? <span className="text-grey-400">—</span>}
                         </span>
                       )}
                     </TableCell>
 
-                    <TableCell className="text-right">
+                    <TableCell className="hidden 2xl:table-cell text-right">
                       <span className="inline-flex items-center gap-1 rounded-full bg-grey-100 px-2.5 py-0.5 text-[11px] font-semibold text-grey-700">
                         <Camera className="size-3" />
                         {photos}
@@ -236,7 +236,7 @@ function Section({
                           Review <ExternalLink className="size-3" />
                         </Link>
                       ) : kind === "changes" ? (
-                        <p className="text-left text-[11px] leading-snug text-grey-600">
+                        <p className="ml-auto max-w-[160px] truncate text-left text-[11px] leading-snug text-grey-600">
                           {v.review_notes ? `“${v.review_notes}”` : <span className="text-grey-400">Re-submit pending</span>}
                         </p>
                       ) : (

@@ -118,11 +118,11 @@ export default async function AdminInspectorsPage() {
             <TableHeader>
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Inspector</TableHead>
-                <TableHead>Contact</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Application</TableHead>
+                <TableHead className="hidden 2xl:table-cell">Contact</TableHead>
+                <TableHead className="hidden 2xl:table-cell">Location</TableHead>
+                <TableHead className="hidden xl:table-cell">Application</TableHead>
                 <TableHead>Inspections</TableHead>
-                <TableHead>Member since</TableHead>
+                <TableHead className="hidden lg:table-cell">Member since</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -140,7 +140,7 @@ export default async function AdminInspectorsPage() {
                             {initials(u.full_name ?? u.email ?? "?")}
                           </AvatarFallback>
                         </Avatar>
-                        <div className="min-w-0">
+                        <div className="min-w-0 max-w-[200px]">
                           <p className="truncate font-medium text-grey-900">
                             {u.full_name ?? "—"}
                           </p>
@@ -148,14 +148,14 @@ export default async function AdminInspectorsPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-sm text-grey-700">
+                    <TableCell className="hidden text-sm text-grey-700 2xl:table-cell">
                       {u.phone ?? <span className="text-grey-400">—</span>}
                     </TableCell>
-                    <TableCell className="text-sm text-grey-700">
+                    <TableCell className="hidden text-sm text-grey-700 2xl:table-cell">
                       {app?.city ? `${app.city}, ` : ""}
                       {u.country ?? (app?.city ? "" : <span className="text-grey-400">—</span>)}
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden xl:table-cell">
                       <div className="space-y-1">
                         {app ? (
                           <>
@@ -184,7 +184,7 @@ export default async function AdminInspectorsPage() {
                         <span className="text-[10px] uppercase tracking-wide text-grey-400">done / assigned</span>
                       </div>
                     </TableCell>
-                    <TableCell className="text-xs text-grey-600">
+                    <TableCell className="hidden text-xs text-grey-600 lg:table-cell">
                       {new Date(u.created_at).toLocaleDateString("en-GB", {
                         day: "numeric", month: "short", year: "numeric",
                       })}

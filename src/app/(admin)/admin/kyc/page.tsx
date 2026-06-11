@@ -51,9 +51,9 @@ export default async function AdminKycPage() {
             <TableHeader>
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Buyer</TableHead>
-                <TableHead>Document</TableHead>
+                <TableHead className="hidden xl:table-cell">Document</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Submitted</TableHead>
+                <TableHead className="hidden lg:table-cell">Submitted</TableHead>
                 <TableHead className="text-right">Review</TableHead>
               </TableRow>
             </TableHeader>
@@ -61,24 +61,24 @@ export default async function AdminKycPage() {
               {rows.map((r) => (
                 <TableRow key={r.id} className="[&>td]:px-5 [&>td]:py-3.5">
                   <TableCell>
-                    <p className="font-medium text-grey-900">
+                    <p className="max-w-[220px] truncate font-medium text-grey-900">
                       {r.user?.company_name ?? r.user?.full_name ?? "—"}
                     </p>
-                    <p className="text-[11px] text-grey-500">
+                    <p className="max-w-[220px] truncate text-[11px] text-grey-500">
                       {r.user?.email} · {r.user?.country}
                     </p>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden max-w-[200px] xl:table-cell">
                     <a
                       href={r.file_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm font-medium text-brand-700 hover:underline"
+                      className="block max-w-[200px] truncate text-sm font-medium text-brand-700 hover:underline"
                     >
                       {r.document_type.replace(/_/g, " ")}
                     </a>
                     {r.reviewer_note && (
-                      <p className="mt-0.5 text-[11px] text-grey-500 italic">Note: {r.reviewer_note}</p>
+                      <p className="mt-0.5 max-w-[200px] truncate text-[11px] text-grey-500 italic">Note: {r.reviewer_note}</p>
                     )}
                   </TableCell>
                   <TableCell>
@@ -90,7 +90,7 @@ export default async function AdminKycPage() {
                       {r.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs text-grey-500">
+                  <TableCell className="hidden text-xs text-grey-500 lg:table-cell">
                     {formatRelativeTime(r.created_at)}
                   </TableCell>
                   <TableCell className="text-right">

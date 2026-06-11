@@ -56,13 +56,13 @@ export default async function AdminInvoicesPage() {
             <TableHeader>
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Invoice</TableHead>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Buyer</TableHead>
+                <TableHead className="hidden xl:table-cell">Vehicle</TableHead>
+                <TableHead className="hidden 2xl:table-cell">Buyer</TableHead>
                 <TableHead className="text-right">Hammer</TableHead>
                 <TableHead className="text-right">Fee</TableHead>
                 <TableHead className="text-right">Total</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="text-right">Date</TableHead>
+                <TableHead className="hidden text-right lg:table-cell">Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -76,15 +76,15 @@ export default async function AdminInvoicesPage() {
                       {r.invoice_number ?? r.id.slice(0, 8)}
                     </Link>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden xl:table-cell">
                     {r.vehicle ? (
-                      <Link href={`/admin/vehicles/${r.vehicle.id}`} className="text-sm text-grey-800 hover:text-brand-700">
+                      <Link href={`/admin/vehicles/${r.vehicle.id}`} className="block max-w-[180px] truncate text-sm text-grey-800 hover:text-brand-700">
                         {r.vehicle.year} {r.vehicle.make} {r.vehicle.model}
                       </Link>
                     ) : "—"}
                   </TableCell>
-                  <TableCell>
-                    <p className="text-sm font-medium text-grey-900">
+                  <TableCell className="hidden 2xl:table-cell">
+                    <p className="max-w-[180px] truncate text-sm font-medium text-grey-900">
                       {r.buyer?.company_name ?? r.buyer?.full_name ?? "—"}
                     </p>
                     <p className="text-[11px] text-grey-500">{r.buyer?.country}</p>
@@ -102,7 +102,7 @@ export default async function AdminInvoicesPage() {
                       {r.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-right text-xs text-grey-500">{formatRelativeTime(r.created_at)}</TableCell>
+                  <TableCell className="hidden text-right text-xs text-grey-500 lg:table-cell">{formatRelativeTime(r.created_at)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

@@ -109,15 +109,15 @@ export default async function AdminVehiclesPage({
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border border-grey-200 bg-white shadow-xs">
-          <Table className="min-w-[820px]">
+          <Table className="min-w-full xl:min-w-0">
             <TableHeader>
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Vehicle</TableHead>
-                <TableHead>VIN</TableHead>
-                <TableHead>Mileage</TableHead>
+                <TableHead className="hidden 2xl:table-cell">VIN</TableHead>
+                <TableHead className="hidden xl:table-cell">Mileage</TableHead>
                 <TableHead>Price</TableHead>
-                <TableHead>Market</TableHead>
-                <TableHead>Auction</TableHead>
+                <TableHead className="hidden 2xl:table-cell">Market</TableHead>
+                <TableHead className="hidden xl:table-cell">Auction</TableHead>
                 <TableHead className="text-right">Status</TableHead>
               </TableRow>
             </TableHeader>
@@ -134,8 +134,8 @@ export default async function AdminVehiclesPage({
                       </Link>
                       <p className="text-[11px] text-grey-500">{v.location_city} · {v.exterior_color}</p>
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-grey-600">{v.vin}</TableCell>
-                    <TableCell className="text-sm text-grey-700">{formatKm(v.mileage_km)}</TableCell>
+                    <TableCell className="hidden 2xl:table-cell max-w-[180px] truncate font-mono text-xs text-grey-600">{v.vin}</TableCell>
+                    <TableCell className="hidden xl:table-cell text-sm text-grey-700">{formatKm(v.mileage_km)}</TableCell>
                     <TableCell className="tabular-nums">
                       <span className="font-semibold text-grey-900">{formatEur(v.listed_price_eur)}</span>
                       {pos !== "unknown" && (
@@ -144,8 +144,8 @@ export default async function AdminVehiclesPage({
                         </span>
                       )}
                     </TableCell>
-                    <TableCell className="tabular-nums text-sm text-grey-600">{formatEur(val.avgEur)}</TableCell>
-                    <TableCell>
+                    <TableCell className="hidden 2xl:table-cell tabular-nums text-sm text-grey-600">{formatEur(val.avgEur)}</TableCell>
+                    <TableCell className="hidden xl:table-cell">
                       {auction ? (
                         <Link href={`/auction/${auction.id}`} className="text-xs font-medium text-brand-700 hover:underline">
                           {auction.status} · {auction.bid_count} bids

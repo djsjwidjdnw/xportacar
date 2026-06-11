@@ -204,9 +204,9 @@ export default async function AdminDashboardPage() {
               <TableHeader>
                 <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                   <TableHead>{t("activityVehicle")}</TableHead>
-                  <TableHead>{t("activityEvent")}</TableHead>
+                  <TableHead className="hidden xl:table-cell">{t("activityEvent")}</TableHead>
                   <TableHead className="text-right">{t("activityValue")}</TableHead>
-                  <TableHead className="text-right">{t("activityWhen")}</TableHead>
+                  <TableHead className="hidden lg:table-cell text-right">{t("activityWhen")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -221,18 +221,18 @@ export default async function AdminDashboardPage() {
                   return (
                     <TableRow key={r.id} className="[&>td]:px-5 [&>td]:py-3.5">
                       <TableCell>
-                        <div className="font-medium text-grey-900">
+                        <div className="max-w-[220px] truncate font-medium text-grey-900">
                           {v ? `${v.year} ${v.make} ${v.model}` : "—"}
                         </div>
                       </TableCell>
-                      <TableCell className="text-sm text-grey-700">
+                      <TableCell className="hidden xl:table-cell max-w-[280px] truncate text-sm text-grey-700">
                         New bid by{" "}
                         <span className="font-medium text-grey-900">{bidderName}</span>
                       </TableCell>
                       <TableCell className="text-right font-semibold tabular-nums text-grey-900">
                         {formatEur(r.amount_eur)}
                       </TableCell>
-                      <TableCell className="text-right text-sm text-grey-500">
+                      <TableCell className="hidden lg:table-cell text-right text-sm text-grey-500">
                         {formatRelativeTime(r.created_at)}
                       </TableCell>
                     </TableRow>

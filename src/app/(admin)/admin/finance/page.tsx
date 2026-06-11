@@ -104,13 +104,13 @@ export default async function AdminFinancePage() {
               <TableHeader>
                 <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                   <TableHead>Invoice #</TableHead>
-                  <TableHead>Buyer</TableHead>
-                  <TableHead>Vehicle</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead className="text-right">Platform fee</TableHead>
+                  <TableHead className="hidden xl:table-cell">Buyer</TableHead>
+                  <TableHead className="hidden xl:table-cell">Vehicle</TableHead>
+                  <TableHead className="hidden 2xl:table-cell text-right">Amount</TableHead>
+                  <TableHead className="hidden 2xl:table-cell text-right">Platform fee</TableHead>
                   <TableHead className="text-right">Total</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Created</TableHead>
+                  <TableHead className="hidden lg:table-cell">Created</TableHead>
                   <TableHead className="w-12"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -133,21 +133,21 @@ export default async function AdminFinancePage() {
                         {inv.invoice_number ?? inv.id.slice(0, 8)}
                       </Link>
                     </TableCell>
-                    <TableCell className="text-sm">
-                      <p className="font-medium text-grey-900">
+                    <TableCell className="hidden xl:table-cell text-sm">
+                      <p className="max-w-[180px] truncate font-medium text-grey-900">
                         {inv.buyer?.company_name ?? inv.buyer?.full_name ?? "—"}
                       </p>
-                      <p className="text-[11px] text-grey-500">{inv.buyer?.email}</p>
+                      <p className="max-w-[180px] truncate text-[11px] text-grey-500">{inv.buyer?.email}</p>
                     </TableCell>
-                    <TableCell className="text-sm text-grey-700">
+                    <TableCell className="hidden xl:table-cell max-w-[180px] truncate text-sm text-grey-700">
                       {inv.vehicle
                         ? `${inv.vehicle.year} ${inv.vehicle.make} ${inv.vehicle.model}`
                         : "—"}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-grey-700">
+                    <TableCell className="hidden 2xl:table-cell text-right tabular-nums text-grey-700">
                       {formatEur(inv.amount_eur)}
                     </TableCell>
-                    <TableCell className="text-right tabular-nums text-brand-700">
+                    <TableCell className="hidden 2xl:table-cell text-right tabular-nums text-brand-700">
                       {formatEur(inv.platform_fee_eur)}
                     </TableCell>
                     <TableCell className="text-right font-bold tabular-nums text-grey-900">
@@ -164,7 +164,7 @@ export default async function AdminFinancePage() {
                         {inv.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-xs text-grey-600">
+                    <TableCell className="hidden lg:table-cell text-xs text-grey-600">
                       {formatRelativeTime(inv.created_at)}
                     </TableCell>
                     <TableCell>

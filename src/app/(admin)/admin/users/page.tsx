@@ -99,10 +99,10 @@ export default async function AdminUsersPage({
               <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
                 <TableHead>Name</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Company</TableHead>
-                <TableHead>Country</TableHead>
+                <TableHead className="hidden 2xl:table-cell">Company</TableHead>
+                <TableHead className="hidden 2xl:table-cell">Country</TableHead>
                 <TableHead>KYC</TableHead>
-                <TableHead>Member since</TableHead>
+                <TableHead className="hidden lg:table-cell">Member since</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -124,7 +124,7 @@ export default async function AdminUsersPage({
                           {initials(u.full_name ?? u.email)}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="min-w-0">
+                      <div className="min-w-0 max-w-[200px] sm:max-w-[260px]">
                         <p className="truncate font-medium text-grey-900">
                           {u.full_name ?? "—"}
                         </p>
@@ -137,10 +137,10 @@ export default async function AdminUsersPage({
                       {u.role}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-sm text-grey-700">
+                  <TableCell className="hidden 2xl:table-cell max-w-[180px] truncate text-sm text-grey-700">
                     {u.company_name ?? <span className="text-grey-400">—</span>}
                   </TableCell>
-                  <TableCell className="text-sm text-grey-700">
+                  <TableCell className="hidden 2xl:table-cell text-sm text-grey-700">
                     {u.country ?? <span className="text-grey-400">—</span>}
                   </TableCell>
                   <TableCell>
@@ -148,7 +148,7 @@ export default async function AdminUsersPage({
                       {u.kyc_status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs text-grey-600">
+                  <TableCell className="hidden lg:table-cell text-xs text-grey-600">
                     {new Date(u.created_at).toLocaleDateString("en-GB", {
                       day: "numeric", month: "short", year: "numeric",
                     })}

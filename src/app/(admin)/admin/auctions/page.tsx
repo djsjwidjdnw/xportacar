@@ -120,12 +120,12 @@ export default async function AdminAuctionsPage({
             <TableRow className="bg-grey-50/60 [&>th]:px-5 [&>th]:py-3 [&>th]:text-xs [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-wide [&>th]:text-grey-500">
               <TableHead>Vehicle</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Start</TableHead>
-              <TableHead>End</TableHead>
-              <TableHead className="text-right">Start price</TableHead>
+              <TableHead className="hidden lg:table-cell">Start</TableHead>
+              <TableHead className="hidden lg:table-cell">End</TableHead>
+              <TableHead className="hidden 2xl:table-cell text-right">Start price</TableHead>
               <TableHead className="text-right">Current bid</TableHead>
-              <TableHead className="text-right">Bids</TableHead>
-              <TableHead>Winner</TableHead>
+              <TableHead className="hidden 2xl:table-cell text-right">Bids</TableHead>
+              <TableHead className="hidden 2xl:table-cell">Winner</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
@@ -151,32 +151,32 @@ export default async function AdminAuctionsPage({
                         {v.year} {v.make} {v.model}
                       </Link>
                     ) : "—"}
-                    {v && <p className="text-[11px] text-grey-500">{v.location_city} · {v.vin}</p>}
+                    {v && <p className="max-w-[200px] truncate text-[11px] text-grey-500">{v.location_city} · {v.vin}</p>}
                   </TableCell>
                   <TableCell>
                     <Badge className={`${STATUS_STYLE[a.status as AuctionStatus] ?? "bg-grey-100 text-grey-700 ring-grey-200"} ring-1 capitalize`}>
                       {a.status}
                     </Badge>
                   </TableCell>
-                  <TableCell className="text-xs text-grey-600">
+                  <TableCell className="hidden lg:table-cell text-xs text-grey-600">
                     {a.start_time ? formatRelativeTime(a.start_time) : "—"}
                   </TableCell>
-                  <TableCell className="text-xs text-grey-600">
+                  <TableCell className="hidden lg:table-cell text-xs text-grey-600">
                     {a.end_time ? formatRelativeTime(a.end_time) : "—"}
                   </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums text-grey-700">
+                  <TableCell className="hidden 2xl:table-cell text-right text-sm tabular-nums text-grey-700">
                     {formatEur(a.starting_price_eur)}
                   </TableCell>
                   <TableCell className="text-right font-semibold tabular-nums text-grey-900">
                     {formatEur(a.current_bid_eur)}
                   </TableCell>
-                  <TableCell className="text-right text-sm">
+                  <TableCell className="hidden 2xl:table-cell text-right text-sm">
                     <span className="font-semibold text-grey-900">{a.bid_count ?? 0}</span>
                     <span className="ml-1 text-[11px] text-grey-500">/ {a.bidder_count ?? 0} bidders</span>
                   </TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="hidden 2xl:table-cell text-sm">
                     {w ? (
-                      <span className="font-medium text-grey-900">
+                      <span className="block max-w-[180px] truncate font-medium text-grey-900">
                         {w.company_name ?? w.full_name ?? w.email}
                       </span>
                     ) : (
