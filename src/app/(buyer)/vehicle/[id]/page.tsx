@@ -31,7 +31,7 @@ export async function generateMetadata(
   const { data } = await supabase
     .from("vehicles")
     .select(`
-      year, make, model, location_city, location_country, listed_price_eur,
+      year, make, model, trim, location_city, location_country, listed_price_eur,
       vehicle_photos ( url, sort_order )
     `)
     .eq("id", id)
@@ -42,7 +42,7 @@ export async function generateMetadata(
   const photo = (v.vehicle_photos ?? [])
     .slice()
     .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)[0];
-  const title = `${v.year} ${v.make} ${v.model}`;
+  const title = `${v.year} ${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}`;
   const description = [
     `${v.year} ${v.make} ${v.model} — auctioned from ${v.location_city}, ${v.location_country}.`,
     v.listed_price_eur ? `Listed from €${Number(v.listed_price_eur).toLocaleString("en-GB")}.` : "",
@@ -287,7 +287,7 @@ export default async function VehicleDetailPage({
                 </span>
               </div>
               <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-grey-900 sm:text-4xl">
-                {v.year} {v.make} {v.model}
+                {v.year} {v.make} {v.model}{v.trim ? ` ${v.trim}` : ""}
               </h1>
               <p className="mt-1 text-grey-500">
                 {v.exterior_color} · {v.interior_color}

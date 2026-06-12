@@ -39,7 +39,7 @@ export async function GET(
       id, invoice_number, amount_eur, platform_fee_eur, total_eur, status, created_at, payment_confirmed_at,
       shipping_method, shipping_eur, shipping_distance_km, shipping_address, extras, extras_eur,
       buyer:profiles!buyer_id ( full_name, company_name, country, email, phone, company_registration ),
-      vehicle:vehicles!vehicle_id ( year, make, model, vin, exterior_color, mileage_km )
+      vehicle:vehicles!vehicle_id ( year, make, model, trim, vin, exterior_color, mileage_km )
     `)
     .eq("id", id)
     .single();
@@ -123,7 +123,7 @@ export async function GET(
   text("VEHICLE", M, y, 8, bold, GREY); y -= 14;
   const v = inv.vehicle;
   if (v) {
-    text(`${v.year} ${v.make} ${v.model}`, M, y, 11, bold); y -= 13;
+    text(`${v.year} ${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}`, M, y, 11, bold); y -= 13;
     text(`VIN: ${v.vin ?? "—"}`, M, y, 9, font, GREY); y -= 12;
     text(`${v.exterior_color ?? ""}${v.mileage_km != null ? ` · ${Number(v.mileage_km).toLocaleString("en-GB")} km` : ""}`, M, y, 9, font, GREY); y -= 12;
   }

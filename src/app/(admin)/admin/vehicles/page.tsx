@@ -130,7 +130,7 @@ export default async function AdminVehiclesPage({
                   <TableRow key={v.id} className="cursor-pointer transition-colors hover:bg-grey-50 [&>td]:px-5 [&>td]:py-3.5">
                     <TableCell>
                       <Link href={`/admin/vehicles/${v.id}`} className="font-medium text-grey-900 hover:text-brand-700">
-                        {v.year} {v.make} {v.model}
+                        {v.year} {v.make} {v.model}{v.trim ? ` ${v.trim}` : ""}
                       </Link>
                       <p className="text-[11px] text-grey-500">{v.location_city} · {v.exterior_color}</p>
                     </TableCell>

@@ -139,7 +139,7 @@ export function VehicleCard({
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0 flex-1">
               <h3 className="truncate text-base font-bold text-grey-900">
-                {vehicle.year} {vehicle.make} {vehicle.model}
+                {vehicle.year} {vehicle.make} {vehicle.model}{vehicle.trim ? ` ${vehicle.trim}` : ""}
               </h3>
               <p className="mt-0.5 truncate text-xs text-grey-500">
                 {vehicle.exterior_color} · {vehicle.interior_color}

@@ -61,7 +61,7 @@ export function WonInvoice({
   vehicle, hammerEur, userEmail,
   invoiceId, invoiceNumber, createdAtIso, confirmedAtIso,
 }: {
-  vehicle: { year: number; make: string; model: string; vin: string; city: string; country: string };
+  vehicle: { year: number; make: string; model: string; trim?: string | null; vin: string; city: string; country: string };
   hammerEur: number;
   userEmail: string | null;
   invoiceId: string | null;
@@ -272,7 +272,7 @@ export function WonInvoice({
         </div>
 
         <dl className="mt-5 space-y-1.5 text-sm">
-          <Row label="Vehicle" value={`${vehicle.year} ${vehicle.make} ${vehicle.model}`} strong />
+          <Row label="Vehicle" value={`${vehicle.year} ${vehicle.make} ${vehicle.model}${vehicle.trim ? ` ${vehicle.trim}` : ""}`} strong />
           <Row label="VIN" value={vehicle.vin || "—"} sub />
           <Row label="Location" value={`${vehicle.city}, ${vehicle.country}`} sub />
         </dl>

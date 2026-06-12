@@ -36,7 +36,7 @@ export default async function AuctionWonPage({
     .from("auctions")
     .select(`
       id, status, winner_id, start_time, end_time, current_bid_eur, buy_now_price_eur,
-      vehicle:vehicles!vehicle_id ( id, year, make, model, vin, status, sold_at, location_city, location_country )
+      vehicle:vehicles!vehicle_id ( id, year, make, model, trim, vin, status, sold_at, location_city, location_country )
     `)
     .eq("id", id)
     .single();
@@ -119,7 +119,7 @@ export default async function AuctionWonPage({
           </h1>
           {v && (
             <p className="mt-2 text-base font-semibold text-white/95">
-              {v.year} {v.make} {v.model}
+              {v.year} {v.make} {v.model}{v.trim ? ` ${v.trim}` : ""}
             </p>
           )}
           {isWinner && (
@@ -145,6 +145,7 @@ export default async function AuctionWonPage({
               year: v.year,
               make: v.make,
               model: v.model,
+              trim: v.trim ?? null,
               vin: v.vin ?? "",
               city: v.location_city,
               country: v.location_country,
