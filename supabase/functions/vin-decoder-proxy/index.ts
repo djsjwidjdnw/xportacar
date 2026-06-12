@@ -54,17 +54,74 @@ Deno.serve(async (req) => {
     clearTimeout(timer);
 
     const text = await res.text();
-    // TEMPORARY: log auto.dev's status + a body snippet (never the key) so VIN
-    // decode behaviour is visible in the Supabase function logs. Safe to remove.
-    console.log(`[vin-decoder-proxy] vin=${vin} upstream=${res.status} body=${text.slice(0, 300)}`);
     if (!res.ok) {
       // Pass the status through (400 invalid format, 404/422 = not found) so the
       // client can branch and fall back to manual entry.
+      console.log(`[vin-decoder-proxy] vin=${vin} autodev=${res.status} (passthrough)`);
       return passthrough(text, res.status);
     }
-    return passthrough(text, 200);
+
+    // auto.dev coverage for exotic/low-volume cars is inconsistent — many VINs
+    // come back with only year+make. Enrich the gaps from NHTSA vPIC (free, no
+    // key, broad global coverage), filling ONLY the fields auto.dev left empty,
+    // writing into the keys the mobile parser already reads.
+    // deno-lint-ignore no-explicit-any
+    let j: any;
+    try { j = JSON.parse(text); } catch { return passthrough(text, 200); }
+
+    const before = { model: !!j.model, trim: !!j.trim, transmission: !!j.transmission, drive: !!j.drive, fuel: !!j.fuel, body: !!j.body };
+    const nhtsa = await fetchNhtsa(vin);
+    if (nhtsa) {
+      const fill = (key: string, val?: string) => {
+        if (val && val.trim() && (!j[key] || String(j[key]).trim() === "")) j[key] = val.trim();
+      };
+      fill("make", nhtsa.Make);
+      fill("model", nhtsa.Model);
+      fill("trim", nhtsa.Trim || nhtsa.Series);
+      fill("transmission", nhtsa.TransmissionStyle);
+      fill("drive", nhtsa.DriveType);
+      fill("fuel", nhtsa.FuelTypePrimary);
+      fill("body", nhtsa.BodyClass);
+      fill("displacement", nhtsa.DisplacementL);
+      fill("cylinders", nhtsa.EngineCylinders);
+      // Year: auto.dev keeps it in vehicle.year; fill if missing.
+      if (nhtsa.ModelYear && (!j.vehicle || !j.vehicle.year)) {
+        j.vehicle = { ...(j.vehicle ?? {}), year: Number(nhtsa.ModelYear) || nhtsa.ModelYear };
+      }
+    }
+
+    console.log(`[vin-decoder-proxy] vin=${vin} autodev=200 nhtsa=${nhtsa ? "ok" : "none"} ` +
+      `filled={model:${!before.model && !!j.model},trim:${!before.trim && !!j.trim},` +
+      `transmission:${!before.transmission && !!j.transmission},drive:${!before.drive && !!j.drive},` +
+      `fuel:${!before.fuel && !!j.fuel},body:${!before.body && !!j.body}}`);
+
+    return jsonResponse(j, 200);
   } catch (e) {
     console.error("vin-decoder-proxy: upstream fetch failed:", (e as Error)?.name ?? "error");
     return jsonResponse({ error: "upstream_unreachable" }, 502);
   }
 });
+
+// NHTSA vPIC flat decode (DecodeVinValues → Results[0]). Free, no API key.
+// Returns null on any failure so enrichment is strictly best-effort.
+interface NhtsaValues {
+  Make?: string; Model?: string; Series?: string; Trim?: string;
+  TransmissionStyle?: string; DriveType?: string; FuelTypePrimary?: string;
+  BodyClass?: string; DisplacementL?: string; EngineCylinders?: string; ModelYear?: string;
+}
+async function fetchNhtsa(vin: string): Promise<NhtsaValues | null> {
+  try {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 6000);
+    const r = await fetch(
+      `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/${encodeURIComponent(vin)}?format=json`,
+      { headers: { Accept: "application/json" }, signal: ctrl.signal },
+    );
+    clearTimeout(timer);
+    if (!r.ok) return null;
+    const data = await r.json();
+    return (data?.Results?.[0] as NhtsaValues) ?? null;
+  } catch {
+    return null;
+  }
+}
