@@ -5,7 +5,7 @@
 // CRON_SECRET header. Best-effort; never throws to the caller.
 
 import { NextResponse } from "next/server";
-import { sendWatchlistMatchEmail, sendAuctionEndingSoonEmail } from "@/lib/email";
+import { sendWatchlistMatchEmail, sendAuctionEndingSoonEmail, sendAuctionWonEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -25,6 +25,8 @@ export async function POST(req: Request) {
     auctionId?: string;
     priceEur?: number;
     currentBidEur?: number;
+    amountEur?: number;
+    invoiceNumber?: string;
     outbid?: boolean;
   };
   try {
@@ -54,6 +56,15 @@ export async function POST(req: Request) {
         auctionId: body.auctionId ?? "",
         currentBidEur: body.currentBidEur,
         outbid: body.outbid,
+        locale: body.locale,
+      });
+    } else if (kind === "auction_won") {
+      await sendAuctionWonEmail({
+        to,
+        name: body.name ?? "",
+        auctionId: body.auctionId ?? "",
+        amountEur: body.amountEur ?? 0,
+        invoiceNumber: body.invoiceNumber,
         locale: body.locale,
       });
     } else {

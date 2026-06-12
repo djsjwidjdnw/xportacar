@@ -100,7 +100,7 @@ export default async function AdminSettingsPage() {
             status={emailOk ? "ok" : "warn"}
             hint={emailOk ? "RESEND_API_KEY is set." : "Set RESEND_API_KEY to enable bid/win/outbid notifications."}
           />
-          <Setting label="From address" value={process.env.EMAIL_FROM ?? "hello@xportacar.com"} />
+          <Setting label="From address" value={process.env.RESEND_FROM ?? "XportACar <noreply@xportacar.com>"} />
           <Setting label="Templates"    value="outbid · auction-won · welcome" />
         </Section>
 

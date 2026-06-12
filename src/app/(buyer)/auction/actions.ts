@@ -152,7 +152,7 @@ export async function buyNowAction(input: {
 
   await admin
     .from("vehicles")
-    .update({ status: "sold" })
+    .update({ status: "sold", sold_at: new Date().toISOString() })
     .eq("id", auction.vehicle_id);
 
   // The DB trigger creates the invoice when status flips to sold. Defensively
@@ -256,9 +256,9 @@ async function notifyOutbid(
     data:    { auction_id: auctionId, vehicle_id: vehicleId, amount_eur: newBidEur },
   });
   const { data: profile } = await supabase
-    .from("profiles").select("email, full_name").eq("id", outbidUserId).single();
+    .from("profiles").select("email, full_name, language").eq("id", outbidUserId).single();
   if (profile?.email) {
-    await sendOutbidEmail({ to: profile.email, name: profile.full_name ?? "", vehicleTitle: vehicle ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : "your auction", newBidEur, auctionId });
+    await sendOutbidEmail({ to: profile.email, name: profile.full_name ?? "", vehicleTitle: vehicle ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : "your auction", newBidEur, auctionId, locale: (profile as { language?: string }).language });
   }
   // Push notification — silently skips when no tokens are registered.
   await sendPushToUser({

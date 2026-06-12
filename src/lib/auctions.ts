@@ -12,6 +12,7 @@ import "server-only";
 // auctions.
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendAuctionWonEmail } from "@/lib/email";
 
 interface DueAuction {
   id: string;
@@ -69,7 +70,7 @@ export async function settleEndedAuctions(auctionIds: string[]): Promise<void> {
       if (updErr) continue;
 
       if (winnerId) {
-        await admin.from("vehicles").update({ status: "sold" }).eq("id", a.vehicle_id);
+        await admin.from("vehicles").update({ status: "sold", sold_at: new Date().toISOString() }).eq("id", a.vehicle_id);
         await admin.from("notifications").insert({
           user_id: winnerId,
           type: "auction_won",
@@ -77,6 +78,17 @@ export async function settleEndedAuctions(auctionIds: string[]): Promise<void> {
           body: "Your winning bid has been recorded. View your invoice and payment details.",
           data: { auction_id: a.id, amount_eur: finalBid },
         });
+        // Localized "you won" email (best-effort) — mirrors the Buy Now path so
+        // timer-settled winners are also emailed, not just notified in-app.
+        const { data: winner } = await admin
+          .from("profiles").select("email, full_name, language").eq("id", winnerId).single();
+        const w = winner as { email?: string; full_name?: string; language?: string } | null;
+        if (w?.email) {
+          await sendAuctionWonEmail({
+            to: w.email, name: w.full_name ?? "", auctionId: a.id,
+            amountEur: Number(finalBid ?? 0), locale: w.language ?? undefined,
+          });
+        }
       }
     }
   } catch {

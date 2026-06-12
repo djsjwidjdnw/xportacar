@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { sendWelcomeEmail } from "@/lib/email";
+import { resolveLocale } from "@/i18n/server";
 
 export type AuthFormState = {
   ok: boolean;
@@ -78,8 +79,10 @@ export async function signUpAction(
 
   // Welcome email (best-effort; no-ops silently if RESEND_API_KEY is unset,
   // and never throws). Sent before any redirect below since redirect() throws.
+  // Localize to the signup UI language (cookie-resolved).
   if (data.user) {
-    await sendWelcomeEmail({ to: email, name: fullName });
+    const locale = await resolveLocale();
+    await sendWelcomeEmail({ to: email, name: fullName, locale });
   }
 
   // If email confirmation is disabled the user is already a session — send

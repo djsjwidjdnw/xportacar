@@ -31,6 +31,7 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
+  const SITE = (Deno.env.get("SITE_URL") ?? "https://xportacar.com").replace(/\/$/, "");
 
   const nowIso = new Date().toISOString();
   const { data: expired, error } = await admin
@@ -75,6 +76,25 @@ Deno.serve(async (req) => {
         body: "Your winning bid was accepted. Review your invoice and complete payment.",
         data: { auction_id: a.id, vehicle_id: a.vehicle_id, amount_eur: top.amount_eur },
       });
+      // Localized "you won" email via the web's internal notify route (the Buy
+      // Now path emails directly; timer wins settle here, so email from here).
+      try {
+        const { data: winner } = await admin
+          .from("profiles").select("email, full_name, language").eq("id", top.bidder_id).single();
+        const w = winner as { email?: string; full_name?: string; language?: string } | null;
+        if (w?.email) {
+          await fetch(`${SITE}/api/internal/notify`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-cron-secret": secret },
+            body: JSON.stringify({
+              kind: "auction_won", to: w.email, name: w.full_name ?? "",
+              auctionId: a.id, amountEur: Number(top.amount_eur), locale: w.language ?? undefined,
+            }),
+          });
+        }
+      } catch (e) {
+        console.error("close-expired-auctions: won-email post failed", (e as Error)?.message);
+      }
       sold++;
     } else {
       // No bids or reserve not met → close without a sale; relist the vehicle.
