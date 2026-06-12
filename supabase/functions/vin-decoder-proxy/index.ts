@@ -189,6 +189,11 @@ async function sha1Hex(s: string): Promise<string> {
 // Vincario / vindecoder.eu 3.2 decode. Auth = first 10 chars of
 // sha1("<VIN>|decode|<API_KEY>|<SECRET_KEY>"). Returns a Partial<DecodedVehicle>
 // or null; throws on a credit/auth error so the caller can log it honestly.
+//
+// Vincario lookups are precious — never call for valuation. This decode is the
+// ONLY place Vincario is ever hit, it is gated (free sources first), cached, and
+// usage-logged. Valuation uses auto.dev listings exclusively (valuation-proxy),
+// which never imports or references Vincario.
 async function decodeVincario(vin: string): Promise<Partial<DecodedVehicle> | null> {
   const control = (await sha1Hex(`${vin}|decode|${VINCARIO_API_KEY}|${VINCARIO_SECRET_KEY}`)).substring(0, 10);
   const url = `https://api.vindecoder.eu/3.2/${VINCARIO_API_KEY}/${control}/decode/${vin}.json`;

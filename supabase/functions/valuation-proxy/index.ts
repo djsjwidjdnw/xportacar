@@ -49,12 +49,15 @@ Deno.serve(async (req) => {
     );
   }
 
-  // Full model string incl. trim — trims move the price a lot.
-  const modelQuery = trim ? `${model} ${trim}` : model;
+  // Query the BASE model only. auto.dev's `model` param expects the model name
+  // ("Aventador"); passing "Aventador SVJ" returns ZERO records. Trim lives on
+  // each returned record (record.trim, e.g. "LP 770-4 SVJ"), so the CLIENT
+  // filters/aggregates by trim — that's what makes a base→SVJ swap change the
+  // value. We forward `trim` only for the usage log below.
   const qs = new URLSearchParams({
     apikey: AUTODEV_KEY,
     make,
-    model: modelQuery,
+    model,
     year_min: String(year),
     year_max: String(year),
   });
@@ -73,6 +76,18 @@ Deno.serve(async (req) => {
       console.error(`valuation-proxy: upstream returned ${res.status}`);
       return jsonResponse({ error: "upstream_error", status: res.status }, 502);
     }
+
+    // Log year/make/model/trim + a quick avg of usable prices (priceUnformatted;
+    // `price` is often a string like "accepting_offers" for exotics).
+    try {
+      const j = JSON.parse(text) as { records?: Record<string, unknown>[] };
+      const nums = (j.records ?? [])
+        .map((r) => Number(r.priceUnformatted))
+        .filter((n) => Number.isFinite(n) && n > 1000);
+      const avg = nums.length ? Math.round(nums.reduce((s, n) => s + n, 0) / nums.length) : 0;
+      console.log(`[valuation-proxy] year=${year} make=${make} model=${model} trim=${trim || "-"} records=${nums.length} price=$${avg}`);
+    } catch { /* logging only */ }
+
     return passthrough(text, 200);
   } catch (e) {
     console.error("valuation-proxy: upstream fetch failed:", (e as Error)?.name ?? "error");
