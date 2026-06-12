@@ -22,6 +22,7 @@ import { paymentReceivedAdminEmail } from "./templates/paymentReceivedAdmin";
 import { paymentVerifiedEmail } from "./templates/paymentVerified";
 import { vehicleListedEmail } from "./templates/vehicleListed";
 import { newInspectorApplicationEmail } from "./templates/newInspectorApplication";
+import { accountDeletedEmail } from "./templates/accountDeleted";
 import { statusPickedUpEmail } from "./templates/statusPickedUp";
 import { statusInTransitEmail } from "./templates/statusInTransit";
 import { statusDeliveredEmail } from "./templates/statusDelivered";
@@ -41,6 +42,7 @@ export { kycRejectedEmail } from "./templates/kycRejected";
 export { paymentReceivedAdminEmail } from "./templates/paymentReceivedAdmin";
 export { paymentVerifiedEmail } from "./templates/paymentVerified";
 export { vehicleListedEmail } from "./templates/vehicleListed";
+export { accountDeletedEmail } from "./templates/accountDeleted";
 export { newInspectorApplicationEmail } from "./templates/newInspectorApplication";
 export { statusPickedUpEmail } from "./templates/statusPickedUp";
 export { statusInTransitEmail } from "./templates/statusInTransit";
@@ -301,4 +303,8 @@ export async function sendAuctionEndingSoonEmail(args: {
       locale: toEmailLocale(args.locale),
     }),
   );
+}
+
+export async function sendAccountDeletedEmail(args: { to: string; dateStr: string; locale?: string }) {
+  await sendEmail(args.to, accountDeletedEmail({ dateStr: args.dateStr, locale: toEmailLocale(args.locale) }));
 }

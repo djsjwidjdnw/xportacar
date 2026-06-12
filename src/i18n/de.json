@@ -386,5 +386,21 @@
     "panelRearRightDoor": "Hintere rechte Tür",
     "panelTrunk": "Kofferraum",
     "panelRoof": "Dach"
+  },
+  "deleteAccount": {
+    "button": "Konto löschen",
+    "title": "Konto löschen",
+    "warning": "Dadurch werden Ihr Konto und alle zugehörigen Daten dauerhaft gelöscht.",
+    "loseIntro": "Sie verlieren:",
+    "loseBids": "Ihre Gebote und Ihre Merkliste",
+    "loseInspections": "Ihren Inspektionsverlauf",
+    "loseInvoices": "Zugriff auf frühere Rechnungen",
+    "cannotUndo": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "typeToConfirm": "Geben Sie zur Bestätigung DELETE ein.",
+    "confirm": "Mein Konto löschen",
+    "deleting": "Wird gelöscht…",
+    "cancel": "Abbrechen",
+    "success": "Ihr Konto wurde gelöscht.",
+    "failed": "Ihr Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
   }
 }

@@ -5,7 +5,7 @@
 // CRON_SECRET header. Best-effort; never throws to the caller.
 
 import { NextResponse } from "next/server";
-import { sendWatchlistMatchEmail, sendAuctionEndingSoonEmail, sendAuctionWonEmail } from "@/lib/email";
+import { sendWatchlistMatchEmail, sendAuctionEndingSoonEmail, sendAuctionWonEmail, sendAccountDeletedEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -28,6 +28,7 @@ export async function POST(req: Request) {
     amountEur?: number;
     invoiceNumber?: string;
     outbid?: boolean;
+    dateStr?: string;
   };
   try {
     body = await req.json();
@@ -65,6 +66,12 @@ export async function POST(req: Request) {
         auctionId: body.auctionId ?? "",
         amountEur: body.amountEur ?? 0,
         invoiceNumber: body.invoiceNumber,
+        locale: body.locale,
+      });
+    } else if (kind === "account_deleted") {
+      await sendAccountDeletedEmail({
+        to,
+        dateStr: body.dateStr ?? new Date().toISOString().slice(0, 10),
         locale: body.locale,
       });
     } else {

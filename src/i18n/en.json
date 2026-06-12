@@ -386,5 +386,21 @@
     "panelRearRightDoor": "Rear right door",
     "panelTrunk": "Trunk",
     "panelRoof": "Roof"
+  },
+  "deleteAccount": {
+    "button": "Delete account",
+    "title": "Delete account",
+    "warning": "This will permanently delete your account and all associated data.",
+    "loseIntro": "You will lose:",
+    "loseBids": "Your bids and watchlist",
+    "loseInspections": "Your inspection history",
+    "loseInvoices": "Access to past invoices",
+    "cannotUndo": "This action cannot be undone.",
+    "typeToConfirm": "Type DELETE to confirm.",
+    "confirm": "Delete my account",
+    "deleting": "Deleting…",
+    "cancel": "Cancel",
+    "success": "Your account has been deleted.",
+    "failed": "Couldn't delete your account. Please try again."
   }
 }

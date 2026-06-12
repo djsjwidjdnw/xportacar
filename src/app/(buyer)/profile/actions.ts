@@ -51,3 +51,24 @@ export async function updateProfileAction(
   revalidatePath("/dashboard");
   return { ok: true, message: "Profile updated." };
 }
+
+// --------------------------------------------------------------------
+// Account deletion (Apple Guideline 5.1.1(v)). Invokes the delete-my-account
+// Edge Function with the user's session (cookie-authed server client carries
+// the JWT), which scrubs all data + deletes the auth user, then signs out.
+// --------------------------------------------------------------------
+export async function deleteMyAccountAction(): Promise<{ ok: boolean; error?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Not signed in." };
+
+  const { data, error } = await supabase.functions.invoke("delete-my-account", { body: {} });
+  if (error) return { ok: false, error: error.message || "Account deletion failed." };
+  if (data && (data as { ok?: boolean }).ok === false) {
+    return { ok: false, error: (data as { error?: string }).error ?? "Account deletion failed." };
+  }
+
+  // The auth user is gone; clear the local session cookies too.
+  await supabase.auth.signOut();
+  return { ok: true };
+}

@@ -386,5 +386,21 @@
     "panelRearRightDoor": "Porte arrière droite",
     "panelTrunk": "Coffre",
     "panelRoof": "Toit"
+  },
+  "deleteAccount": {
+    "button": "Supprimer le compte",
+    "title": "Supprimer le compte",
+    "warning": "Cette action supprimera définitivement votre compte et toutes les données associées.",
+    "loseIntro": "Vous perdrez :",
+    "loseBids": "Vos enchères et votre liste de suivi",
+    "loseInspections": "Votre historique d'inspections",
+    "loseInvoices": "L'accès à vos anciennes factures",
+    "cannotUndo": "Cette action est irréversible.",
+    "typeToConfirm": "Saisissez DELETE pour confirmer.",
+    "confirm": "Supprimer mon compte",
+    "deleting": "Suppression…",
+    "cancel": "Annuler",
+    "success": "Votre compte a été supprimé.",
+    "failed": "Impossible de supprimer votre compte. Veuillez réessayer."
   }
 }
