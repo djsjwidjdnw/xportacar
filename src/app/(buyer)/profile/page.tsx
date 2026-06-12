@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { KycUploader } from "@/components/profile/KycUploader";
 import { ProfileEditForm } from "@/components/profile/ProfileEditForm";
 import { DeleteAccountSection } from "@/components/profile/DeleteAccountSection";
+import { ChangePasswordSection } from "@/components/profile/ChangePasswordSection";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
 import { formatRelativeTime, initials } from "@/lib/utils";
@@ -111,6 +112,8 @@ export default async function ProfilePage() {
           <h3 className="mb-5 text-lg font-bold text-grey-900">Account details</h3>
           <ProfileEditForm profile={profile} />
         </section>
+
+        <ChangePasswordSection email={user.email ?? profile.email ?? ""} />
 
         <DeleteAccountSection />
       </div>

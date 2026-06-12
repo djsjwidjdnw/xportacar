@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,7 @@ export function LoginForm({ next }: { next: string }) {
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <Label htmlFor="password">{t("password")}</Label>
-          <a href="#" className="text-xs font-medium text-brand-700 hover:underline">{t("forgotPassword")}</a>
+          <Link href="/reset-password" className="text-xs font-medium text-brand-700 hover:underline">{t("forgotPassword")}</Link>
         </div>
         <div className="relative">
           <Input

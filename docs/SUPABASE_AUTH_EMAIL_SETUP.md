@@ -34,6 +34,11 @@ you can lift it).
 Dashboard → **Authentication → URL Configuration**:
 - [ ] **Site URL:** `https://xportacar.com`
 - [ ] **Redirect URLs:** include `https://xportacar.com/**` (and any preview URLs).
+      This wildcard must cover **`https://xportacar.com/reset-password/callback`**,
+      which is where the "Forgot password" flow (web + both mobile apps) lands —
+      the reset email's link redirects there to set a new password. For local
+      dev also add `http://localhost:3000/**`. If a recovery link shows
+      "invalid or expired", the callback URL is almost always not allow-listed.
 
 (Auto-confirm note: signups are auto-confirmed, so the "Confirm signup" email is
 usually not sent — the template is included below for completeness / if you ever
