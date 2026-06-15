@@ -2,6 +2,7 @@ import "server-only";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage } from "pdf-lib";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { CUSTOMS_DISCLAIMER_TEXT } from "@/components/shared/CustomsDisclaimer";
 import { pickThumbnailPhoto, thumb } from "@/lib/utils";
 
@@ -73,6 +74,10 @@ export interface InvoicePdfOverrides {
   shippingLabel?: string;
   shippingEur?: number;
   tuvEur?: number;
+  /** Use the service-role client (bypasses RLS). Only set this once the caller
+   *  has independently authorized access to THIS invoice — e.g. a valid signed
+   *  token, or an already-verified invoice owner. */
+  useAdminClient?: boolean;
 }
 
 /**
@@ -85,7 +90,7 @@ export async function renderInvoicePdf(
   invoiceId: string,
   overrides: InvoicePdfOverrides = {},
 ): Promise<{ buffer: Buffer; filename: string } | null> {
-  const supabase = await createClient();
+  const supabase = overrides.useAdminClient ? createAdminClient() : await createClient();
   const { data: invoice } = await supabase
     .from("invoices")
     .select(`

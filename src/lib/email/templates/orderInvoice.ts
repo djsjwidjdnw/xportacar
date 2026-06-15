@@ -112,6 +112,8 @@ export function orderInvoiceEmail(args: {
   shippingEur: number;
   shippingLabel?: string;
   shippingAddress?: string | null;
+  /** Login-free signed PDF URL. Falls back to the session-gated route URL. */
+  pdfUrl?: string;
   extras?: { name: string; priceEur: number }[];
   totalEur: number;
   locale?: EmailLocale;
@@ -164,7 +166,7 @@ export function orderInvoiceEmail(args: {
     subject: c.subject(args.invoiceNumber),
     heading: c.heading,
     bodyHtml,
-    ctaUrl: `${SITE_URL}/api/invoice/${args.invoiceId}/pdf`,
+    ctaUrl: args.pdfUrl ?? `${SITE_URL}/api/invoice/${args.invoiceId}/pdf`,
     ctaLabel: c.ctaLabel,
     dir: rtl ? "rtl" : "ltr",
   });
