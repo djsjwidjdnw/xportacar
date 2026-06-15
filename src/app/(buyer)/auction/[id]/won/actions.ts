@@ -7,8 +7,8 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
-import { sendPaymentReceivedAdminEmail, sendInvoiceEmail } from "@/lib/email";
-import { renderInvoicePdf } from "@/lib/invoice/pdf";
+import { sendPaymentReceivedAdminEmail } from "@/lib/email";
+import { finalizeInvoiceAndEmail } from "@/lib/invoice/finalize";
 
 // Step 1 of the two-step win flow: the buyer confirms (within 36h of winning)
 // that they intend to pay. This starts the 5-working-day wire-transfer clock.
@@ -228,18 +228,17 @@ export async function createCheckoutSessionAction(input: {
 }
 
 // --------------------------------------------------------------------
-// Finalize the buyer's shipping + extras selection onto the invoice, so the
-// chosen breakdown is durable (dashboard, PDF, admin). Recomputes the total =
-// hammer + platform fee (2.9%) + shipping + extras. Owner-gated.
+// Finalize the buyer's shipping + extras selection onto the invoice (durable on
+// dashboard, PDF, admin) and send the invoice email. Owner-gated, then delegates
+// to the shared finalizeInvoiceAndEmail() core (also used by the mobile endpoint
+// POST /api/invoice/[id]/finalize) so the email fires identically on both.
 // --------------------------------------------------------------------
-const PLATFORM_FEE_PCT = 0.029;
-
 export async function finalizeInvoiceShippingAction(input: {
   invoiceId: string;
   shippingMethod: "standard" | "door_to_door";
   shippingEur: number;
   distanceKm?: number | null;
-  shippingAddress?: string | null;
+  shippingAddress?: string | null; // legacy free-text (kept for caller compat)
   // Structured door-to-door address (from the autofill). Optional so standard
   // shipping (no address) keeps working unchanged.
   shippingLine1?: string | null;
@@ -255,101 +254,30 @@ export async function finalizeInvoiceShippingAction(input: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in to confirm your order." };
 
+  // Verify ownership here; the shared core uses the service-role client and does
+  // not re-check ownership.
   const { data: inv } = await supabase
-    .from("invoices")
-    .select("id, buyer_id, amount_eur, invoice_number, vehicle:vehicles!vehicle_id(year, make, model, trim), buyer:profiles!buyer_id(email, language)")
-    .eq("id", input.invoiceId)
-    .single();
-  // deno-lint-ignore no-explicit-any
-  const i = inv as any;
-  if (!i || i.buyer_id !== user.id) return { ok: false, error: "Invoice not found." };
-
-  const extras = Array.isArray(input.extras) ? input.extras : [];
-  const extrasEur = extras.reduce((s, e) => s + (Number(e.price_eur) || 0), 0);
-  const shippingEur = Math.max(0, Number(input.shippingEur) || 0);
-  const hammer = Number(i.amount_eur) || 0;
-  const feeEur = Math.round(hammer * PLATFORM_FEE_PCT * 100) / 100;
-  const totalEur = Math.round((hammer + feeEur + shippingEur + extrasEur) * 100) / 100;
-
-  // Build a formatted single-string address from the structured fields (used by
-  // the PDF + email which read shipping_address). Falls back to the legacy
-  // free-text shippingAddress if no structured fields were provided.
-  const structuredLines = [
-    input.shippingLine1?.trim(),
-    input.shippingLine2?.trim(),
-    [input.shippingPostalCode?.trim(), input.shippingCity?.trim()].filter(Boolean).join(" "),
-    input.shippingCountry?.trim()?.toUpperCase(),
-  ].filter((l): l is string => !!l && l.length > 0);
-  const formattedAddress =
-    structuredLines.length > 0 ? structuredLines.join("\n") : (input.shippingAddress?.trim() || null);
-
-  // RLS does not grant buyers UPDATE on invoices → use the service-role client.
-  const admin = createAdminClient();
-  const { error } = await admin
-    .from("invoices")
-    .update({
-      shipping_method: input.shippingMethod,
-      shipping_eur: shippingEur,
-      shipping_distance_km: input.distanceKm ?? null,
-      shipping_address: formattedAddress,
-      shipping_line1: input.shippingLine1?.trim() || null,
-      shipping_line2: input.shippingLine2?.trim() || null,
-      shipping_city: input.shippingCity?.trim() || null,
-      shipping_postal_code: input.shippingPostalCode?.trim() || null,
-      shipping_country: input.shippingCountry?.trim()?.toUpperCase() || null,
-      shipping_latitude: input.shippingLatitude ?? null,
-      shipping_longitude: input.shippingLongitude ?? null,
-      extras,
-      extras_eur: extrasEur,
-      total_eur: totalEur,
-    })
-    .eq("id", input.invoiceId);
-  if (error) return { ok: false, error: error.message };
-
-  // Send the invoice email now that the total is finalized — this is the
-  // unified completion point for BOTH Buy Now and timer-won orders (both reach
-  // the won page and finalise shipping here). Best-effort: never block the
-  // order on email. Includes the full breakdown + wire/bank details + PDF link.
-  try {
-    const veh = Array.isArray(i.vehicle) ? i.vehicle[0] : i.vehicle;
-    const buyer = Array.isArray(i.buyer) ? i.buyer[0] : i.buyer;
-    const vehicleTitle = veh
-      ? `${veh.year} ${veh.make} ${veh.model}${veh.trim ? ` ${veh.trim}` : ""}`
-      : "Vehicle";
-    const shippingLabel =
-      input.shippingMethod === "door_to_door"
-        ? (input.distanceKm ? `Door-to-door delivery (${input.distanceKm} km)` : "Door-to-door delivery")
-        : "Standard port shipping";
-    if (buyer?.email) {
-      // Attach the actual rendered PDF (same document the /pdf route serves).
-      // Best-effort: if rendering fails, send the email without the attachment.
-      let attachments: { filename: string; content: Buffer }[] | undefined;
-      try {
-        const pdf = await renderInvoicePdf(input.invoiceId);
-        if (pdf) attachments = [{ filename: `invoice-${i.invoice_number ?? input.invoiceId.slice(0, 8)}.pdf`, content: pdf.buffer }];
-      } catch (e) {
-        console.error("[invoice pdf] render-for-email failed:", (e as Error)?.message);
-      }
-      await sendInvoiceEmail({
-        to: buyer.email,
-        invoiceNumber: i.invoice_number ?? input.invoiceId.slice(0, 8),
-        invoiceId: input.invoiceId,
-        vehicleTitle,
-        hammerEur: hammer,
-        feeEur,
-        shippingEur,
-        shippingLabel,
-        shippingAddress: formattedAddress,
-        extras: extras.map((e) => ({ name: e.name, priceEur: Number(e.price_eur) || 0 })),
-        totalEur,
-        locale: buyer.language,
-        attachments,
-      });
-    }
-  } catch (e) {
-    console.error("[invoice email] send failed:", (e as Error)?.message);
+    .from("invoices").select("id, buyer_id").eq("id", input.invoiceId).single();
+  if (!inv || (inv as { buyer_id: string }).buyer_id !== user.id) {
+    return { ok: false, error: "Invoice not found." };
   }
 
+  const res = await finalizeInvoiceAndEmail({
+    invoiceId: input.invoiceId,
+    shippingMethod: input.shippingMethod,
+    shippingEur: input.shippingEur,
+    distanceKm: input.distanceKm,
+    shippingLine1: input.shippingLine1,
+    shippingLine2: input.shippingLine2,
+    shippingCity: input.shippingCity,
+    shippingPostalCode: input.shippingPostalCode,
+    shippingCountry: input.shippingCountry,
+    shippingLatitude: input.shippingLatitude,
+    shippingLongitude: input.shippingLongitude,
+    extras: input.extras,
+  });
+  if (!res.ok) return { ok: false, error: res.error };
+
   revalidatePath("/dashboard");
-  return { ok: true, totalEur };
+  return { ok: true, totalEur: res.totalEur };
 }
