@@ -213,12 +213,17 @@ export default async function BuyerDashboardPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-semibold tabular-nums text-grey-900">{formatEur(r.total_eur)}</span>
-                        <Link
-                          href={`/admin/invoices/${r.id}`}
+                        {/* Was /admin/invoices/{id} — the (admin) layout
+                            redirects buyers to '/', so their own invoice link
+                            was broken. Point at the buyer-readable inline PDF. */}
+                        <a
+                          href={`/api/invoice/${r.id}/pdf`}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="text-xs font-medium text-brand-700 hover:underline"
                         >
-                          View →
-                        </Link>
+                          View PDF →
+                        </a>
                       </div>
                     </li>
                   );
