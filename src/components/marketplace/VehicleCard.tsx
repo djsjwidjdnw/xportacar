@@ -88,9 +88,12 @@ export function VehicleCard({
             src={thumb(photo, 600)}
             alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
             className={cn(
-              // contain (not cover) so the car is centred with whitespace,
-              // never zoomed/cropped. Neutral bg fills the letterbox area.
-              "size-full max-w-full object-contain transition-transform duration-500 group-hover:scale-[1.04]",
+              // cover (not contain) so the front-right 3/4 hero fills the
+              // landscape frame edge-to-edge — a clean product-listing look
+              // (Cars.com / Autotrader), car centred via object-center, no gray
+              // side bars. (The full-size hero on the vehicle detail page stays
+              // object-contain for the no-zoom requirement — not this card.)
+              "size-full max-w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]",
               ended && "opacity-90",
             )}
             loading="lazy"
