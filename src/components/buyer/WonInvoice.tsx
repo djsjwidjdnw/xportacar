@@ -7,7 +7,7 @@
 // action can update without a full server round-trip.
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { Building2, CheckCircle2, Clock, Download, Mail, MapPin, Receipt } from "lucide-react";
+import { Building2, CheckCircle2, Clock, Download, Eye, Mail, MapPin, Receipt } from "lucide-react";
 
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
@@ -315,10 +315,19 @@ export function WonInvoice({
               href={pdfHref}
               target="_blank"
               rel="noopener noreferrer"
+              className="inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white hover:bg-brand-700"
+            >
+              <Eye className="size-4" />
+              View PDF
+            </a>
+            <a
+              href={`${pdfHref}&download=1`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex h-10 items-center gap-2 rounded-lg border border-grey-200 px-4 text-sm font-semibold text-grey-800 hover:bg-grey-50"
             >
               <Download className="size-4" />
-              Download PDF invoice
+              Download PDF
             </a>
             {mailtoHref && (
               <a

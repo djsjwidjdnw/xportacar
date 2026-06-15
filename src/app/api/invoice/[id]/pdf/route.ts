@@ -177,10 +177,13 @@ export async function GET(
 
   const bytes = await pdf.save();
   const number = inv.invoice_number ?? inv.id.slice(0, 8);
+  // Default to INLINE so the PDF previews in the browser / in-app webview (the
+  // "View PDF" buttons + the email link). Pass ?download=1 to force a download.
+  const disposition = sp.get("download") === "1" ? "attachment" : "inline";
   return new Response(Buffer.from(bytes), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${number}.pdf"`,
+      "Content-Disposition": `${disposition}; filename="${number}.pdf"`,
       "Cache-Control": "no-store",
     },
   });
