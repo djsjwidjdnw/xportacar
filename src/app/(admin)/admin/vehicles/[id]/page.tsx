@@ -170,24 +170,28 @@ export default async function AdminVehicleDetailPage({
               />
             </div>
 
-            {/* Create-auction CTA stays available the whole time the vehicle is
-                ready (status "listed") AND no auction exists yet. It used to be
-                gated on status==="listed" alone, but creating an auction flips
-                the vehicle to "in_auction", so the button vanished immediately.
-                Gating on the actual auction row (auction = v.auctions[0]) keeps
-                it visible from approval until an auction is created. */}
-            {!auction && v.status === "listed" && (
-              <div className="mt-5 border-t border-grey-100 pt-5">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-grey-500">Ready to auction</p>
-                <CreateAuctionButton
-                  vehicleId={v.id}
-                  listedPriceEur={v.listed_price_eur}
-                  reservePriceEur={v.reserve_price_eur}
-                  buyNowPriceEur={v.buy_now_price_eur}
-                />
-                <ReopenInspectionButton vehicleId={v.id} />
-              </div>
-            )}
+            {/* Admin actions — STATUS-INDEPENDENT by design.
+                "Create auction" shows whenever no auction row exists yet, for ANY
+                vehicle status (createAuctionAction upserts on vehicle_id and has
+                no status gate, so it's safe from any status). "Re-open
+                inspection" is ALWAYS available — an admin can send the vehicle
+                back to the inspector for revisions at any point, regardless of
+                status or whether an auction exists (reopenInspectionAction also
+                has no status gate). Vehicle status no longer hides either button. */}
+            <div className="mt-5 border-t border-grey-100 pt-5">
+              {!auction && (
+                <>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-grey-500">Create auction</p>
+                  <CreateAuctionButton
+                    vehicleId={v.id}
+                    listedPriceEur={v.listed_price_eur}
+                    reservePriceEur={v.reserve_price_eur}
+                    buyNowPriceEur={v.buy_now_price_eur}
+                  />
+                </>
+              )}
+              <ReopenInspectionButton vehicleId={v.id} />
+            </div>
 
             <dl className="mt-6 space-y-2.5 border-t border-grey-100 pt-5 text-sm">
               <Row label="Listed price" value={formatEur(v.listed_price_eur)} />
