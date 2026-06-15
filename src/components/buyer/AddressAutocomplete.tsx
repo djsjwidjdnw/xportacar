@@ -66,6 +66,7 @@ export function AddressAutocomplete({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [noResults, setNoResults] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const skipNext = useRef(false);
   const boxRef = useRef<HTMLDivElement | null>(null);
@@ -80,22 +81,24 @@ export function AddressAutocomplete({
   }, []);
 
   // Debounced lookup off the street field (500ms → respects Nominatim 1 req/s).
+  // Requires a country first and filters the geocoder to THAT country.
   useEffect(() => {
     if (skipNext.current) { skipNext.current = false; return; }
     const q = value.line1.trim();
     if (timer.current) clearTimeout(timer.current);
-    if (q.length < 3) { setSuggestions([]); setOpen(false); return; }
+    setNoResults(false);
+    if (!value.country || q.length < 3) { setSuggestions([]); setOpen(false); setLoading(false); return; }
+    setLoading(true);
     timer.current = setTimeout(async () => {
-      setLoading(true);
       try {
-        const qFull = value.country ? `${q}, ${countryName(value.country)}` : q;
-        const res = await fetch(`/api/geocode?q=${encodeURIComponent(qFull)}`);
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(q)}&country=${encodeURIComponent(value.country)}`);
         const data: { suggestions?: Suggestion[] } = await res.json();
         const list = data.suggestions ?? [];
         setSuggestions(list);
         setOpen(list.length > 0);
+        setNoResults(list.length === 0);
       } catch {
-        setSuggestions([]); setOpen(false);
+        setSuggestions([]); setOpen(false); setNoResults(true);
       } finally {
         setLoading(false);
       }
@@ -123,9 +126,27 @@ export function AddressAutocomplete({
   const setField = (patch: Partial<DeliveryAddress>, keepCoords = false) =>
     onChange({ ...value, ...patch, ...(keepCoords ? {} : { lat: null, lon: null }) });
 
+  const hasCountry = !!value.country;
+  const disabledCls = (base: string) => `${base} ${!hasCountry ? "cursor-not-allowed bg-grey-50 text-grey-400" : ""}`;
+
   return (
     <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {/* Street line 1 — drives the autofill */}
+      {/* 1. Country FIRST — gates the street autofill */}
+      <div className="sm:col-span-2">
+        <label className={labelCls}>Country *</label>
+        <select
+          value={value.country}
+          onChange={(e) => setField({ country: e.target.value })}
+          className={inputCls}
+        >
+          <option value="">Select country first…</option>
+          {SHIP_COUNTRIES.map((c) => (
+            <option key={c.code} value={c.code}>{c.name}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* 2. Street line 1 — drives the autofill (enabled once a country is set) */}
       <div className="relative sm:col-span-2" ref={boxRef}>
         <label className={labelCls}>Street address *</label>
         <div className="relative">
@@ -133,14 +154,19 @@ export function AddressAutocomplete({
             value={value.line1}
             onChange={(e) => setField({ line1: e.target.value })}
             onFocus={() => suggestions.length > 0 && setOpen(true)}
-            placeholder="Start typing, e.g. Maximilianstraße 12"
+            disabled={!hasCountry}
+            placeholder={hasCountry ? "Start typing, e.g. Maximilianstraße 12" : "Please select your country first"}
             autoComplete="off"
-            className={inputCls}
+            className={disabledCls(inputCls)}
           />
           {loading && (
             <Loader2 className="absolute right-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-grey-400" />
           )}
         </div>
+        {hasCountry && loading && <p className="mt-1 text-xs text-grey-500">Searching addresses…</p>}
+        {hasCountry && !loading && noResults && value.line1.trim().length >= 3 && (
+          <p className="mt-1 text-xs text-grey-500">No address found. Type it manually.</p>
+        )}
         {open && suggestions.length > 0 && (
           <ul className="absolute z-20 mt-1 max-h-64 w-full overflow-auto rounded-lg border border-grey-200 bg-white py-1 shadow-lg">
             {suggestions.map((s, i) => (
@@ -159,26 +185,29 @@ export function AddressAutocomplete({
         )}
       </div>
 
-      {/* Apartment / unit — optional, keeps coordinates */}
+      {/* 3. Apartment / unit — optional, keeps coordinates */}
       <div className="sm:col-span-2">
         <label className={labelCls}>Apartment / unit (optional)</label>
         <input
           value={value.line2}
           onChange={(e) => setField({ line2: e.target.value }, true)}
+          disabled={!hasCountry}
           placeholder="Apt 4B, Building C…"
           autoComplete="off"
-          className={inputCls}
+          className={disabledCls(inputCls)}
         />
       </div>
 
+      {/* 4. Postal + City — autofilled but editable */}
       <div>
         <label className={labelCls}>Postal code *</label>
         <input
           value={value.postalCode}
           onChange={(e) => setField({ postalCode: e.target.value })}
+          disabled={!hasCountry}
           placeholder="80539"
           autoComplete="off"
-          className={inputCls}
+          className={disabledCls(inputCls)}
         />
       </div>
 
@@ -187,24 +216,11 @@ export function AddressAutocomplete({
         <input
           value={value.city}
           onChange={(e) => setField({ city: e.target.value })}
+          disabled={!hasCountry}
           placeholder="Munich"
           autoComplete="off"
-          className={inputCls}
+          className={disabledCls(inputCls)}
         />
-      </div>
-
-      <div className="sm:col-span-2">
-        <label className={labelCls}>Country *</label>
-        <select
-          value={value.country}
-          onChange={(e) => setField({ country: e.target.value })}
-          className={inputCls}
-        >
-          <option value="">Select a country…</option>
-          {SHIP_COUNTRIES.map((c) => (
-            <option key={c.code} value={c.code}>{c.name}</option>
-          ))}
-        </select>
       </div>
     </div>
   );

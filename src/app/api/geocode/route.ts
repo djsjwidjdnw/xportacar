@@ -38,11 +38,18 @@ export async function GET(req: NextRequest) {
   const q = (req.nextUrl.searchParams.get("q") ?? "").trim();
   if (q.length < 3) return Response.json({ suggestions: [] });
 
+  // Filter to a single selected country (e.g. "de") when provided — far better
+  // results than searching all of EU+UK at once. Falls back to the full list.
+  const reqCountry = (req.nextUrl.searchParams.get("country") ?? "").trim().toLowerCase();
+  const countryCodes = /^[a-z]{2}$/.test(reqCountry) && COUNTRY_CODES.split(",").includes(reqCountry)
+    ? reqCountry
+    : COUNTRY_CODES;
+
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "json");
   url.searchParams.set("addressdetails", "1");
   url.searchParams.set("limit", "5");
-  url.searchParams.set("countrycodes", COUNTRY_CODES);
+  url.searchParams.set("countrycodes", countryCodes);
   url.searchParams.set("q", q);
 
   try {
