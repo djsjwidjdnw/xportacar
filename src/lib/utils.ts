@@ -78,6 +78,10 @@ export function thumb(url: string | null | undefined, width = 600): string {
     if (u.pathname.includes("/storage/v1/object/public/")) {
       u.pathname = u.pathname.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
       u.searchParams.set("width", String(width));
+      // 4:3 height + resize=cover → Supabase center-crops the source server-side
+      // (tall portrait phone photos are cropped to fit, not letterboxed). The
+      // card then displays a true 4:3 image with object-cover.
+      u.searchParams.set("height", String(Math.round((width * 3) / 4)));
       u.searchParams.set("quality", "70");
       u.searchParams.set("resize", "cover");
       return u.toString();
