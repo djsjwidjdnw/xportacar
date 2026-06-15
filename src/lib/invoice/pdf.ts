@@ -6,7 +6,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { CUSTOMS_DISCLAIMER_TEXT } from "@/components/shared/CustomsDisclaimer";
 import { pickThumbnailPhoto, thumb } from "@/lib/utils";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://xportacar.com";
+// `||` not `??`: NEXT_PUBLIC_SITE_URL is an empty string in prod, which would
+// make the logo fetch a host-less relative URL.
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://xportacar.com").replace(/\/+$/, "");
 
 // Real receivables details (provided by the client). Both accounts are shown so
 // European buyers can wire in EUR and UAE/regional buyers in AED.

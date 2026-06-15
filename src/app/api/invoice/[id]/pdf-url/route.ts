@@ -26,5 +26,7 @@ export async function GET(
     return Response.json({ error: "not found" }, { status: 404 });
   }
 
-  return Response.json({ url: signedInvoicePdfUrl(id) });
+  // Pin the host to the request origin (e.g. https://xportacar.com) so the URL
+  // is always absolute and openable, regardless of NEXT_PUBLIC_SITE_URL.
+  return Response.json({ url: signedInvoicePdfUrl(id, { origin: req.nextUrl.origin }) });
 }

@@ -8,7 +8,10 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 // The invoice id is bound into the signature, so a token only ever works for
 // that one invoice, and only until it expires.
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://xportacar.com";
+// NOTE: `||` not `??` — NEXT_PUBLIC_SITE_URL is set to an EMPTY STRING in prod,
+// and `"" ?? x` keeps "", producing a host-less relative URL that Linking.openURL
+// (mobile) and email clients can't open. `|| fallback` handles the empty case.
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://xportacar.com").replace(/\/+$/, "");
 const DEFAULT_TTL_SEC = 7 * 24 * 60 * 60; // 7 days
 
 // Dedicated signing secret. Prefer SIGNED_URL_SECRET; fall back to CRON_SECRET
@@ -45,9 +48,15 @@ export function verifyInvoiceToken(invoiceId: string, token: string | null | und
 }
 
 // Absolute, publicly-openable PDF URL (no session needed). Falls back to the
-// session-only URL if signing is unavailable (no secret configured).
-export function signedInvoicePdfUrl(invoiceId: string, opts?: { download?: boolean; ttlSec?: number }): string {
-  const base = `${SITE_URL}/api/invoice/${invoiceId}/pdf`;
+// session-only URL if signing is unavailable (no secret configured). Pass
+// `origin` (e.g. the incoming request's origin) to pin the host to exactly what
+// the caller used — the most robust option for the mobile app.
+export function signedInvoicePdfUrl(
+  invoiceId: string,
+  opts?: { download?: boolean; ttlSec?: number; origin?: string },
+): string {
+  const host = (opts?.origin || SITE_URL).replace(/\/+$/, "");
+  const base = `${host}/api/invoice/${invoiceId}/pdf`;
   const token = signInvoiceToken(invoiceId, opts?.ttlSec);
   const params = new URLSearchParams();
   if (token) params.set("token", token);
