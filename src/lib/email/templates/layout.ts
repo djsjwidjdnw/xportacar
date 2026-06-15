@@ -2,7 +2,11 @@
 // Pure (no "server-only" import) so templates stay trivially testable and can
 // be previewed/snapshotted without a server context.
 
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// `|| ...` not `?? ...`: NEXT_PUBLIC_SITE_URL is an EMPTY STRING in prod, which
+// `??` would keep — producing relative ("/logos/…") links/images that break in
+// email clients. Falls back to the live site when unset/empty; local dev keeps
+// its non-empty .env.local value (http://localhost:3000).
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://xportacar.com").replace(/\/+$/, "");
 
 /** The four locales the platform ships translations for. */
 export type EmailLocale = "en" | "de" | "fr" | "ar";
