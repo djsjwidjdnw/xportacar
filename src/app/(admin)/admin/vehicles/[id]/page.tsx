@@ -170,7 +170,13 @@ export default async function AdminVehicleDetailPage({
               />
             </div>
 
-            {v.status === "listed" && (
+            {/* Create-auction CTA stays available the whole time the vehicle is
+                ready (status "listed") AND no auction exists yet. It used to be
+                gated on status==="listed" alone, but creating an auction flips
+                the vehicle to "in_auction", so the button vanished immediately.
+                Gating on the actual auction row (auction = v.auctions[0]) keeps
+                it visible from approval until an auction is created. */}
+            {!auction && v.status === "listed" && (
               <div className="mt-5 border-t border-grey-100 pt-5">
                 <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-grey-500">Ready to auction</p>
                 <CreateAuctionButton
@@ -215,6 +221,22 @@ export default async function AdminVehicleDetailPage({
                 Open buyer auction view
                 <ExternalLink className="size-3.5" />
               </Link>
+              {/* Once an auction exists the create button is replaced by an
+                  edit affordance. Only offer it before any bids land — the
+                  create action UPSERTs on vehicle_id, so editing after bids
+                  would reset the live auction. */}
+              {auction.bid_count === 0 && (
+                <div className="mt-4 border-t border-grey-100 pt-4">
+                  <CreateAuctionButton
+                    vehicleId={v.id}
+                    listedPriceEur={auction.starting_price_eur}
+                    reservePriceEur={auction.reserve_price_eur}
+                    buyNowPriceEur={auction.buy_now_price_eur}
+                    variant="outline"
+                    label="Edit auction"
+                  />
+                </div>
+              )}
             </div>
           )}
         </aside>

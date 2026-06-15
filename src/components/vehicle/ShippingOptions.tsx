@@ -57,7 +57,7 @@ export function ShippingOptions({
 
   const roro = useMemo(() => portRoutes(rates, "roro"), [rates]);
   const doorPrice = serviceRate(rates, "door_to_door_eu")?.base_price_eur ?? 800;
-  const tuvPrice = serviceRate(rates, "service_tuv")?.base_price_eur ?? 3500;
+  const tuvPrice = serviceRate(rates, "service_tuv")?.base_price_eur ?? 3570;
 
   const shippingEur = getShippingPriceEur(choice, rates);
   const total = (vehiclePriceEur ?? 0) + shippingEur;
@@ -175,7 +175,7 @@ export function ShippingOptions({
         </span>
         <span className="flex-1">
           <span className="block text-sm font-semibold text-grey-900">German Registration (TÜV)</span>
-          <span className="block text-[11px] text-grey-500">Inspection for DE registration, CoC, customs paperwork</span>
+          <span className="block text-[11px] text-grey-500">Paragraph 21 inspection, euro-spec conversion &amp; German registration documents</span>
         </span>
         <span className="text-sm font-bold text-brand-700">+ {format(tuvPrice)}</span>
       </button>

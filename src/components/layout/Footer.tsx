@@ -22,9 +22,9 @@ export function Footer() {
             </p>
             <ul className="mt-6 space-y-2.5 text-sm">
               <li>
-                <a href="mailto:simon@xportacar.com" className="inline-flex items-center gap-2 text-grey-700 transition-colors hover:text-brand-700">
+                <a href="mailto:contact@xportacar.com" className="inline-flex items-center gap-2 text-grey-700 transition-colors hover:text-brand-700">
                   <Mail className="size-4 text-grey-500" />
-                  simon@xportacar.com
+                  contact@xportacar.com
                 </a>
               </li>
               <li className="flex items-start gap-2 text-grey-700">

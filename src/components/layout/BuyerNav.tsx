@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Gavel, Heart, LayoutDashboard, Menu, ShoppingBag, TrendingUp, X } from "lucide-react";
+import { Gavel, Heart, Info, LayoutDashboard, Menu, ShoppingBag, TrendingUp, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -33,6 +33,7 @@ interface NavLink {
 const LINKS: NavLink[] = [
   { href: "/marketplace",     key: "marketplace", icon: ShoppingBag },
   { href: "/auctions",        key: "auctions",    icon: Gavel },
+  { href: "/about",           key: "about",       icon: Info },
   { href: "/dashboard#bids",  key: "myBids",      icon: TrendingUp,     authOnly: true },
   { href: "/dashboard",       key: "dashboard",   icon: LayoutDashboard, authOnly: true },
   { href: "/watchlist",       key: "watchlist",   icon: Heart,          authOnly: true },

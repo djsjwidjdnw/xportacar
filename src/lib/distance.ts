@@ -67,7 +67,7 @@ export function knownCities(country: string | null | undefined): string[] {
     .sort();
 }
 
-export const TUV_EUR = 3500;
+export const TUV_EUR = 3570;
 
 export interface ExtraItem { name: string; price_eur: number }
 

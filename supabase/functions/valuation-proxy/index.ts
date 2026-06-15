@@ -9,7 +9,7 @@
 // and we re-check it here. CORS for the web export. Best-effort rate limiting.
 // The key is never returned in a response and never logged.
 
-import { corsHeaders, jsonResponse, passthrough } from "../_shared/cors.ts";
+import { corsHeaders, jsonResponse } from "../_shared/cors.ts";
 import { getUserId } from "../_shared/auth.ts";
 import { rateLimited } from "../_shared/rateLimit.ts";
 
@@ -77,18 +77,29 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "upstream_error", status: res.status }, 502);
     }
 
-    // Log year/make/model/trim + a quick avg of usable prices (priceUnformatted;
-    // `price` is often a string like "accepting_offers" for exotics).
-    try {
-      const j = JSON.parse(text) as { records?: Record<string, unknown>[] };
-      const nums = (j.records ?? [])
-        .map((r) => Number(r.priceUnformatted))
-        .filter((n) => Number.isFinite(n) && n > 1000);
-      const avg = nums.length ? Math.round(nums.reduce((s, n) => s + n, 0) / nums.length) : 0;
-      console.log(`[valuation-proxy] year=${year} make=${make} model=${model} trim=${trim || "-"} records=${nums.length} price=$${avg}`);
-    } catch { /* logging only */ }
+    // PROVENANCE: auto.dev is a US-market listings API. It exposes NO country /
+    // region / lat-lng filter (only US `zip`+`distance` and `retailListing.state`)
+    // and returns ZERO UAE/GCC records, so these figures are US comparables, not
+    // UAE prices. Adding a fake UAE zip/state would just return 0 records and
+    // silently break valuation. We therefore keep the US query and TAG the
+    // response so the client can show an honest "US market reference — limited
+    // UAE coverage" note. Real UAE valuation needs a different data source.
+    let j: { records?: Record<string, unknown>[] } & Record<string, unknown> = {};
+    try { j = JSON.parse(text); } catch { /* keep {} on parse failure */ }
+    const nums = (j.records ?? [])
+      .map((r) => Number(r.priceUnformatted))
+      .filter((n) => Number.isFinite(n) && n > 1000);
+    const avg = nums.length ? Math.round(nums.reduce((s, n) => s + n, 0) / nums.length) : 0;
+    console.log(`[valuation-proxy] year=${year} make=${make} model=${model} trim=${trim || "-"} records=${nums.length} price=$${avg}`);
 
-    return passthrough(text, 200);
+    return jsonResponse({
+      ...j,
+      market: "US",
+      source: "auto.dev",
+      note: nums.length
+        ? "Reference based on US market comparables — UAE/GCC listings are not available from this source."
+        : "Limited market data — estimate based on regional comparables.",
+    }, 200);
   } catch (e) {
     console.error("valuation-proxy: upstream fetch failed:", (e as Error)?.name ?? "error");
     return jsonResponse({ error: "upstream_unreachable" }, 502);
