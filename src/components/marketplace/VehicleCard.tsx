@@ -82,7 +82,7 @@ export function VehicleCard({
   return (
     <Link href={`/vehicle/${vehicle.id}`} className="group block">
       <Card className="max-w-full overflow-hidden ring-1 ring-grey-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:ring-grey-300">
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-grey-100">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-grey-100">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={thumb(photo, 600)}
