@@ -82,18 +82,18 @@ export function VehicleCard({
   return (
     <Link href={`/vehicle/${vehicle.id}`} className="group block">
       <Card className="max-w-full overflow-hidden ring-1 ring-grey-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:ring-grey-300">
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-grey-100">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0f1419]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={thumb(photo, 600)}
             alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
             className={cn(
-              // cover (not contain) so the front-right 3/4 hero fills the
-              // landscape frame edge-to-edge — a clean product-listing look
-              // (Cars.com / Autotrader), car centred via object-center, no gray
-              // side bars. (The full-size hero on the vehicle detail page stays
-              // object-contain for the no-zoom requirement — not this card.)
-              "size-full max-w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]",
+              // CONTAIN (not cover) on a 4:3 frame so the WHOLE car is always
+              // visible — uploaded photos vary in aspect ratio, and cover was
+              // slicing off the rear. The dark #0f1419 frame makes any
+              // letterbox band read as an intentional showroom backdrop rather
+              // than accidental gray bars. (Detail-page hero is separate.)
+              "size-full max-w-full object-contain object-center transition-transform duration-500 group-hover:scale-[1.03]",
               ended && "opacity-90",
             )}
             loading="lazy"
