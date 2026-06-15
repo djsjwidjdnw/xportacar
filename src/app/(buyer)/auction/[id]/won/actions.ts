@@ -240,6 +240,15 @@ export async function finalizeInvoiceShippingAction(input: {
   shippingEur: number;
   distanceKm?: number | null;
   shippingAddress?: string | null;
+  // Structured door-to-door address (from the autofill). Optional so standard
+  // shipping (no address) keeps working unchanged.
+  shippingLine1?: string | null;
+  shippingLine2?: string | null;
+  shippingCity?: string | null;
+  shippingPostalCode?: string | null;
+  shippingCountry?: string | null; // ISO 3166-1 alpha-2
+  shippingLatitude?: number | null;
+  shippingLongitude?: number | null;
   extras?: { name: string; price_eur: number }[];
 }): Promise<{ ok: boolean; error?: string; totalEur?: number }> {
   const supabase = await createClient();
@@ -262,6 +271,18 @@ export async function finalizeInvoiceShippingAction(input: {
   const feeEur = Math.round(hammer * PLATFORM_FEE_PCT * 100) / 100;
   const totalEur = Math.round((hammer + feeEur + shippingEur + extrasEur) * 100) / 100;
 
+  // Build a formatted single-string address from the structured fields (used by
+  // the PDF + email which read shipping_address). Falls back to the legacy
+  // free-text shippingAddress if no structured fields were provided.
+  const structuredLines = [
+    input.shippingLine1?.trim(),
+    input.shippingLine2?.trim(),
+    [input.shippingPostalCode?.trim(), input.shippingCity?.trim()].filter(Boolean).join(" "),
+    input.shippingCountry?.trim()?.toUpperCase(),
+  ].filter((l): l is string => !!l && l.length > 0);
+  const formattedAddress =
+    structuredLines.length > 0 ? structuredLines.join("\n") : (input.shippingAddress?.trim() || null);
+
   // RLS does not grant buyers UPDATE on invoices → use the service-role client.
   const admin = createAdminClient();
   const { error } = await admin
@@ -270,7 +291,14 @@ export async function finalizeInvoiceShippingAction(input: {
       shipping_method: input.shippingMethod,
       shipping_eur: shippingEur,
       shipping_distance_km: input.distanceKm ?? null,
-      shipping_address: input.shippingAddress?.trim() || null,
+      shipping_address: formattedAddress,
+      shipping_line1: input.shippingLine1?.trim() || null,
+      shipping_line2: input.shippingLine2?.trim() || null,
+      shipping_city: input.shippingCity?.trim() || null,
+      shipping_postal_code: input.shippingPostalCode?.trim() || null,
+      shipping_country: input.shippingCountry?.trim()?.toUpperCase() || null,
+      shipping_latitude: input.shippingLatitude ?? null,
+      shipping_longitude: input.shippingLongitude ?? null,
       extras,
       extras_eur: extrasEur,
       total_eur: totalEur,
@@ -311,6 +339,7 @@ export async function finalizeInvoiceShippingAction(input: {
         feeEur,
         shippingEur,
         shippingLabel,
+        shippingAddress: formattedAddress,
         extras: extras.map((e) => ({ name: e.name, priceEur: Number(e.price_eur) || 0 })),
         totalEur,
         locale: buyer.language,

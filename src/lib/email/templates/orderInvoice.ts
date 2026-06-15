@@ -36,6 +36,7 @@ type Copy = {
   lEurIban: string;
   lAedIban: string;
   lReference: string;
+  deliverTo: string;
   deadline: string;
   ctaLabel: string;
 };
@@ -49,6 +50,7 @@ const COPY: Localized<Copy> = {
     payHeading: "How to pay",
     payIntro: "Pay by wire transfer within 5 working days of the invoice date to one of the accounts below:",
     lBeneficiary: "Beneficiary", lBank: "Bank", lBic: "BIC / SWIFT", lEurIban: "EUR IBAN", lAedIban: "AED IBAN", lReference: "Reference",
+    deliverTo: "Deliver to",
     deadline: "Payment is due within 5 working days of the invoice date. Shipping begins once payment is confirmed.",
     ctaLabel: "View invoice PDF",
   },
@@ -60,6 +62,7 @@ const COPY: Localized<Copy> = {
     payHeading: "So bezahlen Sie",
     payIntro: "Zahlen Sie per Überweisung innerhalb von 5 Werktagen ab Rechnungsdatum auf eines der folgenden Konten:",
     lBeneficiary: "Begünstigter", lBank: "Bank", lBic: "BIC / SWIFT", lEurIban: "EUR IBAN", lAedIban: "AED IBAN", lReference: "Verwendungszweck",
+    deliverTo: "Lieferadresse",
     deadline: "Die Zahlung ist innerhalb von 5 Werktagen ab Rechnungsdatum fällig. Der Versand beginnt nach Zahlungsbestätigung.",
     ctaLabel: "Rechnungs-PDF ansehen",
   },
@@ -71,6 +74,7 @@ const COPY: Localized<Copy> = {
     payHeading: "Comment payer",
     payIntro: "Payez par virement bancaire sous 5 jours ouvrés à compter de la date de facture sur l'un des comptes ci-dessous :",
     lBeneficiary: "Bénéficiaire", lBank: "Banque", lBic: "BIC / SWIFT", lEurIban: "IBAN EUR", lAedIban: "IBAN AED", lReference: "Référence",
+    deliverTo: "Adresse de livraison",
     deadline: "Le paiement est dû sous 5 jours ouvrés à compter de la date de facture. L'expédition commence une fois le paiement confirmé.",
     ctaLabel: "Voir la facture PDF",
   },
@@ -82,6 +86,7 @@ const COPY: Localized<Copy> = {
     payHeading: "كيفية الدفع",
     payIntro: "ادفع عبر التحويل البنكي خلال 5 أيام عمل من تاريخ الفاتورة إلى أحد الحسابين أدناه:",
     lBeneficiary: "المستفيد", lBank: "البنك", lBic: "السويفت / BIC", lEurIban: "آيبان اليورو", lAedIban: "آيبان الدرهم", lReference: "المرجع",
+    deliverTo: "عنوان التسليم",
     deadline: "يُستحق الدفع خلال 5 أيام عمل من تاريخ الفاتورة. يبدأ الشحن بعد تأكيد الدفع.",
     ctaLabel: "عرض الفاتورة PDF",
   },
@@ -106,6 +111,7 @@ export function orderInvoiceEmail(args: {
   feeEur: number;
   shippingEur: number;
   shippingLabel?: string;
+  shippingAddress?: string | null;
   extras?: { name: string; priceEur: number }[];
   totalEur: number;
   locale?: EmailLocale;
@@ -128,8 +134,18 @@ export function orderInvoiceEmail(args: {
   const bankRow = (label: string, value: string) =>
     `<tr><td style="padding:4px 12px 4px 0;font-size:13px;color:#667085;white-space:nowrap;vertical-align:top;text-align:${align};">${label}</td><td style="padding:4px 0;font-size:13px;font-weight:600;color:#101828;text-align:${align};">${value}</td></tr>`;
 
+  const addressLines = (args.shippingAddress ?? "")
+    .split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const deliverBlock = addressLines.length > 0
+    ? `<div style="margin-top:18px;background:#f9fafb;border:1px solid #eaecf0;border-radius:10px;padding:14px;">
+        <p style="margin:0 0 4px;font-size:13px;font-weight:700;color:#101828;text-align:${align};">${c.deliverTo}</p>
+        <p style="margin:0;font-size:13px;color:#475467;line-height:1.5;text-align:${align};">${addressLines.map(escapeHtml).join("<br>")}</p>
+      </div>`
+    : "";
+
   const bodyHtml = `${c.intro(veh, num)}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:18px;border-collapse:collapse;">${rows}</table>
+    ${deliverBlock}
     <div style="margin-top:22px;background:#f9fafb;border:1px solid #eaecf0;border-radius:10px;padding:16px;">
       <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#101828;text-align:${align};">${c.payHeading}</p>
       <p style="margin:0 0 10px;font-size:13px;color:#475467;text-align:${align};">${c.payIntro}</p>

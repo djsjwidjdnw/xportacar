@@ -320,6 +320,7 @@ export async function sendInvoiceEmail(args: {
   feeEur: number;
   shippingEur: number;
   shippingLabel?: string;
+  shippingAddress?: string | null;
   extras?: { name: string; priceEur: number }[];
   totalEur: number;
   locale?: string;
@@ -336,6 +337,7 @@ export async function sendInvoiceEmail(args: {
       feeEur: args.feeEur,
       shippingEur: args.shippingEur,
       shippingLabel: args.shippingLabel,
+      shippingAddress: args.shippingAddress,
       extras: args.extras,
       totalEur: args.totalEur,
       locale: toEmailLocale(args.locale),

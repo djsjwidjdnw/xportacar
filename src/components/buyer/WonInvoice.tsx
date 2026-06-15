@@ -13,13 +13,17 @@ import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { CustomsDisclaimer } from "@/components/shared/CustomsDisclaimer";
 import { PaymentProofDialog } from "@/components/buyer/PaymentProofDialog";
 import {
+  AddressAutocomplete, EMPTY_DELIVERY_ADDRESS, countryName,
+  type DeliveryAddress,
+} from "@/components/buyer/AddressAutocomplete";
+import {
   ShippingOptions, type ShippingChoice,
 } from "@/components/vehicle/ShippingOptions";
 import {
   describeMethod, getMethodPriceEur, tuvPriceEur,
 } from "@/lib/shipping";
 import {
-  distanceFromHamburgKm, shippingCostEur, knownCountries, TUV_EUR,
+  distanceFromHamburgKm, distanceFromHamburgCoords, shippingCostEur, TUV_EUR,
 } from "@/lib/distance";
 import { finalizeInvoiceShippingAction } from "@/app/(buyer)/auction/[id]/won/actions";
 import { toast } from "@/components/ui/toast";
@@ -71,8 +75,7 @@ export function WonInvoice({
 }) {
   const { format } = useCurrency();
   const [shipping, setShipping] = useState<ShippingChoice>({ method: { kind: "port", port: "Hamburg" }, tuv: false });
-  const [country, setCountry] = useState("");
-  const [city, setCity] = useState("");
+  const [address, setAddress] = useState<DeliveryAddress>(EMPTY_DELIVERY_ADDRESS);
   const [saved, setSaved] = useState(false);
   const [savingOrder, startSave] = useTransition();
   const [now, setNow] = useState(() => new Date());
@@ -95,9 +98,15 @@ export function WonInvoice({
   const confirmExpired = !confirmed && confirmDeadline.getTime() <= now.getTime();
 
   // Door-to-door is priced from the delivery address: €4500 flat + €3.50/km
-  // from Hamburg. Standard port / warehouse keep their flat method price.
+  // from Hamburg. Use the geocoded coordinates (Haversine) when the buyer picked
+  // an autofill suggestion, otherwise fall back to the country/city lookup table.
+  // Standard port / warehouse keep their flat method price.
   const isDoor = shipping.method.kind === "door";
-  const distanceKm = isDoor ? distanceFromHamburgKm(country, city) : null;
+  const distanceKm = isDoor
+    ? (address.lat != null && address.lon != null
+        ? distanceFromHamburgCoords(address.lat, address.lon)
+        : distanceFromHamburgKm(countryName(address.country), address.city))
+    : null;
 
   const feeEur = hammerEur * PLATFORM_FEE_PCT;
   const methodEur = isDoor
@@ -110,17 +119,30 @@ export function WonInvoice({
 
   const saveOrder = () => {
     if (!invoiceId) return;
-    if (isDoor && (!country.trim() || !city.trim())) {
-      toast.err("Add a delivery address", "Enter the country and city for door-to-door delivery.");
+    if (isDoor && (!address.line1.trim() || !address.city.trim() || !address.postalCode.trim() || !address.country.trim())) {
+      toast.err("Complete the delivery address", "Street, postal code, city and country are required for door-to-door delivery.");
       return;
     }
+    const oneLine = isDoor
+      ? [address.line1, address.line2, [address.postalCode, address.city].filter(Boolean).join(" "), countryName(address.country)]
+          .map((s) => s.trim()).filter(Boolean).join(", ")
+      : null;
     startSave(async () => {
       const res = await finalizeInvoiceShippingAction({
         invoiceId,
         shippingMethod: isDoor ? "door_to_door" : "standard",
         shippingEur: methodEur,
         distanceKm,
-        shippingAddress: isDoor ? `${city.trim()}, ${country.trim()}` : null,
+        shippingAddress: oneLine,
+        ...(isDoor ? {
+          shippingLine1: address.line1,
+          shippingLine2: address.line2,
+          shippingCity: address.city,
+          shippingPostalCode: address.postalCode,
+          shippingCountry: address.country,
+          shippingLatitude: address.lat,
+          shippingLongitude: address.lon,
+        } : {}),
         extras,
       });
       if (!res.ok) { toast.err("Couldn't save order", res.error ?? "Try again."); return; }
@@ -225,32 +247,18 @@ export function WonInvoice({
             <MapPin className="size-4 text-brand-600" />
             <h3 className="text-sm font-bold text-grey-900">Delivery address (door-to-door)</h3>
           </div>
-          <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-grey-500">Country</label>
-              <input
-                list="dtd-countries"
-                value={country}
-                onChange={(e) => { setCountry(e.target.value); setSaved(false); }}
-                placeholder="Germany"
-                className="h-10 w-full rounded-lg border border-grey-200 px-3 text-sm"
-              />
-              <datalist id="dtd-countries">
-                {knownCountries().map((c) => <option key={c} value={c} />)}
-              </datalist>
-            </div>
-            <div>
-              <label className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-grey-500">City</label>
-              <input
-                value={city}
-                onChange={(e) => { setCity(e.target.value); setSaved(false); }}
-                placeholder="Munich"
-                className="h-10 w-full rounded-lg border border-grey-200 px-3 text-sm"
-              />
-            </div>
-          </div>
+          <p className="mt-1 text-xs text-grey-600">
+            Start typing your street and pick a suggestion to autofill — we deliver across the EU &amp; UK.
+          </p>
+          <AddressAutocomplete
+            value={address}
+            onChange={(a) => { setAddress(a); setSaved(false); }}
+          />
           <p className="mt-3 text-sm text-grey-700">
-            Distance from Hamburg: <span className="font-semibold text-grey-900">{distanceKm ?? 0} km</span>.
+            Distance from Hamburg: <span className="font-semibold text-grey-900">{distanceKm ?? 0} km</span>
+            {address.lat != null && address.lon != null
+              ? <span className="text-grey-500"> (located)</span>
+              : <span className="text-grey-500"> (estimated)</span>}.
             {" "}Shipping: {format(4500)} + {format(methodEur - 4500)} = <span className="font-semibold text-grey-900">{format(methodEur)}</span>
           </p>
         </section>

@@ -24,6 +24,8 @@ export default async function AdminInvoiceDetailPage({
     .select(`
       id, invoice_number, amount_eur, platform_fee_eur, total_eur, status, created_at, paid_at,
       payment_confirmed_at, payment_verified_at, payment_proof_urls, payment_proof_note,
+      shipping_method, shipping_eur, shipping_distance_km, shipping_address, extras, extras_eur,
+      shipping_line1, shipping_line2, shipping_city, shipping_postal_code, shipping_country,
       buyer:profiles!buyer_id ( id, full_name, company_name, country, email, phone, company_registration ),
       vehicle:vehicles!vehicle_id ( id, year, make, model, vin, exterior_color, mileage_km ),
       auction:auctions!auction_id ( id, end_time )
@@ -53,6 +55,26 @@ export default async function AdminInvoiceDetailPage({
       return { filename: p.filename ?? "Payment proof", href, uploaded_at: p.uploaded_at };
     }),
   );
+
+  // Structured delivery address (door-to-door) — prefer the structured columns,
+  // fall back to the legacy free-text shipping_address.
+  const addrLines: string[] = (() => {
+    const structured = [
+      inv.shipping_line1,
+      inv.shipping_line2,
+      [inv.shipping_postal_code, inv.shipping_city].filter(Boolean).join(" "),
+      inv.shipping_country,
+    ].map((s: string | null) => (s ?? "").trim()).filter(Boolean);
+    if (structured.length > 0) return structured;
+    return String(inv.shipping_address ?? "").split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  })();
+  const shippingLabel =
+    inv.shipping_method === "door_to_door"
+      ? `Door-to-door delivery${inv.shipping_distance_km != null ? ` (${inv.shipping_distance_km} km)` : ""}`
+      : inv.shipping_method === "standard"
+        ? "Standard port shipping"
+        : null;
+  const extrasList: { name: string; price_eur: number }[] = Array.isArray(inv.extras) ? inv.extras : [];
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10 print:p-0">
@@ -124,6 +146,16 @@ export default async function AdminInvoiceDetailPage({
                 </p>
               </>
             )}
+            {addrLines.length > 0 && (
+              <>
+                <p className="mt-3 text-xs font-semibold uppercase tracking-wide text-grey-500">Deliver to</p>
+                <p className="mt-1 text-sm leading-relaxed text-grey-700">
+                  {addrLines.map((l, i) => (
+                    <span key={i}>{l}{i < addrLines.length - 1 ? <br /> : null}</span>
+                  ))}
+                </p>
+              </>
+            )}
           </div>
         </section>
 
@@ -158,6 +190,24 @@ export default async function AdminInvoiceDetailPage({
               </td>
               <td className="py-3 text-right tabular-nums">{formatEur(inv.platform_fee_eur)}</td>
             </tr>
+            {shippingLabel && inv.shipping_eur != null && (
+              <tr className="border-b border-grey-100">
+                <td className="py-3">
+                  <p className="font-medium">{shippingLabel}</p>
+                  <p className="text-xs text-grey-500">Delivery</p>
+                </td>
+                <td className="py-3 text-right tabular-nums">{formatEur(inv.shipping_eur)}</td>
+              </tr>
+            )}
+            {extrasList.map((e, i) => (
+              <tr key={i} className="border-b border-grey-100">
+                <td className="py-3">
+                  <p className="font-medium">{e.name}</p>
+                  <p className="text-xs text-grey-500">Add-on service</p>
+                </td>
+                <td className="py-3 text-right tabular-nums">{formatEur(Number(e.price_eur) || 0)}</td>
+              </tr>
+            ))}
             <tr className="text-base font-bold">
               <td className="py-4">Total due</td>
               <td className="py-4 text-right tabular-nums">{formatEur(inv.total_eur)}</td>
