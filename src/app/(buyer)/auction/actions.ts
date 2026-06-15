@@ -150,10 +150,15 @@ export async function buyNowAction(input: {
   // page — this is what made Buy Now appear broken.
   if (aupErr) return { ok: false, error: `Could not close the auction: ${aupErr.message}` };
 
-  await admin
+  const { error: vupErr } = await admin
     .from("vehicles")
     .update({ status: "sold", sold_at: new Date().toISOString() })
     .eq("id", auction.vehicle_id);
+  // Surface a vehicle-update failure too (was previously unchecked), so a
+  // half-closed sale (auction sold but vehicle still 'listed') can never pass
+  // silently. Both writes use the service-role admin client, so neither is
+  // blocked by the staff-only RLS on vehicles/auctions.
+  if (vupErr) return { ok: false, error: `Could not mark the vehicle sold: ${vupErr.message}` };
 
   // The DB trigger creates the invoice when status flips to sold. Defensively
   // ensure one exists (idempotent on the unique auction_id) so the won page can
