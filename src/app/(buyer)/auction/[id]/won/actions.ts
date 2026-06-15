@@ -7,7 +7,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
-import { sendPaymentReceivedAdminEmail } from "@/lib/email";
+import { sendPaymentReceivedAdminEmail, sendInvoiceEmail } from "@/lib/email";
 
 // Step 1 of the two-step win flow: the buyer confirms (within 36h of winning)
 // that they intend to pay. This starts the 5-working-day wire-transfer clock.
@@ -247,7 +247,7 @@ export async function finalizeInvoiceShippingAction(input: {
 
   const { data: inv } = await supabase
     .from("invoices")
-    .select("id, buyer_id, amount_eur")
+    .select("id, buyer_id, amount_eur, invoice_number, vehicle:vehicles!vehicle_id(year, make, model, trim), buyer:profiles!buyer_id(email, language)")
     .eq("id", input.invoiceId)
     .single();
   // deno-lint-ignore no-explicit-any
@@ -276,6 +276,39 @@ export async function finalizeInvoiceShippingAction(input: {
     })
     .eq("id", input.invoiceId);
   if (error) return { ok: false, error: error.message };
+
+  // Send the invoice email now that the total is finalized — this is the
+  // unified completion point for BOTH Buy Now and timer-won orders (both reach
+  // the won page and finalise shipping here). Best-effort: never block the
+  // order on email. Includes the full breakdown + wire/bank details + PDF link.
+  try {
+    const veh = Array.isArray(i.vehicle) ? i.vehicle[0] : i.vehicle;
+    const buyer = Array.isArray(i.buyer) ? i.buyer[0] : i.buyer;
+    const vehicleTitle = veh
+      ? `${veh.year} ${veh.make} ${veh.model}${veh.trim ? ` ${veh.trim}` : ""}`
+      : "Vehicle";
+    const shippingLabel =
+      input.shippingMethod === "door_to_door"
+        ? (input.distanceKm ? `Door-to-door delivery (${input.distanceKm} km)` : "Door-to-door delivery")
+        : "Standard port shipping";
+    if (buyer?.email) {
+      await sendInvoiceEmail({
+        to: buyer.email,
+        invoiceNumber: i.invoice_number ?? input.invoiceId.slice(0, 8),
+        invoiceId: input.invoiceId,
+        vehicleTitle,
+        hammerEur: hammer,
+        feeEur,
+        shippingEur,
+        shippingLabel,
+        extras: extras.map((e) => ({ name: e.name, priceEur: Number(e.price_eur) || 0 })),
+        totalEur,
+        locale: buyer.language,
+      });
+    }
+  } catch (e) {
+    console.error("[invoice email] send failed:", (e as Error)?.message);
+  }
 
   revalidatePath("/dashboard");
   return { ok: true, totalEur };

@@ -28,6 +28,7 @@ import { statusInTransitEmail } from "./templates/statusInTransit";
 import { statusDeliveredEmail } from "./templates/statusDelivered";
 import { watchlistMatchEmail } from "./templates/watchlistMatch";
 import { auctionEndingSoonEmail } from "./templates/auctionEndingSoon";
+import { orderInvoiceEmail } from "./templates/orderInvoice";
 
 export type { EmailContent, EmailLocale } from "./templates/layout";
 export { toEmailLocale } from "./templates/layout";
@@ -49,6 +50,7 @@ export { statusInTransitEmail } from "./templates/statusInTransit";
 export { statusDeliveredEmail } from "./templates/statusDelivered";
 export { watchlistMatchEmail } from "./templates/watchlistMatch";
 export { auctionEndingSoonEmail } from "./templates/auctionEndingSoon";
+export { orderInvoiceEmail } from "./templates/orderInvoice";
 
 export async function sendWelcomeEmail(args: { to: string; name: string; locale?: string }) {
   await sendEmail(args.to, welcomeEmail({ name: args.name, locale: toEmailLocale(args.locale) }));
@@ -307,4 +309,34 @@ export async function sendAuctionEndingSoonEmail(args: {
 
 export async function sendAccountDeletedEmail(args: { to: string; dateStr: string; locale?: string }) {
   await sendEmail(args.to, accountDeletedEmail({ dateStr: args.dateStr, locale: toEmailLocale(args.locale) }));
+}
+
+export async function sendInvoiceEmail(args: {
+  to: string;
+  invoiceNumber: string;
+  invoiceId: string;
+  vehicleTitle: string;
+  hammerEur: number;
+  feeEur: number;
+  shippingEur: number;
+  shippingLabel?: string;
+  extras?: { name: string; priceEur: number }[];
+  totalEur: number;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    orderInvoiceEmail({
+      invoiceNumber: args.invoiceNumber,
+      invoiceId: args.invoiceId,
+      vehicleTitle: args.vehicleTitle,
+      hammerEur: args.hammerEur,
+      feeEur: args.feeEur,
+      shippingEur: args.shippingEur,
+      shippingLabel: args.shippingLabel,
+      extras: args.extras,
+      totalEur: args.totalEur,
+      locale: toEmailLocale(args.locale),
+    }),
+  );
 }
