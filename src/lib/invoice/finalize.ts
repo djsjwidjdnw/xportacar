@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendInvoiceEmail } from "@/lib/email";
 import { renderInvoicePdf } from "@/lib/invoice/pdf";
 import { signedInvoicePdfUrl } from "@/lib/invoice/signedUrl";
+import { serverShippingEur, serverPriceExtras } from "@/lib/distance";
 
 // Single source of truth for finalizing a buyer's shipping + extras selection on
 // an invoice and sending the invoice email. Called by BOTH the web server action
@@ -46,9 +47,16 @@ export async function finalizeInvoiceAndEmail(
   const i = inv as any;
   if (!i) return { ok: false, error: "Invoice not found." };
 
-  const extras = Array.isArray(input.extras) ? input.extras : [];
-  const extrasEur = extras.reduce((s, e) => s + (Number(e.price_eur) || 0), 0);
-  const shippingEur = Math.max(0, Number(input.shippingEur) || 0);
+  // SECURITY: never trust client-supplied euro amounts. Recompute shipping from
+  // the method + (geocoded coords or country/city), and re-price extras against
+  // the server catalog. input.shippingEur / input.distanceKm / extras[].price_eur
+  // are ignored — a buyer cannot deflate total_eur (which flows to Stripe).
+  const { eur: shippingEur, distanceKm: shippingDistanceKm } = serverShippingEur(
+    input.shippingMethod,
+    { lat: input.shippingLatitude, lon: input.shippingLongitude, country: input.shippingCountry, city: input.shippingCity },
+  );
+  const extras = serverPriceExtras(input.extras);
+  const extrasEur = extras.reduce((s, e) => s + e.price_eur, 0);
   const hammer = Number(i.amount_eur) || 0;
   const feeEur = Math.round(hammer * PLATFORM_FEE_PCT * 100) / 100;
   const totalEur = Math.round((hammer + feeEur + shippingEur + extrasEur) * 100) / 100;
@@ -66,7 +74,7 @@ export async function finalizeInvoiceAndEmail(
     .update({
       shipping_method: input.shippingMethod,
       shipping_eur: shippingEur,
-      shipping_distance_km: input.distanceKm ?? null,
+      shipping_distance_km: shippingDistanceKm,
       shipping_address: formattedAddress,
       shipping_line1: input.shippingLine1?.trim() || null,
       shipping_line2: input.shippingLine2?.trim() || null,
@@ -96,8 +104,8 @@ export async function finalizeInvoiceAndEmail(
       : "Vehicle";
     const shippingLabel =
       input.shippingMethod === "door_to_door"
-        ? input.distanceKm
-          ? `Door-to-door delivery (${input.distanceKm} km)`
+        ? shippingDistanceKm
+          ? `Door-to-door delivery (${shippingDistanceKm} km)`
           : "Door-to-door delivery"
         : "Standard port shipping";
     if (!buyer?.email) {

@@ -11,17 +11,14 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://xportacar.com";
 const DEFAULT_TTL_SEC = 7 * 24 * 60 * 60; // 7 days
 
-// Reuse an existing high-entropy server secret so the feature ships with no new
-// env var: prefer a dedicated SIGNED_URL_SECRET, then CRON_SECRET (already set
-// in Vercel), then the service-role key. All are server-only — never sent to a
-// client, and the HMAC never exposes them.
+// Dedicated signing secret. Prefer SIGNED_URL_SECRET; fall back to CRON_SECRET
+// (already set in Vercel) so the feature ships with no new env var. We do NOT
+// fall back to the service-role key — that is an RLS-bypassing credential and
+// must not double as a URL-signing key (key separation). Both candidates are
+// server-only and the HMAC never exposes them. If neither is set, signing
+// returns null and the PDF route falls back to session auth (fail-closed).
 function secret(): string {
-  return (
-    process.env.SIGNED_URL_SECRET ??
-    process.env.CRON_SECRET ??
-    process.env.SUPABASE_SERVICE_ROLE_KEY ??
-    ""
-  );
+  return process.env.SIGNED_URL_SECRET ?? process.env.CRON_SECRET ?? "";
 }
 
 export function signInvoiceToken(invoiceId: string, ttlSec = DEFAULT_TTL_SEC): string | null {

@@ -60,6 +60,48 @@ export function distanceFromHamburgCoords(lat: number, lon: number): number {
   return Math.max(0, Math.round(straight * 1.3));
 }
 
+// ISO 3166-1 alpha-2 → DISTANCE_KM table key, for server-side recompute where
+// the client sends a 2-letter country code rather than a full name.
+const ISO2_TO_NAME: Record<string, string> = {
+  DE: "germany", NL: "netherlands", BE: "belgium", AT: "austria", FR: "france",
+  CH: "switzerland", CZ: "czechia", PL: "poland", IT: "italy", ES: "spain",
+  PT: "portugal", DK: "denmark", SE: "sweden", NO: "norway", FI: "finland",
+  IE: "ireland", GB: "united kingdom", LU: "luxembourg",
+};
+
+/** Distance from Hamburg using an ISO-2 country code + city (table fallback). */
+export function distanceFromHamburgKmByCode(iso2: string | null | undefined, city: string | null | undefined): number {
+  return distanceFromHamburgKm(ISO2_TO_NAME[(iso2 ?? "").trim().toUpperCase()] ?? "", city);
+}
+
+// --------------------------------------------------------------------
+// SERVER-AUTHORITATIVE pricing. Never trust client-supplied euro amounts —
+// recompute shipping + extras from these values when finalizing an invoice.
+// --------------------------------------------------------------------
+
+/** Recompute door/standard shipping server-side. Prefers geocoded lat/lon
+ *  (Haversine), else the ISO-2 country/city table. Always ≥ PORT_FLAT_EUR. */
+export function serverShippingEur(
+  method: "standard" | "door_to_door",
+  addr: { lat?: number | null; lon?: number | null; country?: string | null; city?: string | null },
+): { eur: number; distanceKm: number | null } {
+  if (method !== "door_to_door") return { eur: PORT_FLAT_EUR, distanceKm: null };
+  const km = (addr.lat != null && addr.lon != null && Number.isFinite(addr.lat) && Number.isFinite(addr.lon))
+    ? distanceFromHamburgCoords(Number(addr.lat), Number(addr.lon))
+    : distanceFromHamburgKmByCode(addr.country, addr.city);
+  return { eur: PORT_FLAT_EUR + Math.round(km * DOOR_PER_KM_EUR), distanceKm: km };
+}
+
+/** Re-price the buyer's SELECTED extras against the server catalog, ignoring any
+ *  client-supplied prices. Unknown extras are dropped. Currently only TÜV. */
+export function serverPriceExtras(
+  selected: { name?: string | null }[] | undefined,
+): { name: string; price_eur: number }[] {
+  if (!Array.isArray(selected)) return [];
+  const wantsTuv = selected.some((e) => /t[üu]v|german registration/i.test(String(e?.name ?? "")));
+  return wantsTuv ? [{ name: "German Registration (TÜV)", price_eur: TUV_EUR }] : [];
+}
+
 export type ShippingKind = "standard" | "door_to_door";
 
 /** Shipping cost in EUR for the chosen method. Door-to-door = flat + €3.50/km. */
