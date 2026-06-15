@@ -82,18 +82,17 @@ export function VehicleCard({
   return (
     <Link href={`/vehicle/${vehicle.id}`} className="group block">
       <Card className="max-w-full overflow-hidden ring-1 ring-grey-200 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:ring-grey-300">
-        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#0f1419]">
+        <div className="relative aspect-[4/3] w-full overflow-hidden bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={thumb(photo, 600)}
             alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
             className={cn(
-              // CONTAIN (not cover) on a 4:3 frame so the WHOLE car is always
-              // visible — uploaded photos vary in aspect ratio, and cover was
-              // slicing off the rear. The dark #0f1419 frame makes any
-              // letterbox band read as an intentional showroom backdrop rather
-              // than accidental gray bars. (Detail-page hero is separate.)
-              "size-full max-w-full object-contain object-center transition-transform duration-500 group-hover:scale-[1.03]",
+              // Bring-A-Trailer style: object-cover fills the 4:3 frame
+              // edge-to-edge, car centred — photos frame the vehicle with some
+              // natural crop (accepted). bg-white shows through only at the
+              // instant before load. (Detail-page hero is separate, contain.)
+              "size-full max-w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]",
               ended && "opacity-90",
             )}
             loading="lazy"
