@@ -10,11 +10,11 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://xportacar.com";
 // Real receivables details (provided by the client). Both accounts are shown so
 // European buyers can wire in EUR and UAE/regional buyers in AED.
 const BANK = {
-  beneficiary: "Global Business Consultancy L.L.C-FZ",
+  beneficiary: "Global Business Consultancy L.L.C FZ",
   bank: "WIO Bank",
   bankAddress: "Etihad Airways Centre 5th Floor, Abu Dhabi, UAE",
   swift: "WIOBAEADXXX",
-  ibanEur: "AE94 46 0860 0000 0977 0643 954",
+  ibanEur: "AE46 0860 0000 0977 0643 954",
   ibanAed: "AE94 0860 0000 0944 9287 910",
 };
 
