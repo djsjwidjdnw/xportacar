@@ -9,9 +9,16 @@ import {
   type Localized,
 } from "./layout";
 
-// NOTE: bank account details (IBAN / SWIFT / beneficiary / bank name) are
-// INTENTIONALLY NOT in this email. The team sends the correct company wire
-// details to the buyer separately. Do NOT hardcode any account here.
+// Real receivables details (provided by the client). Both accounts are shown so
+// EU buyers can wire in EUR and UAE/regional buyers in AED. The invoice PDF
+// attached to this email carries the same details.
+const BANK = {
+  beneficiary: "Global Business Consultancy L.L.C-FZ",
+  bank: "WIO Bank, Etihad Airways Centre 5th Floor, Abu Dhabi, UAE",
+  swift: "WIOBAEADXXX",
+  ibanEur: "AE94 46 0860 0000 0977 0643 954",
+  ibanAed: "AE94 0860 0000 0944 9287 910",
+};
 
 type Copy = {
   subject: (num: string) => string;
@@ -22,7 +29,13 @@ type Copy = {
   rowShipping: string;
   rowTotal: string;
   payHeading: string;
-  payInfo: string;
+  payIntro: string;
+  lBeneficiary: string;
+  lBank: string;
+  lBic: string;
+  lEurIban: string;
+  lAedIban: string;
+  lReference: string;
   deadline: string;
   ctaLabel: string;
 };
@@ -31,60 +44,44 @@ const COPY: Localized<Copy> = {
   en: {
     subject: (num) => `Your XportACar invoice ${num}`,
     heading: "Your invoice is ready",
-    intro: (veh, num) =>
-      `Thank you for your purchase of <strong>${veh}</strong>. Invoice <strong>${num}</strong> is ready — the breakdown is below.`,
-    rowVehicle: "Vehicle price",
-    rowFee: "Platform fee (2.9%)",
-    rowShipping: "Shipping",
-    rowTotal: "Total due",
+    intro: (veh, num) => `Thank you for your purchase of <strong>${veh}</strong>. Invoice <strong>${num}</strong> is ready — the breakdown and payment details are below, and the full invoice is attached as a PDF.`,
+    rowVehicle: "Vehicle price", rowFee: "Platform fee (2.9%)", rowShipping: "Shipping", rowTotal: "Total due",
     payHeading: "How to pay",
-    payInfo:
-      "Bank account details for payment will be sent to you separately by our team within 24 hours. If you don't receive them, please contact contact@xportacar.com.",
+    payIntro: "Pay by wire transfer within 5 working days of the invoice date to one of the accounts below:",
+    lBeneficiary: "Beneficiary", lBank: "Bank", lBic: "BIC / SWIFT", lEurIban: "EUR IBAN", lAedIban: "AED IBAN", lReference: "Reference",
     deadline: "Payment is due within 5 working days of the invoice date. Shipping begins once payment is confirmed.",
     ctaLabel: "View invoice PDF",
   },
   de: {
     subject: (num) => `Ihre XportACar-Rechnung ${num}`,
     heading: "Ihre Rechnung ist bereit",
-    intro: (veh, num) =>
-      `Vielen Dank für Ihren Kauf von <strong>${veh}</strong>. Rechnung <strong>${num}</strong> ist bereit — die Aufschlüsselung finden Sie unten.`,
-    rowVehicle: "Fahrzeugpreis",
-    rowFee: "Plattformgebühr (2,9 %)",
-    rowShipping: "Versand",
-    rowTotal: "Fälliger Gesamtbetrag",
+    intro: (veh, num) => `Vielen Dank für Ihren Kauf von <strong>${veh}</strong>. Rechnung <strong>${num}</strong> ist bereit — die Aufschlüsselung und Zahlungsdaten finden Sie unten; die vollständige Rechnung ist als PDF angehängt.`,
+    rowVehicle: "Fahrzeugpreis", rowFee: "Plattformgebühr (2,9 %)", rowShipping: "Versand", rowTotal: "Fälliger Gesamtbetrag",
     payHeading: "So bezahlen Sie",
-    payInfo:
-      "Die Bankverbindung für die Zahlung wird Ihnen innerhalb von 24 Stunden separat von unserem Team zugesandt. Falls Sie diese nicht erhalten, kontaktieren Sie bitte contact@xportacar.com.",
+    payIntro: "Zahlen Sie per Überweisung innerhalb von 5 Werktagen ab Rechnungsdatum auf eines der folgenden Konten:",
+    lBeneficiary: "Begünstigter", lBank: "Bank", lBic: "BIC / SWIFT", lEurIban: "EUR IBAN", lAedIban: "AED IBAN", lReference: "Verwendungszweck",
     deadline: "Die Zahlung ist innerhalb von 5 Werktagen ab Rechnungsdatum fällig. Der Versand beginnt nach Zahlungsbestätigung.",
     ctaLabel: "Rechnungs-PDF ansehen",
   },
   fr: {
     subject: (num) => `Votre facture XportACar ${num}`,
     heading: "Votre facture est prête",
-    intro: (veh, num) =>
-      `Merci pour votre achat de <strong>${veh}</strong>. La facture <strong>${num}</strong> est prête — le détail figure ci-dessous.`,
-    rowVehicle: "Prix du véhicule",
-    rowFee: "Frais de plateforme (2,9 %)",
-    rowShipping: "Expédition",
-    rowTotal: "Total dû",
+    intro: (veh, num) => `Merci pour votre achat de <strong>${veh}</strong>. La facture <strong>${num}</strong> est prête — le détail et les coordonnées de paiement figurent ci-dessous, et la facture complète est jointe en PDF.`,
+    rowVehicle: "Prix du véhicule", rowFee: "Frais de plateforme (2,9 %)", rowShipping: "Expédition", rowTotal: "Total dû",
     payHeading: "Comment payer",
-    payInfo:
-      "Les coordonnées bancaires pour le paiement vous seront envoyées séparément par notre équipe sous 24 heures. Si vous ne les recevez pas, veuillez contacter contact@xportacar.com.",
+    payIntro: "Payez par virement bancaire sous 5 jours ouvrés à compter de la date de facture sur l'un des comptes ci-dessous :",
+    lBeneficiary: "Bénéficiaire", lBank: "Banque", lBic: "BIC / SWIFT", lEurIban: "IBAN EUR", lAedIban: "IBAN AED", lReference: "Référence",
     deadline: "Le paiement est dû sous 5 jours ouvrés à compter de la date de facture. L'expédition commence une fois le paiement confirmé.",
     ctaLabel: "Voir la facture PDF",
   },
   ar: {
     subject: (num) => `فاتورتك من XportACar ${num}`,
     heading: "فاتورتك جاهزة",
-    intro: (veh, num) =>
-      `شكرًا لشرائك <strong>${veh}</strong>. الفاتورة <strong>${num}</strong> جاهزة — التفاصيل أدناه.`,
-    rowVehicle: "سعر المركبة",
-    rowFee: "رسوم المنصة (2.9%)",
-    rowShipping: "الشحن",
-    rowTotal: "الإجمالي المستحق",
+    intro: (veh, num) => `شكرًا لشرائك <strong>${veh}</strong>. الفاتورة <strong>${num}</strong> جاهزة — التفاصيل وبيانات الدفع أدناه، والفاتورة الكاملة مرفقة بصيغة PDF.`,
+    rowVehicle: "سعر المركبة", rowFee: "رسوم المنصة (2.9%)", rowShipping: "الشحن", rowTotal: "الإجمالي المستحق",
     payHeading: "كيفية الدفع",
-    payInfo:
-      "سيتم إرسال تفاصيل الحساب البنكي للدفع إليك بشكل منفصل من قِبل فريقنا خلال 24 ساعة. إذا لم تستلمها، يرجى التواصل مع contact@xportacar.com.",
+    payIntro: "ادفع عبر التحويل البنكي خلال 5 أيام عمل من تاريخ الفاتورة إلى أحد الحسابين أدناه:",
+    lBeneficiary: "المستفيد", lBank: "البنك", lBic: "السويفت / BIC", lEurIban: "آيبان اليورو", lAedIban: "آيبان الدرهم", lReference: "المرجع",
     deadline: "يُستحق الدفع خلال 5 أيام عمل من تاريخ الفاتورة. يبدأ الشحن بعد تأكيد الدفع.",
     ctaLabel: "عرض الفاتورة PDF",
   },
@@ -128,11 +125,22 @@ export function orderInvoiceEmail(args: {
     row(c.rowTotal, `<span style="color:#1570EF;">${eur(args.totalEur)}</span>`, { bold: true, align }),
   ].join("");
 
+  const bankRow = (label: string, value: string) =>
+    `<tr><td style="padding:4px 12px 4px 0;font-size:13px;color:#667085;white-space:nowrap;vertical-align:top;text-align:${align};">${label}</td><td style="padding:4px 0;font-size:13px;font-weight:600;color:#101828;text-align:${align};">${value}</td></tr>`;
+
   const bodyHtml = `${c.intro(veh, num)}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:18px;border-collapse:collapse;">${rows}</table>
     <div style="margin-top:22px;background:#f9fafb;border:1px solid #eaecf0;border-radius:10px;padding:16px;">
       <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#101828;text-align:${align};">${c.payHeading}</p>
-      <p style="margin:0;font-size:13px;line-height:1.6;color:#475467;text-align:${align};">${escapeHtml(c.payInfo)}</p>
+      <p style="margin:0 0 10px;font-size:13px;color:#475467;text-align:${align};">${c.payIntro}</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        ${bankRow(c.lBeneficiary, escapeHtml(BANK.beneficiary))}
+        ${bankRow(c.lBank, escapeHtml(BANK.bank))}
+        ${bankRow(c.lBic, escapeHtml(BANK.swift))}
+        ${bankRow(c.lEurIban, escapeHtml(BANK.ibanEur))}
+        ${bankRow(c.lAedIban, escapeHtml(BANK.ibanAed))}
+        ${bankRow(c.lReference, num)}
+      </table>
     </div>
     <p style="margin:16px 0 0;font-size:12px;color:#98a2b3;text-align:${align};">${c.deadline}</p>`;
 

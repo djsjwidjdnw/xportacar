@@ -323,6 +323,8 @@ export async function sendInvoiceEmail(args: {
   extras?: { name: string; priceEur: number }[];
   totalEur: number;
   locale?: string;
+  /** Optional PDF (or other) attachments — e.g. the rendered invoice PDF. */
+  attachments?: { filename: string; content: Buffer; contentType?: string }[];
 }) {
   await sendEmail(
     args.to,
@@ -338,5 +340,6 @@ export async function sendInvoiceEmail(args: {
       totalEur: args.totalEur,
       locale: toEmailLocale(args.locale),
     }),
+    args.attachments,
   );
 }

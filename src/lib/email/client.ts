@@ -18,7 +18,13 @@ function getClient(): Resend | null {
   return cached;
 }
 
-export async function sendEmail(to: string, content: EmailContent): Promise<{ sent: boolean }> {
+export interface EmailAttachment { filename: string; content: Buffer; contentType?: string }
+
+export async function sendEmail(
+  to: string,
+  content: EmailContent,
+  attachments?: EmailAttachment[],
+): Promise<{ sent: boolean }> {
   const client = getClient();
   if (!client) {
     if (process.env.NODE_ENV !== "production") {
@@ -33,6 +39,7 @@ export async function sendEmail(to: string, content: EmailContent): Promise<{ se
       subject: content.subject,
       html: content.html,
       text: content.text,
+      ...(attachments && attachments.length ? { attachments } : {}),
     });
     if (error) {
       console.error(`[email] Resend rejected "${content.subject}" → ${to}: ${error.message ?? error}`);

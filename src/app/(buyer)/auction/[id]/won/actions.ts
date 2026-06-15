@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getStripe, isStripeConfigured } from "@/lib/stripe";
 import { sendPaymentReceivedAdminEmail, sendInvoiceEmail } from "@/lib/email";
+import { renderInvoicePdf } from "@/lib/invoice/pdf";
 
 // Step 1 of the two-step win flow: the buyer confirms (within 36h of winning)
 // that they intend to pay. This starts the 5-working-day wire-transfer clock.
@@ -292,6 +293,15 @@ export async function finalizeInvoiceShippingAction(input: {
         ? (input.distanceKm ? `Door-to-door delivery (${input.distanceKm} km)` : "Door-to-door delivery")
         : "Standard port shipping";
     if (buyer?.email) {
+      // Attach the actual rendered PDF (same document the /pdf route serves).
+      // Best-effort: if rendering fails, send the email without the attachment.
+      let attachments: { filename: string; content: Buffer }[] | undefined;
+      try {
+        const pdf = await renderInvoicePdf(input.invoiceId);
+        if (pdf) attachments = [{ filename: `invoice-${i.invoice_number ?? input.invoiceId.slice(0, 8)}.pdf`, content: pdf.buffer }];
+      } catch (e) {
+        console.error("[invoice pdf] render-for-email failed:", (e as Error)?.message);
+      }
       await sendInvoiceEmail({
         to: buyer.email,
         invoiceNumber: i.invoice_number ?? input.invoiceId.slice(0, 8),
@@ -304,6 +314,7 @@ export async function finalizeInvoiceShippingAction(input: {
         extras: extras.map((e) => ({ name: e.name, priceEur: Number(e.price_eur) || 0 })),
         totalEur,
         locale: buyer.language,
+        attachments,
       });
     }
   } catch (e) {
