@@ -169,8 +169,8 @@ export async function GET(
   text("PAYMENT INSTRUCTIONS", M, y, 8, bold, GREY); y -= 14;
   text(`Confirm payment within 36 hours of winning — by ${fmtDate(confirmDeadline)}.`, M, y, 9, font, DARK); y -= 12;
   text(`Complete the wire transfer within 5 working days of confirming — by ${fmtDate(payDeadline)}.`, M, y, 9, font, DARK); y -= 12;
-  text("Pay by wire transfer to XportACar (Global Business Consultancy L.L.C-FZ).", M, y, 9, font, DARK); y -= 12;
-  text("Bank account details will be sent to your registered email.", M, y, 9, font, GREY);
+  text("Bank account details for payment will be sent to you separately within 24 hours.", M, y, 9, font, DARK); y -= 12;
+  text("If you don't receive them, contact contact@xportacar.com.", M, y, 9, font, GREY);
 
   // Footer
   text("Thank you for your business — XportACar · info@xportacar.com", M, 40, 8, font, GREY);
