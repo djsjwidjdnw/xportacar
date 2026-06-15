@@ -88,11 +88,10 @@ export function VehicleCard({
             src={thumb(photo, 600)}
             alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
             className={cn(
-              // Bring-A-Trailer style: object-cover fills the 4:3 frame
-              // edge-to-edge, car centred — photos frame the vehicle with some
-              // natural crop (accepted). bg-white shows through only at the
-              // instant before load. (Detail-page hero is separate, contain.)
-              "size-full max-w-full object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]",
+              // object-contain on a white 4:3 frame: the WHOLE car is always
+              // shown (portrait/phone photos were being center-cropped to ~40%
+              // by object-cover). White background = luxury-auction standard.
+              "size-full max-w-full object-contain object-center transition-transform duration-500 group-hover:scale-[1.03]",
               ended && "opacity-90",
             )}
             loading="lazy"
