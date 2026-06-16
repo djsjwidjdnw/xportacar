@@ -9,7 +9,7 @@
 //         shippingLongitude, extras: [{ name, price_eur }] }
 import type { NextRequest } from "next/server";
 
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createBearerClient } from "@/lib/supabase/bearer";
 import { finalizeInvoiceAndEmail } from "@/lib/invoice/finalize";
 
 export async function POST(
@@ -17,15 +17,22 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const auth = req.headers.get("authorization") ?? "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
-  if (!token) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  const authHeader = req.headers.get("authorization");
+  // Token-scoped client (anon key + the user's bearer token) — RLS-scoped to the
+  // buyer, so no service-role key is needed (it was found stale in prod).
+  const db = createBearerClient(authHeader);
+  console.info(`[finalize] invoice=${id} authHeader=${authHeader ? "present" : "MISSING"}`);
+  if (!db) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
 
-  const admin = createAdminClient();
-  const { data: { user }, error: uErr } = await admin.auth.getUser(token);
-  if (uErr || !user) return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  const { data: { user }, error: uErr } = await db.auth.getUser();
+  if (uErr || !user) {
+    console.warn(`[finalize] getUser failed: ${uErr?.message ?? "no user"}`);
+    return Response.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  }
+  console.info(`[finalize] authed user=${user.id}`);
 
-  const { data: inv } = await admin
+  // Ownership: RLS scopes this SELECT to the buyer's own invoices.
+  const { data: inv } = await db
     .from("invoices").select("id, buyer_id").eq("id", id).maybeSingle();
   if (!inv || (inv as { buyer_id: string }).buyer_id !== user.id) {
     return Response.json({ ok: false, error: "not found" }, { status: 404 });
@@ -44,7 +51,7 @@ export async function POST(
     : [];
   const num = (v: unknown) => (v == null || v === "" ? null : Number(v));
 
-  const res = await finalizeInvoiceAndEmail({
+  const res = await finalizeInvoiceAndEmail(db, {
     invoiceId: id,
     shippingMethod: method,
     shippingEur: Number(body.shippingEur) || 0,

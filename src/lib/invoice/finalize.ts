@@ -1,6 +1,6 @@
 import "server-only";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { createAdminClient } from "@/lib/supabase/admin";
 import { sendInvoiceEmail } from "@/lib/email";
 import { renderInvoicePdf } from "@/lib/invoice/pdf";
 import { signedInvoicePdfUrl } from "@/lib/invoice/signedUrl";
@@ -11,9 +11,11 @@ import { serverShippingEur, serverPriceExtras } from "@/lib/distance";
 // (finalizeInvoiceShippingAction) and the mobile endpoint
 // (POST /api/invoice/[id]/finalize) so the email fires no matter the platform.
 //
-// The caller MUST authorize ownership of the invoice first. This persists with
-// the service-role client and recomputes total = hammer + 2.9% fee + shipping +
-// extras. The email (PDF attachment + signed login-free link) is best-effort.
+// `db` is an RLS-scoped client authenticated AS THE BUYER (cookie session on web,
+// bearer token on mobile). The buyer can read + UPDATE their own invoice (RLS
+// policies "buyers see/update own invoices"), so no service-role key is needed —
+// the caller has already authenticated the user; RLS enforces ownership. Recomputes
+// total = hammer + 2.9% fee + shipping + extras. Email is best-effort.
 
 const PLATFORM_FEE_PCT = 0.029;
 
@@ -33,10 +35,10 @@ export interface FinalizeInvoiceInput {
 }
 
 export async function finalizeInvoiceAndEmail(
+  db: SupabaseClient,
   input: FinalizeInvoiceInput,
 ): Promise<{ ok: boolean; error?: string; totalEur?: number; pdfUrl?: string }> {
-  const admin = createAdminClient();
-  const { data: inv } = await admin
+  const { data: inv } = await db
     .from("invoices")
     .select(
       "id, amount_eur, invoice_number, vehicle:vehicles!vehicle_id(year, make, model, trim), buyer:profiles!buyer_id(email, language)",
@@ -69,7 +71,7 @@ export async function finalizeInvoiceAndEmail(
   ].filter((l): l is string => !!l && l.length > 0);
   const formattedAddress = structuredLines.length > 0 ? structuredLines.join("\n") : null;
 
-  const { error } = await admin
+  const { error } = await db
     .from("invoices")
     .update({
       shipping_method: input.shippingMethod,
@@ -113,7 +115,7 @@ export async function finalizeInvoiceAndEmail(
     } else {
       let attachments: { filename: string; content: Buffer }[] | undefined;
       try {
-        const pdf = await renderInvoicePdf(input.invoiceId, { useAdminClient: true });
+        const pdf = await renderInvoicePdf(input.invoiceId, { client: db });
         if (pdf) attachments = [{ filename: `invoice-${num}.pdf`, content: pdf.buffer }];
         else console.warn(`[invoice email] invoice ${num}: renderInvoicePdf returned null`);
       } catch (e) {

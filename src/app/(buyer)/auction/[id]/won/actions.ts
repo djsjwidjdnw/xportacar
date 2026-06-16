@@ -254,15 +254,15 @@ export async function finalizeInvoiceShippingAction(input: {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in to confirm your order." };
 
-  // Verify ownership here; the shared core uses the service-role client and does
-  // not re-check ownership.
+  // Verify ownership here; pass the cookie-scoped client to the core (RLS lets
+  // the buyer read + update their own invoice — no service-role key needed).
   const { data: inv } = await supabase
     .from("invoices").select("id, buyer_id").eq("id", input.invoiceId).single();
   if (!inv || (inv as { buyer_id: string }).buyer_id !== user.id) {
     return { ok: false, error: "Invoice not found." };
   }
 
-  const res = await finalizeInvoiceAndEmail({
+  const res = await finalizeInvoiceAndEmail(supabase, {
     invoiceId: input.invoiceId,
     shippingMethod: input.shippingMethod,
     shippingEur: input.shippingEur,

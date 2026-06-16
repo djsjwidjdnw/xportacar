@@ -1,5 +1,6 @@
 import "server-only";
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFImage } from "pdf-lib";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -80,6 +81,9 @@ export interface InvoicePdfOverrides {
    *  has independently authorized access to THIS invoice — e.g. a valid signed
    *  token, or an already-verified invoice owner. */
   useAdminClient?: boolean;
+  /** Render with a caller-supplied client (e.g. a bearer/cookie RLS-scoped
+   *  client). Preferred over useAdminClient for user-authenticated requests. */
+  client?: SupabaseClient;
 }
 
 /**
@@ -92,7 +96,7 @@ export async function renderInvoicePdf(
   invoiceId: string,
   overrides: InvoicePdfOverrides = {},
 ): Promise<{ buffer: Buffer; filename: string } | null> {
-  const supabase = overrides.useAdminClient ? createAdminClient() : await createClient();
+  const supabase = overrides.client ?? (overrides.useAdminClient ? createAdminClient() : await createClient());
   const { data: invoice } = await supabase
     .from("invoices")
     .select(`
