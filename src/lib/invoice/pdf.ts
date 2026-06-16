@@ -97,7 +97,7 @@ export async function renderInvoicePdf(
   overrides: InvoicePdfOverrides = {},
 ): Promise<{ buffer: Buffer; filename: string } | null> {
   const supabase = overrides.client ?? (overrides.useAdminClient ? createAdminClient() : await createClient());
-  const { data: invoice } = await supabase
+  const { data: invoice, error: invErr } = await supabase
     .from("invoices")
     .select(`
       id, invoice_number, amount_eur, platform_fee_eur, total_eur, status, created_at, payment_confirmed_at,
@@ -107,7 +107,10 @@ export async function renderInvoicePdf(
     `)
     .eq("id", invoiceId)
     .single();
-  if (!invoice) return null;
+  if (!invoice) {
+    console.warn(`[invoice pdf] invoice ${invoiceId} not readable (admin=${!!overrides.useAdminClient}, scoped=${!!overrides.client}): ${invErr?.message ?? "no row"}`);
+    return null;
+  }
   // deno-lint-ignore no-explicit-any
   const inv = invoice as any;
 
