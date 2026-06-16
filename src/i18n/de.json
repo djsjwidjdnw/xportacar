@@ -90,6 +90,9 @@
     "viewResult": "Ergebnis ansehen"
   },
   "landing": {
+    "heroPhotoAltPremium": "Premium-Fahrzeuge aus dem GCC",
+    "heroPhotoAltInspection": "Professionelle Fahrzeuginspektion",
+    "heroPhotoAltTransport": "Haustürlieferung von den VAE in die EU",
     "navAbout": "Über uns",
     "navHowItWorks": "So funktioniert's",
     "navContact": "Kontakt",

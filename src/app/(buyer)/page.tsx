@@ -95,10 +95,10 @@ export default async function HomePage() {
           <div className="relative lg:col-span-5">
             <div className="absolute -top-6 left-6 right-6 h-72 rounded-3xl bg-gradient-to-br from-brand-500/20 to-brand-700/20 blur-3xl" />
             <div className="relative grid grid-cols-2 gap-3">
-              <HeroPhoto src="https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&q=80" alt="UAE Mercedes" tall />
+              <HeroPhoto src="/rs6.avif" alt={t("heroPhotoAltPremium")} tall />
               <div className="grid gap-3">
-                <HeroPhoto src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80" alt="Porsche" />
-                <HeroPhoto src="https://images.unsplash.com/photo-1568844293986-8d0400bd4745?w=800&q=80" alt="Land Cruiser" />
+                <HeroPhoto src="/inspection55.avif" alt={t("heroPhotoAltInspection")} />
+                <HeroPhoto src="/transport55.avif" alt={t("heroPhotoAltTransport")} />
               </div>
               <div className="col-span-2 mt-1 flex items-center gap-3 rounded-2xl border border-grey-200 bg-white/90 p-4 shadow-lg backdrop-blur">
                 <div className="grid size-10 shrink-0 place-items-center rounded-full bg-success-50 text-success-600">
