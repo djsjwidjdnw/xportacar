@@ -1,0 +1,9 @@
+# Treat binary assets as binary so git never applies CRLF/text normalization
+# (which would corrupt e.g. public/invoice-letterhead.pdf on checkout).
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.ico  binary
+*.woff  binary
+*.woff2 binary
