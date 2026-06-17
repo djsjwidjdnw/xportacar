@@ -330,6 +330,7 @@ export default async function VehicleDetailPage({
                 inspectionNotes={v.inspection_notes}
                 inspectionDate={v.inspection_date}
                 paintThicknessUrl={paintThicknessUrl}
+                paintReadings={paintReadings}
               />
             </section>
 

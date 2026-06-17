@@ -9,6 +9,7 @@ import {
 import { useTranslations } from "@/i18n/provider";
 import { cn } from "@/lib/utils";
 import type { VehicleDamage } from "@/types";
+import { PaintThicknessReport, type PaintThicknessReading } from "@/components/vehicle/PaintThicknessReport";
 
 const SEVERITY_STYLES: Record<VehicleDamage["severity"], { className: string; key: string }> = {
   cosmetic: { className: "bg-grey-100 text-grey-700 ring-grey-200",          key: "severityCosmetic" },
@@ -25,34 +26,42 @@ export function ConditionReport({
   inspectionNotes,
   inspectionDate,
   paintThicknessUrl,
+  paintReadings,
 }: {
   damages: VehicleDamage[];
   photos?: ReportPhoto[];
   inspectionNotes?: string | null;
   inspectionDate?: string | null;
   paintThicknessUrl?: string | null;
+  paintReadings?: PaintThicknessReading[];
 }) {
   const t = useTranslations("vehicle");
 
-  // The full report is worth opening when there are photos, inspector notes,
-  // a paint-thickness reading, or damage photos the buyer can drill into.
-  const hasFullReport =
-    (photos?.length ?? 0) > 0 || !!inspectionNotes || !!paintThicknessUrl || damages.some((d) => d.photo_url);
+  // Only "real" readings count — a null reading_microns coerces to 0 upstream,
+  // which must not surface the per-panel grid (or hide the gauge-photo fallback).
+  const hasPaintReadings = (paintReadings ?? []).some(
+    (r) => Number.isFinite(r.reading_microns) && r.reading_microns > 0,
+  );
 
-  // Paint-thickness reading card — always shown (inside or outside the dialog)
-  // when an inspector captured a gauge photo.
+  // The full report is worth opening when there are photos, inspector notes,
+  // per-panel paint readings, a gauge photo, or damage photos to drill into.
+  const hasFullReport =
+    (photos?.length ?? 0) > 0 || !!inspectionNotes || hasPaintReadings || !!paintThicknessUrl || damages.some((d) => d.photo_url);
+
+  // Paint-thickness teaser card on the page — shown when an inspector captured a
+  // gauge photo. The full per-panel grid lives in <PaintThicknessReport>.
   const paintBlock = paintThicknessUrl ? (
     <div className="flex items-center gap-3 rounded-xl border border-grey-200 bg-white p-3">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={paintThicknessUrl}
-        alt="Paint thickness gauge reading"
+        alt={t("paintThicknessTest")}
         loading="lazy"
         className="size-16 shrink-0 rounded-lg object-cover ring-1 ring-grey-200"
       />
       <div>
-        <p className="text-sm font-semibold text-grey-900">Paint thickness test</p>
-        <p className="text-xs text-grey-500">Gauge reading captured during inspection</p>
+        <p className="text-sm font-semibold text-grey-900">{t("paintThicknessTest")}</p>
+        <p className="text-xs text-grey-500">{t("paintThicknessTestSub")}</p>
       </div>
     </div>
   ) : null;
@@ -127,19 +136,22 @@ export function ConditionReport({
             </section>
           )}
 
-          {/* Paint thickness reading */}
-          {paintThicknessUrl && (
+          {/* Paint thickness — full per-panel grid (photo + microns + colour band).
+              Falls back to the single gauge photo when no per-panel readings exist. */}
+          {hasPaintReadings ? (
+            <PaintThicknessReport readings={paintReadings!} />
+          ) : paintThicknessUrl ? (
             <section>
-              <h3 className="mb-2 text-sm font-bold text-grey-900">Paint thickness test</h3>
+              <h3 className="mb-2 text-sm font-bold text-grey-900">{t("paintThicknessTest")}</h3>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={paintThicknessUrl}
-                alt="Paint thickness gauge reading"
+                alt={t("paintThicknessTest")}
                 loading="lazy"
                 className="max-h-72 w-full rounded-lg object-contain ring-1 ring-grey-200"
               />
             </section>
-          )}
+          ) : null}
 
           {/* Photos */}
           {photos && photos.length > 0 && (

@@ -24,38 +24,28 @@ const PANEL_LABEL_KEY: Record<string, string> = {
   roof: "panelRoof",
 };
 
-// Reading bands → colour token + status-label key.
-//   < 80 µm  → thin   (red)    possible respray / thin paint
-//  80–200 µm → normal (green)  factory paint
-//   > 200 µm → thick  (amber)  thick paint, possible repair
-function band(microns: number): {
-  statusKey: "statusThin" | "statusNormal" | "statusThick";
+// Reading bands → colour token + status-label key. Thresholds are the agreed
+// repaint-detection bands (shared verbatim with the mobile buyer app):
+//   < 150 µm   → factory  (green)   factory paint, no repair
+//  150–250 µm  → touch-up (amber)   minor touch-up possible
+//   > 250 µm   → repaint  (red)     likely repainted or filler
+type Band = {
+  statusKey: "bandFactory" | "bandTouchup" | "bandRepaint";
   pill: string;
   value: string;
   dot: string;
-} {
-  if (microns < 80) {
-    return {
-      statusKey: "statusThin",
-      pill: "bg-error-50 text-error-700 ring-error-200",
-      value: "text-error-700",
-      dot: "bg-error-500",
-    };
-  }
-  if (microns <= 200) {
-    return {
-      statusKey: "statusNormal",
-      pill: "bg-success-50 text-success-700 ring-success-200",
-      value: "text-success-700",
-      dot: "bg-success-500",
-    };
-  }
-  return {
-    statusKey: "statusThick",
-    pill: "bg-warning-50 text-warning-700 ring-warning-200",
-    value: "text-warning-700",
-    dot: "bg-warning-500",
-  };
+  range: string;
+};
+const BANDS: Band[] = [
+  { statusKey: "bandFactory", pill: "bg-success-50 text-success-700 ring-success-200", value: "text-success-700", dot: "bg-success-500", range: "<150µm" },
+  { statusKey: "bandTouchup", pill: "bg-warning-50 text-warning-700 ring-warning-200", value: "text-warning-700", dot: "bg-warning-500", range: "150–250µm" },
+  { statusKey: "bandRepaint", pill: "bg-error-50 text-error-700 ring-error-200", value: "text-error-700", dot: "bg-error-500", range: ">250µm" },
+];
+function band(microns: number): Band {
+  if (!Number.isFinite(microns)) return BANDS[0];
+  if (microns < 150) return BANDS[0];
+  if (microns <= 250) return BANDS[1];
+  return BANDS[2];
 }
 
 export function PaintThicknessReport({
@@ -64,14 +54,30 @@ export function PaintThicknessReport({
   readings: PaintThicknessReading[];
 }) {
   const t = useTranslations("paint");
-  if (!readings || readings.length === 0) return null;
+  // Drop rows without a real gauge reading. A null reading_microns coerces to 0
+  // upstream (Number(null) === 0), which is finite and < 150 — so an unmeasured
+  // panel would otherwise render as a green "0 µm · factory paint" badge.
+  const valid = (readings ?? []).filter((r) => Number.isFinite(r.reading_microns) && r.reading_microns > 0);
+  if (valid.length === 0) return null;
 
   return (
     <section className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
-      <h2 className="mb-4 text-lg font-bold text-grey-900">{t("title")}</h2>
+      <h2 className="text-lg font-bold text-grey-900">{t("title")}</h2>
+      <p className="mt-1 text-sm text-grey-500">{t("subtitle")}</p>
+
+      {/* Colour legend */}
+      <div className="mt-3 mb-4 flex flex-wrap gap-x-4 gap-y-1.5">
+        {BANDS.map((b) => (
+          <span key={b.statusKey} className="inline-flex items-center gap-1.5 text-[11px] font-medium text-grey-600">
+            <span className={cn("size-2 rounded-full", b.dot)} />
+            {t(b.statusKey)}
+            <span className="text-grey-400">{b.range}</span>
+          </span>
+        ))}
+      </div>
 
       <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {readings.map((r, i) => {
+        {valid.map((r, i) => {
           const b = band(r.reading_microns);
           const labelKey = PANEL_LABEL_KEY[r.panel];
           const panelLabel = labelKey ? t(labelKey) : r.panel;
