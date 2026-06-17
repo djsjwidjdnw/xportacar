@@ -4,8 +4,11 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { CUSTOMS_DISCLAIMER_TEXT } from "@/components/shared/CustomsDisclaimer";
-import { pickThumbnailPhoto, thumb } from "@/lib/utils";
 import { buildInvoicePdfBytes, type InvoiceLineItem, type InvoicePdfData } from "@/lib/invoice/pdfLayout";
+
+// `||` not `??`: NEXT_PUBLIC_SITE_URL is an empty string in prod, which would make
+// the letterhead fetch a host-less relative URL.
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://xportacar.com").replace(/\/+$/, "");
 
 function fmtDate(d: Date): string {
   return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -17,21 +20,29 @@ function addWorkingDays(from: Date, n: number): Date {
   return d;
 }
 
-// Fetch a remote image (the dynamic vehicle hero) and return raw bytes + a PNG/JPEG
-// flag. The branded letterhead logo is embedded from a base64 constant in pdfLayout,
-// so the only network call here is the per-invoice hero photo (best-effort).
-async function fetchImageBytes(url: string, ms = 4000): Promise<{ bytes: Uint8Array; isPng: boolean } | null> {
+// The XPortAcar letterhead (public/invoice-letterhead.pdf) is the locked brand
+// template — we overlay the invoice text onto its blank middle. Load it once per
+// warm lambda: from disk when available (dev / self-hosted), else over HTTP (on
+// Vercel `public/` is served at the site root — the same proven path the old logo
+// used). Only successful loads are cached, so a transient failure retries.
+let letterheadCache: Uint8Array | undefined;
+async function getLetterheadBytes(): Promise<Uint8Array | null> {
+  if (letterheadCache) return letterheadCache;
+  try {
+    const { readFile } = await import("node:fs/promises");
+    const { join } = await import("node:path");
+    const buf = await readFile(join(process.cwd(), "public", "invoice-letterhead.pdf"));
+    letterheadCache = new Uint8Array(buf);
+    return letterheadCache;
+  } catch { /* fall through to HTTP */ }
   try {
     const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), ms);
-    const res = await fetch(url, { signal: ctrl.signal });
+    const t = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(`${SITE_URL}/invoice-letterhead.pdf`, { signal: ctrl.signal });
     clearTimeout(t);
-    if (!res.ok) return null;
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    return { bytes, isPng: bytes[0] === 0x89 && bytes[1] === 0x50 };
-  } catch {
-    return null;
-  }
+    if (res.ok) { letterheadCache = new Uint8Array(await res.arrayBuffer()); return letterheadCache; }
+  } catch { /* ignore */ }
+  return null;
 }
 
 export interface InvoicePdfOverrides {
@@ -48,14 +59,14 @@ export interface InvoicePdfOverrides {
 }
 
 /**
- * Render the branded invoice PDF for `invoiceId` and return its bytes + filename.
+ * Render the invoice PDF for `invoiceId` and return its bytes + filename.
  * Used by BOTH the /api/invoice/[id]/pdf route and the invoice email attachment.
  * Uses the RLS-scoped server client, so it only renders an invoice the caller
  * (the signed-in buyer or staff) is allowed to read. Returns null if not found.
  *
- * The visual layout (XPortAcar letterhead) lives in the pure, testable
- * `buildInvoicePdfBytes` (pdfLayout.ts); this function only resolves the invoice
- * row + server-authoritative pricing and fetches the hero photo.
+ * Visual output = the XPortAcar letterhead with the invoice content overlaid in
+ * its blank middle (see pdfLayout.ts). This function only resolves the invoice row
+ * + server-authoritative pricing and loads the letterhead template.
  */
 export async function renderInvoicePdf(
   invoiceId: string,
@@ -66,9 +77,9 @@ export async function renderInvoicePdf(
     .from("invoices")
     .select(`
       id, invoice_number, amount_eur, platform_fee_eur, total_eur, status, created_at, payment_confirmed_at,
-      shipping_method, shipping_eur, shipping_distance_km, shipping_address, extras, extras_eur,
+      shipping_method, shipping_eur, shipping_distance_km, extras, extras_eur,
       buyer:profiles!buyer_id ( full_name, company_name, country, email, phone, company_registration ),
-      vehicle:vehicles!vehicle_id ( year, make, model, trim, vin, exterior_color, mileage_km, vehicle_photos ( url, sort_order, caption, category ) )
+      vehicle:vehicles!vehicle_id ( year, make, model, trim, vin, exterior_color, mileage_km )
     `)
     .eq("id", invoiceId)
     .single();
@@ -104,20 +115,9 @@ export async function renderInvoicePdf(
   const payDeadline = addWorkingDays(inv.payment_confirmed_at ? new Date(inv.payment_confirmed_at) : created, 5);
   const number = inv.invoice_number ?? inv.id.slice(0, 8);
 
-  // ─── Vehicle hero (the only per-invoice network fetch) ───
   const v = inv.vehicle;
-  const heroUrl = v?.vehicle_photos ? pickThumbnailPhoto(v.vehicle_photos)?.url : null;
-  const hero = heroUrl ? await fetchImageBytes(thumb(heroUrl, 600)) : null;
-
-  // ─── Buyer block ───
   const buyerName = inv.buyer?.company_name ?? inv.buyer?.full_name ?? "—";
   const buyerSubName = inv.buyer?.full_name && inv.buyer?.company_name ? inv.buyer.full_name : null;
-  const vehicleMeta = v
-    ? `${v.exterior_color ?? ""}${v.mileage_km != null ? `${v.exterior_color ? " · " : ""}${Number(v.mileage_km).toLocaleString("en-GB")} km` : ""}`.trim() || null
-    : null;
-  const shippingAddressLines = inv.shipping_address
-    ? String(inv.shipping_address).split(/\r?\n/).map((s: string) => s.trim()).filter(Boolean)
-    : [];
 
   const lineItems: InvoiceLineItem[] = [
     { label: "Winning hammer bid", amount: hammer },
@@ -129,7 +129,6 @@ export async function renderInvoicePdf(
   const data: InvoicePdfData = {
     number,
     statusLabel: String(inv.status ?? "pending").toUpperCase(),
-    isPaid: String(inv.status ?? "").toLowerCase() === "paid",
     dateStr: fmtDate(created),
     payDueStr: fmtDate(payDeadline),
     confirmByStr: fmtDate(confirmDeadline),
@@ -137,18 +136,15 @@ export async function renderInvoicePdf(
     buyerName,
     buyerSubName,
     buyerEmail: inv.buyer?.email ?? null,
-    buyerPhone: inv.buyer?.phone ?? null,
-    buyerCountry: inv.buyer?.country ?? null,
     vehicleTitle: v ? `${v.year} ${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}` : null,
     vehicleVin: v?.vin ?? null,
-    vehicleMeta,
-    shippingAddressLines,
-    hero,
+    vehicleMileage: v?.mileage_km != null ? `${Number(v.mileage_km).toLocaleString("en-GB")} km` : null,
     lineItems,
     totalEur: total,
     disclaimer: CUSTOMS_DISCLAIMER_TEXT,
   };
 
-  const bytes = await buildInvoicePdfBytes(data);
+  const letterhead = await getLetterheadBytes();
+  const bytes = await buildInvoicePdfBytes(data, letterhead);
   return { buffer: Buffer.from(bytes), filename: `${number}.pdf` };
 }

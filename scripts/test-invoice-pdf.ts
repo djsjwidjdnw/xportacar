@@ -1,46 +1,45 @@
-// Standalone render check for the rebuilt invoice PDF (Task 3).
+// Standalone render check for the invoice PDF (overlay on the real letterhead).
 // Run: npx tsx scripts/test-invoice-pdf.ts
-// Imports the PURE layout (no DB / server-only) with mock data, writes a PDF, and
-// asserts it is a valid %PDF buffer of a sane size. Then rasterise + eyeball it.
+// Loads the letterhead from public/, draws the mock invoice content in the middle,
+// writes a PDF, and asserts it is a valid %PDF buffer.
 import { writeFileSync, readFileSync } from "node:fs";
 import { buildInvoicePdfBytes, type InvoicePdfData } from "../src/lib/invoice/pdfLayout";
 
 const CUSTOMS =
   "All import costs including customs duties and VAT are the responsibility of the buyer and are not included in our fees or shipping costs.";
 
+// Toggle a deliberately long vehicle title to verify wrapping (Task 3).
+const LONG_TITLE = process.argv.includes("--long");
+
 async function main() {
-  // Use the real square logo on disk as a stand-in landscape hero (tests the JPEG embed path).
-  const heroBytes = new Uint8Array(readFileSync("public/logos/xportacar-logo.jpg"));
+  const letterhead = new Uint8Array(readFileSync("public/invoice-letterhead.pdf"));
 
   const data: InvoicePdfData = {
     number: "XPC-2026-000042",
     statusLabel: "PENDING",
-    isPaid: false,
     dateStr: "17 June 2026",
     payDueStr: "24 June 2026",
-    confirmByStr: "19 June 2026",
+    confirmByStr: "18 June 2026",
     payByStr: "24 June 2026",
-    buyerName: "Auto Händler München GmbH", // umlaut -> sanitised to ASCII
-    buyerSubName: "Klaus Müller",
-    buyerEmail: "klaus@autohandler-muenchen.de",
-    buyerPhone: "+49 89 123456",
-    buyerCountry: "Germany",
-    vehicleTitle: "2021 Mercedes-Benz GLE 400d 4MATIC AMG Line",
-    vehicleVin: "WDC1671231A123456",
-    vehicleMeta: "Obsidian Black · 42,000 km",
-    shippingAddressLines: ["Hauptstrasse 12", "80331 Munich", "DE"],
-    hero: { bytes: heroBytes, isPng: false },
+    buyerName: "Chase Bitz",
+    buyerSubName: null,
+    buyerEmail: "cb@bradshawtrades.com",
+    vehicleTitle: LONG_TITLE
+      ? "2014 Mercedes-Benz SLS AMG Black Series 2dr Coupe SLS AMG Black Series Edition One Designo"
+      : "2014 Mercedes-Benz SLS AMG Black Series",
+    vehicleVin: "WDDRJ7HA7EA010686",
+    vehicleMileage: "6,000 km",
     lineItems: [
-      { label: "Winning hammer bid", amount: 68500 },
-      { label: "Platform fee (2.9%)", amount: 1986.5 },
-      { label: "Door-to-Door Delivery (1180 km)", amount: 8630 },
+      { label: "Winning hammer bid", amount: 171173 },
+      { label: "Platform fee (2.9%)", amount: 4964.02 },
+      { label: "Standard Port Shipping", amount: 4500 },
       { label: "German Registration (TÜV)", amount: 3570 },
     ],
-    totalEur: 82686.5,
+    totalEur: 184207.02,
     disclaimer: CUSTOMS,
   };
 
-  const bytes = await buildInvoicePdfBytes(data);
+  const bytes = await buildInvoicePdfBytes(data, letterhead);
   writeFileSync("_invoice_test.pdf", bytes);
 
   const header = Buffer.from(bytes.slice(0, 5)).toString("latin1");
