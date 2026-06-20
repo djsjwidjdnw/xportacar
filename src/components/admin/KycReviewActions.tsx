@@ -32,12 +32,37 @@ const COMMON_REASONS = [
 ];
 const OTHER = "__other__";
 
+const ID_LABELS: Record<string, string> = {
+  passport: "Passport",
+  drivers_license: "Driver's License",
+  national_id: "National ID",
+};
+const DOC_LABELS: Record<string, string> = {
+  id_document: "Personal ID",
+  trade_license: "Trade Licence",
+  utility_bill: "Utility bill",
+  other: "Document",
+};
+const DOC_ORDER: Record<string, number> = { id_document: 0, trade_license: 1, utility_bill: 2, other: 3 };
+
+function fmtDate(iso: string): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? "—"
+    : d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
+
 export function KycReviewActions({
-  userId, buyerName, email, isBusiness, status, docs,
+  userId, buyerName, fullName, email, phone, country, registeredAt, isBusiness, status, docs,
 }: {
   userId: string;
   buyerName: string;
+  fullName: string;
   email: string;
+  phone: string;
+  country: string;
+  registeredAt: string;
   isBusiness: boolean;
   status: KycStatus;
   docs: KycReviewDoc[];
@@ -50,6 +75,10 @@ export function KycReviewActions({
   const [isPending, startTransition] = useTransition();
 
   const effectiveReason = reasonChoice === OTHER ? reasonText.trim() : reasonChoice;
+  const idType = docs.find((d) => d.documentType === "id_document")?.idSubtype ?? null;
+  const orderedDocs = [...docs].sort(
+    (a, b) => (DOC_ORDER[a.documentType] ?? 9) - (DOC_ORDER[b.documentType] ?? 9),
+  );
 
   const submit = (decision: "approved" | "rejected") => {
     if (decision === "rejected" && effectiveReason.length < 10) {
@@ -74,21 +103,34 @@ export function KycReviewActions({
       <DialogTrigger render={
         <Button size="sm" variant="outline">{status === "pending" ? "Review" : "View"}</Button>
       } />
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Review verification — {buyerName}</DialogTitle>
           <DialogDescription>
-            {email} · {isBusiness ? "Business account" : "Individual"} · current status:{" "}
-            <span className="font-medium">{status}</span>
+            Confirm the documents match the registration details, then approve or reject.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          {docs.map((d, i) => (
+        {/* Section 1 — registration info */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-2.5 rounded-lg border border-grey-200 bg-grey-50/50 p-4">
+          <Info label="Full name" value={fullName || "—"} />
+          <Info label="Email" value={email || "—"} />
+          <Info label="Phone" value={phone || "—"} />
+          <Info label="Country" value={country || "—"} />
+          <Info label="Registered" value={fmtDate(registeredAt)} />
+          <Info label="Account type" value={isBusiness ? "Business" : "Personal"} />
+          <Info label="ID type" value={idType ? ID_LABELS[idType] ?? idType : "—"} />
+          <Info label="Status" value={status} />
+        </div>
+
+        {/* Section 2 — documents */}
+        <div className="space-y-4">
+          {orderedDocs.map((d, i) => (
             <DocPreview key={i} doc={d} />
           ))}
         </div>
 
+        {/* Section 3 — reject reason (revealed) */}
         {rejecting && (
           <div className="space-y-2 rounded-lg border border-error-100 bg-error-50/40 p-3">
             <label className="block text-xs font-semibold text-grey-700">Rejection reason</label>
@@ -136,8 +178,20 @@ export function KycReviewActions({
   );
 }
 
+function Info({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-[11px] font-semibold uppercase tracking-wide text-grey-500">{label}</p>
+      <p className="truncate text-sm text-grey-900 capitalize">{value}</p>
+    </div>
+  );
+}
+
 function DocPreview({ doc }: { doc: KycReviewDoc }) {
-  const label = doc.documentType.replace(/_/g, " ") + (doc.idSubtype ? ` · ${doc.idSubtype.replace(/_/g, " ")}` : "");
+  const label = DOC_LABELS[doc.documentType] ?? doc.documentType.replace(/_/g, " ");
+  const sub = doc.documentType === "id_document" && doc.idSubtype
+    ? ID_LABELS[doc.idSubtype] ?? doc.idSubtype.replace(/_/g, " ")
+    : null;
   const url = doc.url ?? "";
   const isImage = /\.(png|jpe?g)(\?|$)/i.test(url);
   const isPdf = /\.pdf(\?|$)/i.test(url);
@@ -145,7 +199,9 @@ function DocPreview({ doc }: { doc: KycReviewDoc }) {
   return (
     <div className="rounded-lg border border-grey-200 bg-grey-50/50 p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold capitalize text-grey-700">{label}</span>
+        <span className="text-sm font-semibold text-grey-800">
+          {label}{sub ? <span className="ml-1 text-xs font-normal text-grey-500">· {sub}</span> : null}
+        </span>
         <Badge className={doc.status === "approved"
           ? "bg-success-50 text-success-700 ring-1 ring-success-100"
           : doc.status === "rejected"
@@ -157,15 +213,15 @@ function DocPreview({ doc }: { doc: KycReviewDoc }) {
           <div className="overflow-hidden rounded-md border border-grey-200 bg-white">
             {isImage ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={url} alt={label} className="max-h-48 w-full object-contain" />
+              <img src={url} alt={label} className="mx-auto max-h-[440px] w-full object-contain" />
             ) : isPdf ? (
-              <iframe src={url} title={label} className="h-48 w-full" />
+              <iframe src={url} title={label} className="h-[480px] w-full" />
             ) : (
-              <div className="grid h-24 place-items-center text-grey-400"><FileText className="size-6" /></div>
+              <div className="grid h-28 place-items-center text-grey-400"><FileText className="size-6" /></div>
             )}
           </div>
           <a href={url} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-brand-700 hover:underline">
-            Open <ExternalLink className="size-3" />
+            Open full size <ExternalLink className="size-3" />
           </a>
         </>
       ) : (

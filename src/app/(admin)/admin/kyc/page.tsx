@@ -27,19 +27,24 @@ type SubmissionRow = {
     company_name: string | null;
     email: string | null;
     country: string | null;
+    phone: string | null;
     kyc_status: KycStatus;
     kyc_is_business: boolean | null;
+    created_at: string;
   } | null;
 };
 
 type Buyer = {
   userId: string;
   name: string;
+  fullName: string;
   email: string;
+  phone: string;
   country: string;
   isBusiness: boolean;
   status: KycStatus;
   submittedAt: string;
+  registeredAt: string;
   docs: KycReviewDoc[];
 };
 
@@ -49,7 +54,7 @@ export default async function AdminKycPage() {
     .from("kyc_submissions")
     .select(`
       id, user_id, document_type, id_subtype, file_url, status, created_at,
-      user:profiles!user_id (id, full_name, company_name, email, country, kyc_status, kyc_is_business)
+      user:profiles!user_id (id, full_name, company_name, email, country, phone, kyc_status, kyc_is_business, created_at)
     `)
     .order("created_at", { ascending: false });
   const rows = (rowsRaw ?? []) as unknown as SubmissionRow[];
@@ -74,11 +79,14 @@ export default async function AdminKycPage() {
       byUser.set(r.user_id, {
         userId: r.user_id,
         name: r.user.company_name ?? r.user.full_name ?? "—",
+        fullName: r.user.full_name ?? "",
         email: r.user.email ?? "",
+        phone: r.user.phone ?? "",
         country: r.user.country ?? "",
         isBusiness: !!r.user.kyc_is_business,
         status: r.user.kyc_status,
         submittedAt: r.created_at,
+        registeredAt: r.user.created_at,
         docs: [doc],
       });
     }
@@ -162,7 +170,11 @@ export default async function AdminKycPage() {
                     <KycReviewActions
                       userId={b.userId}
                       buyerName={b.name}
+                      fullName={b.fullName}
                       email={b.email}
+                      phone={b.phone}
+                      country={b.country}
+                      registeredAt={b.registeredAt}
                       isBusiness={b.isBusiness}
                       status={b.status}
                       docs={b.docs}
