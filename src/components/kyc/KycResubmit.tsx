@@ -71,7 +71,7 @@ export function KycResubmit({ defaultBusiness = false }: { defaultBusiness?: boo
             onClick={() => setIsBusiness(opt.v)}
             className={`h-10 flex-1 rounded-lg border text-sm font-semibold transition ${
               isBusiness === opt.v
-                ? "border-primary-600 bg-primary-50 text-primary-700"
+                ? "border-brand-600 bg-brand-50 text-brand-700"
                 : "border-grey-200 bg-white text-grey-600 hover:border-grey-300"
             }`}
           >
@@ -121,7 +121,7 @@ function FilePicker({
   return (
     <div className="space-y-1.5">
       <Label>{label}</Label>
-      <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-grey-300 bg-white px-3 py-2.5 text-sm text-grey-600 hover:border-primary-400">
+      <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-grey-300 bg-white px-3 py-2.5 text-sm text-grey-600 hover:border-brand-400">
         {fileName ? <FileCheck2 className="h-5 w-5 shrink-0 text-success-600" /> : <UploadCloud className="h-5 w-5 shrink-0 text-grey-400" />}
         <span className="truncate">{fileName ?? chooseLabel}</span>
         <input ref={inputRef} type="file" accept={FILE_ACCEPT} onChange={onPick} className="sr-only" />
