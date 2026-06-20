@@ -330,6 +330,18 @@ async function cascadeProxies(auctionId: string, lastBidderId: string, lastAmoun
     if (p.proxy_max_eur > cur) maxByBidder.set(p.bidder_id, p.proxy_max_eur);
   }
 
+  // KYC gate also applies to proxy auto-bids. These inserts use the service-role
+  // client (bidding on someone else's behalf bypasses the bids RLS), so drop any
+  // bidder who is no longer verified — e.g. an admin rejected them mid-auction.
+  const bidderIds = [...maxByBidder.keys()];
+  if (bidderIds.length > 0) {
+    const { data: verifiedRows } = await admin
+      .from("profiles").select("id").in("id", bidderIds).eq("kyc_status", "verified");
+    const verified = new Set((verifiedRows ?? []).map((r) => (r as { id: string }).id));
+    for (const id of bidderIds) if (!verified.has(id)) maxByBidder.delete(id);
+    if (maxByBidder.size === 0) return;
+  }
+
   let topAmount = lastAmount;
   let topBidder = lastBidderId;
   const STEP = 500;

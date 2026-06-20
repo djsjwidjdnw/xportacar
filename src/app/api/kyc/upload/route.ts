@@ -12,11 +12,13 @@ const ALLOWED_MIME = new Set(["application/pdf", "image/png", "image/jpeg"]);
 const ALLOWED_ID_SUBTYPES: KycIdSubtype[] = ["passport", "drivers_license", "national_id"];
 
 function extFor(file: File): string {
-  const fromName = file.name.split(".").pop()?.toLowerCase();
-  if (fromName && /^[a-z0-9]{1,5}$/.test(fromName)) return fromName;
+  // Derive from the (validated) MIME first so the stored key always has a
+  // previewable extension; fall back to a sane filename extension.
   if (file.type === "application/pdf") return "pdf";
   if (file.type === "image/png") return "png";
-  return "jpg";
+  if (file.type === "image/jpeg") return "jpg";
+  const fromName = file.name.split(".").pop()?.toLowerCase();
+  return fromName && /^[a-z0-9]{1,5}$/.test(fromName) ? fromName : "bin";
 }
 
 function badFile(file: unknown): string | null {

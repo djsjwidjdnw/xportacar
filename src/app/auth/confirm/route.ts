@@ -16,8 +16,11 @@ export const runtime = "nodejs";
 // already signed in (when the flow can establish a session in this browser).
 
 function safeNext(next: string | null): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//")) return "/pending-verification";
-  return next;
+  // Normalise backslashes first: the WHATWG URL parser treats "\" as "/", so
+  // "/\evil.com" would resolve to a different origin (open redirect).
+  const n = (next ?? "").replace(/\\/g, "/");
+  if (!n.startsWith("/") || n.startsWith("//")) return "/pending-verification";
+  return n;
 }
 
 export async function GET(req: NextRequest) {

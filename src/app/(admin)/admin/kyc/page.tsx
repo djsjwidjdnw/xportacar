@@ -84,12 +84,15 @@ export default async function AdminKycPage() {
     }
   });
 
+  // "Awaiting review" = has at least one pending document. This matches the
+  // sidebar badge (distinct users with a pending submission) exactly.
+  const hasPending = (b: Buyer) => b.docs.some((d) => d.status === "pending");
   const buyers = [...byUser.values()].sort((a, b) => {
-    if (a.status === "pending" && b.status !== "pending") return -1;
-    if (b.status === "pending" && a.status !== "pending") return 1;
+    const ap = hasPending(a), bp = hasPending(b);
+    if (ap !== bp) return ap ? -1 : 1;
     return b.submittedAt.localeCompare(a.submittedAt);
   });
-  const pendingCount = buyers.filter((b) => b.status === "pending").length;
+  const pendingCount = buyers.filter(hasPending).length;
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
