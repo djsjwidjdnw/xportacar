@@ -32,7 +32,7 @@ const NAV = [
   { href: "/admin/settings",        key: "navSettings",    icon: Settings },
 ] as const;
 
-function NavBody({ onNavigate }: { onNavigate?: () => void }) {
+function NavBody({ onNavigate, pendingKyc = 0 }: { onNavigate?: () => void; pendingKyc?: number }) {
   const pathname = usePathname();
   const t = useTranslations("admin");
   return (
@@ -40,6 +40,7 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
       {NAV.map((item) => {
         const Icon = item.icon;
         const active = pathname.startsWith(item.href);
+        const badge = item.href === "/admin/kyc" && pendingKyc > 0 ? pendingKyc : 0;
         return (
           <Link
             key={item.href}
@@ -54,6 +55,11 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
           >
             <Icon className={cn("size-4", active ? "text-brand-400" : "text-grey-400 group-hover:text-grey-200")} />
             <span className="flex-1">{t(item.key)}</span>
+            {badge > 0 && (
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1.5 text-[11px] font-bold text-white">
+                {badge}
+              </span>
+            )}
             {active && <ChevronRight className="size-4 text-brand-400" />}
           </Link>
         );
@@ -62,14 +68,14 @@ function NavBody({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-export function AdminSidebar({ profile }: { profile: Profile | null }) {
+export function AdminSidebar({ profile, pendingKyc = 0 }: { profile: Profile | null; pendingKyc?: number }) {
   return (
     <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:z-40 bg-grey-900 border-r border-grey-800">
       <div className="flex h-16 items-center justify-between border-b border-grey-800 px-5">
         <Logo variant="dark" href="/admin/dashboard" />
       </div>
       <div className="flex-1 overflow-y-auto scrollbar-thin">
-        <NavBody />
+        <NavBody pendingKyc={pendingKyc} />
       </div>
       <div className="border-t border-grey-800 p-4">
         {profile && (
@@ -93,7 +99,7 @@ export function AdminSidebar({ profile }: { profile: Profile | null }) {
   );
 }
 
-export function AdminTopBar({ profile }: { profile: Profile | null }) {
+export function AdminTopBar({ profile, pendingKyc = 0 }: { profile: Profile | null; pendingKyc?: number }) {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-grey-800 bg-grey-900 px-4 lg:hidden">
@@ -109,7 +115,7 @@ export function AdminTopBar({ profile }: { profile: Profile | null }) {
               <Logo variant="dark" href="/admin/dashboard" />
             </SheetTitle>
           </SheetHeader>
-          <NavBody onNavigate={() => setOpen(false)} />
+          <NavBody onNavigate={() => setOpen(false)} pendingKyc={pendingKyc} />
           {profile && (
             <div className="mt-auto border-t border-grey-800 p-4">
               <p className="text-sm font-semibold text-white">{profile.full_name ?? profile.email}</p>

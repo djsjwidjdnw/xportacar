@@ -1,139 +1,99 @@
 "use server";
 
-// KYC submission server actions.  Stores documents in Supabase Storage
-// at kyc/{user_id}/{timestamp}-{filename} and records a submission row.
+// Admin KYC review action. Document uploads now go through POST /api/kyc/upload
+// (signup token / cookie session / mobile bearer); this file only handles the
+// admin approve/reject decision for a buyer.
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { KycDocType } from "@/types";
+import { sendKycApprovedEmail, sendKycRejectedEmail } from "@/lib/email";
 
-const BUCKET = "kyc-documents";
-
-export interface KycUploadResult {
+export interface KycReviewResult {
   ok: boolean;
   error?: string;
-  fileUrl?: string;
 }
 
-const ALLOWED_DOC_TYPES: KycDocType[] = ["trade_license", "id_document", "utility_bill", "other"];
-
-export async function submitKycDocumentAction(
-  _prev: KycUploadResult | undefined,
-  formData: FormData,
-): Promise<KycUploadResult> {
+async function requireAdmin() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Not signed in." };
-
-  const file = formData.get("file");
-  const documentType = String(formData.get("document_type") ?? "trade_license") as KycDocType;
-  if (!(file instanceof File) || file.size === 0) {
-    return { ok: false, error: "Choose a file to upload." };
-  }
-  if (!ALLOWED_DOC_TYPES.includes(documentType)) {
-    return { ok: false, error: "Invalid document type." };
-  }
-  if (file.size > 8 * 1024 * 1024) {
-    return { ok: false, error: "File must be 8 MB or smaller." };
-  }
-
-  // Use admin client to handle Storage upload (RLS doesn't apply to storage
-  // bucket policies the same way and is simpler to manage from server actions).
-  const admin = createAdminClient();
-
-  // Ensure bucket exists.  No-op on subsequent calls.
-  try {
-    await admin.storage.createBucket(BUCKET, { public: true });
-  } catch { /* already exists */ }
-
-  const fileExt = file.name.split(".").pop()?.toLowerCase() ?? "bin";
-  const objectKey = `${user.id}/${Date.now()}-${documentType}.${fileExt}`;
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  const { error: upErr } = await admin.storage
-    .from(BUCKET)
-    .upload(objectKey, buffer, {
-      contentType: file.type || "application/octet-stream",
-      upsert: false,
-    });
-  if (upErr) return { ok: false, error: upErr.message };
-
-  const { data: publicUrl } = admin.storage.from(BUCKET).getPublicUrl(objectKey);
-
-  const { error: insErr } = await supabase
-    .from("kyc_submissions")
-    .insert({
-      user_id:       user.id,
-      document_type: documentType,
-      file_url:      publicUrl.publicUrl,
-      status:        "pending",
-    });
-  if (insErr) return { ok: false, error: insErr.message };
-
-  // Mark profile pending (in case it was rejected before).
-  await supabase.from("profiles").update({ kyc_status: "pending" }).eq("id", user.id);
-
-  revalidatePath("/profile");
-  revalidatePath("/admin/kyc");
-  return { ok: true, fileUrl: publicUrl.publicUrl };
-}
-
-export async function reviewKycSubmissionAction(input: {
-  submissionId: string;
-  decision: "approved" | "rejected";
-  note?: string;
-}): Promise<{ ok: boolean; error?: string }> {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Not signed in." };
-
+  if (!user) return { reviewer: null, error: "Not signed in." as const };
   const { data: profile } = await supabase
     .from("profiles").select("role").eq("id", user.id).single();
-  if (!profile || !["admin", "superadmin"].includes(profile.role)) {
-    return { ok: false, error: "Admin only." };
+  const role = (profile as { role?: string } | null)?.role;
+  if (!role || !["admin", "superadmin"].includes(role)) {
+    return { reviewer: null, error: "Admin only." as const };
+  }
+  return { reviewer: user, error: null };
+}
+
+// Approve or reject a buyer's KYC. Updates the profile (status + audit +
+// rejection reason), marks their pending submissions reviewed, notifies them,
+// and sends the localized approval/rejection email.
+export async function reviewBuyerKycAction(input: {
+  userId: string;
+  decision: "approved" | "rejected";
+  reason?: string;
+}): Promise<KycReviewResult> {
+  const { reviewer, error } = await requireAdmin();
+  if (error || !reviewer) return { ok: false, error: error ?? "Admin only." };
+
+  const { decision } = input;
+  const reason = (input.reason ?? "").trim();
+  if (decision === "rejected" && reason.length < 10) {
+    return { ok: false, error: "Add a rejection reason (at least 10 characters)." };
   }
 
   const admin = createAdminClient();
-  const { data: sub } = await admin
-    .from("kyc_submissions")
-    .select("id, user_id")
-    .eq("id", input.submissionId)
-    .single();
-  if (!sub) return { ok: false, error: "Submission not found." };
+  const nowIso = new Date().toISOString();
 
+  const { error: upErr } = await admin
+    .from("profiles")
+    .update({
+      kyc_status:           decision === "approved" ? "verified" : "rejected",
+      kyc_reviewed_at:      nowIso,
+      kyc_reviewed_by:      reviewer.id,
+      kyc_rejection_reason: decision === "approved" ? null : reason,
+    })
+    .eq("id", input.userId);
+  if (upErr) return { ok: false, error: upErr.message };
+
+  // Mark this buyer's pending submissions reviewed (mirror the decision).
   await admin
     .from("kyc_submissions")
     .update({
-      status:        input.decision,
-      reviewed_by:   user.id,
-      reviewer_note: input.note ?? null,
-      reviewed_at:   new Date().toISOString(),
+      status:        decision,
+      reviewed_by:   reviewer.id,
+      reviewer_note: decision === "rejected" ? reason : null,
+      reviewed_at:   nowIso,
     })
-    .eq("id", input.submissionId);
+    .eq("user_id", input.userId)
+    .eq("status", "pending");
 
-  if (input.decision === "approved") {
-    await admin
-      .from("profiles")
-      .update({ kyc_status: "verified" })
-      .eq("id", (sub as { user_id: string }).user_id);
-  } else {
-    await admin
-      .from("profiles")
-      .update({ kyc_status: "rejected" })
-      .eq("id", (sub as { user_id: string }).user_id);
-  }
-
+  // Notify + email (best-effort; email transport never throws).
   await admin.from("notifications").insert({
-    user_id: (sub as { user_id: string }).user_id,
+    user_id: input.userId,
     type:    "status_update",
-    title:   input.decision === "approved" ? "KYC approved" : "KYC needs attention",
-    body:    input.decision === "approved"
-      ? "Your trade account is verified. Welcome aboard!"
-      : `Your KYC was rejected. ${input.note ? `Reason: ${input.note}` : "Please re-submit corrected documents."}`,
+    title:   decision === "approved" ? "Account verified" : "Verification needs attention",
+    body:    decision === "approved"
+      ? "Your trade account is verified — you can now bid and use Buy Now."
+      : `Your verification was declined. Reason: ${reason}`,
   });
 
+  const { data: target } = await admin
+    .from("profiles").select("email, full_name, language").eq("id", input.userId).maybeSingle();
+  const t = target as { email?: string; full_name?: string; language?: string } | null;
+  if (t?.email) {
+    if (decision === "approved") {
+      await sendKycApprovedEmail({ to: t.email, name: t.full_name ?? "", locale: t.language });
+    } else {
+      await sendKycRejectedEmail({ to: t.email, name: t.full_name ?? "", reason, locale: t.language });
+    }
+  }
+
   revalidatePath("/admin/kyc");
+  revalidatePath("/admin/users");
+  revalidatePath("/pending-verification");
   revalidatePath("/profile");
   return { ok: true };
 }

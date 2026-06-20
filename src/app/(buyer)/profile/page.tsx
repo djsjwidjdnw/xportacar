@@ -3,11 +3,12 @@ import { ShieldCheck } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { KycUploader } from "@/components/profile/KycUploader";
+import { KycResubmit } from "@/components/kyc/KycResubmit";
 import { ProfileEditForm } from "@/components/profile/ProfileEditForm";
 import { DeleteAccountSection } from "@/components/profile/DeleteAccountSection";
 import { ChangePasswordSection } from "@/components/profile/ChangePasswordSection";
 import { createClient } from "@/lib/supabase/server";
+import { signKycDoc } from "@/lib/kyc/signDocs";
 import { getTranslations } from "@/i18n/server";
 import { formatRelativeTime, initials } from "@/lib/utils";
 import type { KycSubmission, Profile } from "@/types";
@@ -38,6 +39,11 @@ export default async function ProfilePage() {
     country: null,
     language: "en",
     kyc_status: "pending" as const,
+    kyc_is_business: false,
+    kyc_rejection_reason: null,
+    kyc_submitted_at: null,
+    kyc_reviewed_at: null,
+    kyc_reviewed_by: null,
     avatar_url: null,
     full_name: user.email ?? null,
     email: user.email ?? null,
@@ -45,6 +51,7 @@ export default async function ProfilePage() {
     updated_at: new Date().toISOString(),
   };
   const kycSubmissions = (kycRows as KycSubmission[] | null) ?? [];
+  const signedDocs = await Promise.all(kycSubmissions.map((s) => signKycDoc(s.file_url)));
 
   return (
     <div className="bg-grey-50 py-10">
@@ -100,10 +107,36 @@ export default async function ProfilePage() {
               Verify your account
             </h3>
             <p className="mt-1 text-sm text-grey-600">
-              Submit your trade licence and a photo of your government ID. Approval typically takes one business day.
+              Submit a photo of your government ID{profile.kyc_is_business ? " and your trade licence" : ""}. Approval typically takes one business day.
             </p>
+            {profile.kyc_status === "rejected" && profile.kyc_rejection_reason && (
+              <p className="mt-3 rounded-lg bg-error-50 px-4 py-3 text-sm text-error-700">
+                <span className="font-semibold">Reason:</span> {profile.kyc_rejection_reason}
+              </p>
+            )}
+
+            {kycSubmissions.length > 0 && (
+              <ul className="mt-4 space-y-2">
+                {kycSubmissions.map((s, i) => (
+                  <li key={s.id} className="flex items-center justify-between gap-3 rounded-lg border border-grey-200 bg-white px-3 py-2 text-sm">
+                    <span className="truncate capitalize text-grey-700">
+                      {s.document_type.replace(/_/g, " ")}
+                      {signedDocs[i] && (
+                        <a href={signedDocs[i] as string} target="_blank" rel="noreferrer" className="ml-2 text-xs font-medium text-brand-700 hover:underline">view</a>
+                      )}
+                    </span>
+                    <Badge className={s.status === "approved"
+                      ? "bg-success-50 text-success-700 ring-1 ring-success-100"
+                      : s.status === "rejected"
+                      ? "bg-error-50 text-error-700 ring-1 ring-error-100"
+                      : "bg-warning-50 text-warning-700 ring-1 ring-warning-100"}>{s.status}</Badge>
+                  </li>
+                ))}
+              </ul>
+            )}
+
             <div className="mt-5">
-              <KycUploader submissions={kycSubmissions} />
+              <KycResubmit defaultBusiness={profile.kyc_is_business} />
             </div>
           </section>
         )}

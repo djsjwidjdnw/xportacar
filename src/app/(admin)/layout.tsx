@@ -26,10 +26,15 @@ export default async function AdminLayout({
     redirect("/");
   }
 
+  // Pending-KYC badge count (distinct buyers with a pending submission).
+  const { data: pendingRows } = await supabase
+    .from("kyc_submissions").select("user_id").eq("status", "pending");
+  const pendingKyc = new Set((pendingRows ?? []).map((r) => (r as { user_id: string }).user_id)).size;
+
   return (
     <div className="min-h-screen bg-grey-50">
-      <AdminSidebar profile={profile} />
-      <AdminTopBar profile={profile} />
+      <AdminSidebar profile={profile} pendingKyc={pendingKyc} />
+      <AdminTopBar profile={profile} pendingKyc={pendingKyc} />
       <main className="lg:pl-64">
         {/* Desktop top bar — holds the user menu (top-right) so admins can
             reach profile / sign out without a crash. */}
