@@ -17,6 +17,24 @@ export interface ActionResult {
   data?: Record<string, unknown>;
 }
 
+// KYC gate. Returns an error string when the signed-in buyer is not verified
+// ('verified' is the approved state of the kyc_status enum). The DB enforces
+// this too (bids INSERT RLS + buy_now() RPC, migration 024) — this gives a
+// clean message instead of a raw RLS failure, and is the only TS-side guard
+// the web bid path relies on.
+async function kycGate(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+): Promise<string | null> {
+  const { data: profile } = await supabase
+    .from("profiles").select("kyc_status").eq("id", userId).single();
+  const status = (profile as { kyc_status?: string } | null)?.kyc_status;
+  if (status === "verified") return null;
+  return status === "rejected"
+    ? "Your verification was declined. Re-submit your documents from your profile to bid."
+    : "Your account is pending verification. You can bid once an admin approves your documents.";
+}
+
 // --------------------------------------------------------------------
 // Place a bid (with optional proxy maximum)
 //
@@ -33,6 +51,9 @@ export async function placeBidAction(input: {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in to place a bid." };
+
+  const kycErr = await kycGate(supabase, user.id);
+  if (kycErr) return { ok: false, error: kycErr };
 
   // Rate limit: at most one bid per second per user (anti-spam). Uses the
   // idx_bids_bidder (bidder_id, created_at desc) index, so it's a cheap lookup.
@@ -113,6 +134,9 @@ export async function buyNowAction(input: {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in to buy this vehicle." };
+
+  const kycErr = await kycGate(supabase, user.id);
+  if (kycErr) return { ok: false, error: kycErr };
 
   const { data: auction, error: aErr } = await supabase
     .from("auctions")
@@ -216,6 +240,9 @@ export async function placeCounterOfferAction(input: {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in to make a counter offer." };
+
+  const kycErr = await kycGate(supabase, user.id);
+  if (kycErr) return { ok: false, error: kycErr };
 
   if (!Number.isFinite(input.amountEur) || input.amountEur <= 0) {
     return { ok: false, error: "Enter a valid offer amount." };

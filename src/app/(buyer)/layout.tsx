@@ -2,6 +2,7 @@ import { Suspense } from "react";
 
 import { BuyerNav } from "@/components/layout/BuyerNav";
 import { Footer } from "@/components/layout/Footer";
+import { KycBanner } from "@/components/shared/KycBanner";
 import { WelcomeToast } from "@/components/shared/WelcomeToast";
 import { CurrencyProvider } from "@/lib/currency";
 import { createClient } from "@/lib/supabase/server";
@@ -34,6 +35,7 @@ export default async function BuyerLayout({
   return (
     <CurrencyProvider>
       <BuyerNav profile={profile} notifications={notifications} />
+      <KycBanner status={profile?.kyc_status ?? null} />
       <Suspense fallback={null}>
         <WelcomeToast />
       </Suspense>

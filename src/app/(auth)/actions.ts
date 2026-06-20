@@ -2,13 +2,17 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { sendWelcomeEmail } from "@/lib/email";
+import { registerBuyer } from "@/lib/auth/registerBuyer";
 import { resolveLocale } from "@/i18n/server";
 
 export type AuthFormState = {
   ok: boolean;
   error?: string;
   message?: string;
+  // Set after a successful signUp so the client can run the KYC document
+  // upload step (session-free) and then route the buyer onward.
+  needsConfirm?: boolean;   // true when email confirmation is required (no session yet)
+  uploadToken?: string;     // one-time token for POST /api/kyc/upload
 };
 
 export async function signInAction(
@@ -33,64 +37,28 @@ export async function signUpAction(
   _prev: AuthFormState | undefined,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const email = String(formData.get("email") ?? "").trim();
-  const password = String(formData.get("password") ?? "");
-  const fullName = String(formData.get("fullName") ?? "").trim();
-  const companyName = String(formData.get("companyName") ?? "").trim();
-  const country = String(formData.get("country") ?? "").trim();
-
-  if (!email || !password || !fullName) {
-    return { ok: false, error: "Please fill the required fields." };
-  }
-  if (password.length < 8) {
-    return { ok: false, error: "Password must be at least 8 characters." };
-  }
-
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName, company_name: companyName, country, role: "buyer" },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}/marketplace`,
-    },
+  const res = await registerBuyer(supabase, {
+    email: String(formData.get("email") ?? ""),
+    password: String(formData.get("password") ?? ""),
+    fullName: String(formData.get("fullName") ?? ""),
+    companyName: String(formData.get("companyName") ?? ""),
+    country: String(formData.get("country") ?? ""),
+    isBusiness: String(formData.get("isBusiness") ?? "") === "true",
+    locale: await resolveLocale(),
   });
-  if (error) return { ok: false, error: error.message };
+  if (!res.ok) return { ok: false, error: res.error };
 
-  // The DB trigger `handle_new_user` inserts the profile row.  As a safety
-  // net for environments where the trigger isn't deployed, upsert the row
-  // here too — role defaults to 'buyer', kyc_status to 'pending'.
-  if (data.user) {
-    await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id:           data.user.id,
-          email,
-          full_name:    fullName,
-          company_name: companyName || null,
-          country:      country     || null,
-          role:         "buyer",
-          kyc_status:   "pending",
-        },
-        { onConflict: "id" },
-      );
-  }
-
-  // Welcome email (best-effort; no-ops silently if RESEND_API_KEY is unset,
-  // and never throws). Sent before any redirect below since redirect() throws.
-  // Localize to the signup UI language (cookie-resolved).
-  if (data.user) {
-    const locale = await resolveLocale();
-    await sendWelcomeEmail({ to: email, name: fullName, locale });
-  }
-
-  // If email confirmation is disabled the user is already a session — send
-  // them straight to the marketplace with a welcome toast.
-  if (data.session) {
-    redirect("/marketplace?welcome=1");
-  }
-  return { ok: true, message: "Account created — check your email to verify." };
+  // Do NOT redirect here: the client runs the document-upload step first
+  // (the token / needsConfirm flag drive what it does next).
+  return {
+    ok: true,
+    needsConfirm: res.needsConfirm,
+    uploadToken: res.uploadToken,
+    message: res.needsConfirm
+      ? "Account created — check your email to confirm your address."
+      : "Account created.",
+  };
 }
 
 export async function signOutAction() {

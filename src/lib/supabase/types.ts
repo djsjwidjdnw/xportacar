@@ -31,6 +31,7 @@ export type CounterOfferStatus = "pending" | "accepted" | "rejected" | "expired"
 export type InvoiceStatus      = "pending" | "paid" | "cancelled";
 export type KycDocType         = "trade_license" | "id_document" | "utility_bill" | "other";
 export type KycReviewStatus    = "pending" | "approved" | "rejected";
+export type KycIdSubtype        = "passport" | "drivers_license" | "national_id";
 export type DevicePlatform     = "ios" | "android" | "web";
 
 export interface Profile {
@@ -42,6 +43,11 @@ export interface Profile {
   country: string | null;
   language: string;
   kyc_status: KycStatus;
+  kyc_is_business: boolean;
+  kyc_rejection_reason: string | null;
+  kyc_submitted_at: string | null;
+  kyc_reviewed_at: string | null;
+  kyc_reviewed_by: string | null;
   avatar_url: string | null;
   full_name: string | null;
   email: string | null;
@@ -203,6 +209,7 @@ export interface KycSubmission {
   id: string;
   user_id: string;
   document_type: KycDocType;
+  id_subtype: KycIdSubtype | null;
   file_url: string;
   status: KycReviewStatus;
   reviewed_by: string | null;

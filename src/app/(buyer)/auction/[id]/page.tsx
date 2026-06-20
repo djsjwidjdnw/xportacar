@@ -10,7 +10,7 @@ import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
 import { auctionPhase } from "@/lib/utils";
-import type { Auction, BidWithBidder, VehicleWithMedia } from "@/types";
+import type { Auction, BidWithBidder, KycStatus, VehicleWithMedia } from "@/types";
 
 export default async function AuctionPage({
   params,
@@ -47,6 +47,13 @@ export default async function AuctionPage({
       .order("created_at", { ascending: false }),
     supabase.auth.getUser(),
   ]);
+
+  let kycStatus: KycStatus | null = null;
+  if (user) {
+    const { data: prof } = await supabase
+      .from("profiles").select("kyc_status").eq("id", user.id).single();
+    kycStatus = (prof as { kyc_status?: KycStatus } | null)?.kyc_status ?? null;
+  }
 
   const bids = (bidsRows ?? []) as unknown as BidWithBidder[];
   const photos = (v.vehicle_photos ?? [])
@@ -134,6 +141,7 @@ export default async function AuctionPage({
                 isAuthenticated={!!user}
                 currentUserId={user?.id ?? null}
                 vehicleTitle={vehicleTitle}
+                kycStatus={kycStatus}
               />
             </div>
           </aside>

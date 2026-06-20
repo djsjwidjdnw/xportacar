@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Minus, Plus, Gavel, ShoppingCart, MessageSquare, TrendingUp, Trophy, ArrowRight } from "lucide-react";
+import { Minus, Plus, Gavel, ShoppingCart, MessageSquare, TrendingUp, Trophy, ArrowRight, ShieldAlert } from "lucide-react";
 import { useEffect, useMemo, useState, type ComponentProps } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -28,7 +28,7 @@ import {
   buyNowAction,
   placeCounterOfferAction,
 } from "@/app/(buyer)/auction/actions";
-import type { Auction, BidWithBidder } from "@/types";
+import type { Auction, BidWithBidder, KycStatus } from "@/types";
 
 // Euro-prefixed numeric field. A flex "input group": the € is a real inline
 // element to the left of a borderless input, so the symbol always sits beside
@@ -65,6 +65,7 @@ export function BidPanel({
   isAuthenticated,
   currentUserId,
   vehicleTitle,
+  kycStatus,
 }: {
   auction: Auction;
   bids: BidWithBidder[];
@@ -72,6 +73,7 @@ export function BidPanel({
   isAuthenticated: boolean;
   currentUserId: string | null;
   vehicleTitle: string;
+  kycStatus: KycStatus | null;
 }) {
   const t = useTranslations();
   const router = useRouter();
@@ -127,6 +129,8 @@ export function BidPanel({
     return () => window.clearInterval(id);
   }, []);
   const auctionEnded = auctionPhase(auction, now) === "ended";
+  // Signed-in but unverified buyers can browse the auction but not participate.
+  const kycBlocked = isAuthenticated && kycStatus !== "verified";
 
   const placeBid = async () => {
     if (!isAuthenticated) {
@@ -278,6 +282,24 @@ export function BidPanel({
 
         {/* ----- Bid input ----- */}
         <div className="mt-6 border-t border-grey-100 pt-6">
+          {kycBlocked && !auctionEnded ? (
+            <div className="rounded-xl border border-warning-200 bg-warning-50 p-4 text-center">
+              <ShieldAlert className="mx-auto h-6 w-6 text-warning-600" />
+              <p className="mt-2 text-sm font-bold text-grey-900">
+                {kycStatus === "rejected" ? t("kyc.rejectedTitle") : t("kyc.bidLockedPendingTitle")}
+              </p>
+              <p className="mt-1 text-xs text-grey-600">
+                {kycStatus === "rejected" ? t("kyc.bidLockedRejectedBody") : t("kyc.bidLockedPendingBody")}
+              </p>
+              <Link
+                href="/pending-verification"
+                className={cn(buttonVariants({ variant: "default", size: "lg" }), "mt-4 h-11 w-full text-base")}
+              >
+                {t("kyc.bidLockedCta")}
+              </Link>
+            </div>
+          ) : (
+          <>
           <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">
             {t("auction.yourBid")}
           </p>
@@ -438,6 +460,8 @@ export function BidPanel({
                 </DialogFooter>
               </DialogContent>
             </Dialog>
+          )}
+          </>
           )}
         </div>
       </div>
