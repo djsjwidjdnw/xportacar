@@ -30,8 +30,13 @@ export async function GET(req: NextRequest) {
   const supabase = await createClient();
 
   if (tokenHash) {
-    const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
-    if (!error) return NextResponse.redirect(new URL(next, url.origin));
+    // Try the template's type first, then the common email-confirmation types,
+    // so the handler works whether the template uses type=signup or type=email.
+    const candidates = [...new Set([type, "signup", "email"])] as EmailOtpType[];
+    for (const ty of candidates) {
+      const { error } = await supabase.auth.verifyOtp({ type: ty, token_hash: tokenHash });
+      if (!error) return NextResponse.redirect(new URL(next, url.origin));
+    }
   } else if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(new URL(next, url.origin));

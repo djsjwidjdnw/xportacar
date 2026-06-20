@@ -32,17 +32,23 @@ you can lift it).
 ## 2. Confirm the redirect URLs
 
 Dashboard → **Authentication → URL Configuration**:
-- [ ] **Site URL:** `https://xportacar.com`
-- [ ] **Redirect URLs:** include `https://xportacar.com/**` (and any preview URLs).
-      This wildcard must cover **`https://xportacar.com/reset-password/callback`**,
-      which is where the "Forgot password" flow (web + both mobile apps) lands —
-      the reset email's link redirects there to set a new password. For local
-      dev also add `http://localhost:3000/**`. If a recovery link shows
-      "invalid or expired", the callback URL is almost always not allow-listed.
+- [ ] **Site URL:** `https://www.xportacar.com`  (the canonical serving host —
+      matches the mobile app's `webUrl`. The confirm-signup link is built from
+      `{{ .SiteURL }}`, so this must be the host the app actually serves on to
+      avoid an apex→www redirect dropping the session cookie.)
+- [ ] **Redirect URLs:** include `https://www.xportacar.com/**`,
+      `https://xportacar.com/**`, and any preview URLs. These wildcards must cover
+      **`/reset-password/callback`** (Forgot-password flow) **and the new
+      `/auth/confirm`** (signup confirmation). For local dev also add
+      `http://localhost:3000/**`. If a confirm/recovery link shows "invalid or
+      expired", the URL is almost always not allow-listed.
 
-(Auto-confirm note: signups are auto-confirmed, so the "Confirm signup" email is
-usually not sent — the template is included below for completeness / if you ever
-turn confirmation on.)
+### Enable email confirmation (KYC delivery — June 2026)
+Dashboard → **Authentication → Providers → Email** → turn **Confirm email ON**
+(disables auto-confirm). New signups then receive the "Confirm signup" email
+(template 3a below) and must click it before they can sign in. The app already
+handles both states, and KYC documents are uploaded **before** confirmation, so
+nothing breaks in the window before you flip this.
 
 ## 3. Paste the branded templates
 
@@ -51,21 +57,30 @@ the editor to HTML and paste the corresponding block. Supabase fills the
 `{{ … }}` variables at send time — **leave them exactly as written**.
 
 Common variables: `{{ .ConfirmationURL }}` (the action link), `{{ .SiteURL }}`,
-`{{ .Email }}`, `{{ .NewEmail }}` (change-email only), `{{ .Token }}` (6-digit OTP).
+`{{ .TokenHash }}` (used by the confirm-signup link below), `{{ .Email }}`,
+`{{ .NewEmail }}` (change-email only), `{{ .Token }}` (6-digit OTP).
 
 All four share the same shell (blue `#1570EF` header, matching `src/lib/email/`).
 
 ### 3a. Confirm signup
 Subject: `Confirm your XportACar account`
+
+> **Use the `token_hash` link (below), NOT `{{ .ConfirmationURL }}`.** The default
+> `{{ .ConfirmationURL }}` uses the PKCE code flow, whose verifier only exists in
+> the browser that signed up — so a **mobile** signup (confirmed in the phone
+> browser) would fail. The `token_hash` link is verified server-side by our
+> `/auth/confirm` route and works on **any** device. (Our `/auth/confirm` accepts
+> both, but the email must use this one for mobile to work.)
+
 ```html
 <!doctype html><html><body style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f9fafb;padding:24px;">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:12px;border:1px solid #eaecf0;overflow:hidden;">
     <div style="background:#1570EF;color:#fff;padding:24px;"><h1 style="margin:0;font-size:20px;font-weight:800;">XportACar</h1></div>
     <div style="padding:24px;color:#101828;">
       <h2 style="margin:0 0 16px;font-size:18px;">Confirm your email</h2>
-      <div style="font-size:14px;line-height:1.6;color:#475467;">Tap the button below to confirm your email and activate your XportACar account.</div>
-      <div style="margin-top:24px;"><a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#1570EF;color:#fff;text-decoration:none;padding:11px 20px;border-radius:8px;font-weight:600;font-size:14px;">Confirm email</a></div>
-      <div style="margin-top:16px;font-size:12px;color:#98a2b3;">If the button doesn't work, paste this link into your browser:<br/>{{ .ConfirmationURL }}</div>
+      <div style="font-size:14px;line-height:1.6;color:#475467;">Tap the button below to confirm your email and activate your XportACar account. Then sign in — we'll review your verification documents within 24–48 hours.</div>
+      <div style="margin-top:24px;"><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next=/pending-verification" style="display:inline-block;background:#1570EF;color:#fff;text-decoration:none;padding:11px 20px;border-radius:8px;font-weight:600;font-size:14px;">Confirm email</a></div>
+      <div style="margin-top:16px;font-size:12px;color:#98a2b3;">If the button doesn't work, paste this link into your browser:<br/>{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup&next=/pending-verification</div>
     </div>
     <div style="border-top:1px solid #eaecf0;padding:16px 24px;font-size:11px;color:#98a2b3;">© XportACar — UAE-to-EU vehicle auctions. If you didn't create an account, ignore this email.</div>
   </div>
