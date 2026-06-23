@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Car, Gavel, Users, BadgeDollarSign, Settings, ClipboardCheck,
-  MessageSquare, FileText, ShieldCheck, HardHat,
+  MessageSquare, FileText, ShieldCheck, HardHat, Rocket,
   ChevronRight, Menu,
 } from "lucide-react";
 import { useState } from "react";
@@ -29,10 +29,11 @@ const NAV = [
   { href: "/admin/inspectors",      key: "navInspectors",  icon: HardHat },
   { href: "/admin/users",           key: "navUsers",       icon: Users },
   { href: "/admin/finance",         key: "navFinance",     icon: BadgeDollarSign },
+  { href: "/admin/prelaunch",       key: "navPrelaunch",   icon: Rocket },
   { href: "/admin/settings",        key: "navSettings",    icon: Settings },
 ] as const;
 
-function NavBody({ onNavigate, pendingKyc = 0 }: { onNavigate?: () => void; pendingKyc?: number }) {
+function NavBody({ onNavigate, badges = {} }: { onNavigate?: () => void; badges?: Record<string, number> }) {
   const pathname = usePathname();
   const t = useTranslations("admin");
   return (
@@ -40,7 +41,7 @@ function NavBody({ onNavigate, pendingKyc = 0 }: { onNavigate?: () => void; pend
       {NAV.map((item) => {
         const Icon = item.icon;
         const active = pathname.startsWith(item.href);
-        const badge = item.href === "/admin/kyc" && pendingKyc > 0 ? pendingKyc : 0;
+        const badge = badges[item.href] ?? 0;
         return (
           <Link
             key={item.href}
@@ -68,14 +69,14 @@ function NavBody({ onNavigate, pendingKyc = 0 }: { onNavigate?: () => void; pend
   );
 }
 
-export function AdminSidebar({ profile, pendingKyc = 0 }: { profile: Profile | null; pendingKyc?: number }) {
+export function AdminSidebar({ profile, badges = {} }: { profile: Profile | null; badges?: Record<string, number> }) {
   return (
     <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 lg:z-40 bg-grey-900 border-r border-grey-800">
       <div className="flex h-16 items-center justify-between border-b border-grey-800 px-5">
         <Logo variant="dark" href="/admin/dashboard" />
       </div>
       <div className="flex-1 overflow-y-auto scrollbar-thin">
-        <NavBody pendingKyc={pendingKyc} />
+        <NavBody badges={badges} />
       </div>
       <div className="border-t border-grey-800 p-4">
         {profile && (
@@ -99,7 +100,7 @@ export function AdminSidebar({ profile, pendingKyc = 0 }: { profile: Profile | n
   );
 }
 
-export function AdminTopBar({ profile, pendingKyc = 0 }: { profile: Profile | null; pendingKyc?: number }) {
+export function AdminTopBar({ profile, badges = {} }: { profile: Profile | null; badges?: Record<string, number> }) {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-grey-800 bg-grey-900 px-4 lg:hidden">
@@ -115,7 +116,7 @@ export function AdminTopBar({ profile, pendingKyc = 0 }: { profile: Profile | nu
               <Logo variant="dark" href="/admin/dashboard" />
             </SheetTitle>
           </SheetHeader>
-          <NavBody onNavigate={() => setOpen(false)} pendingKyc={pendingKyc} />
+          <NavBody onNavigate={() => setOpen(false)} badges={badges} />
           {profile && (
             <div className="mt-auto border-t border-grey-800 p-4">
               <p className="text-sm font-semibold text-white">{profile.full_name ?? profile.email}</p>
