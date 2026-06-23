@@ -195,7 +195,7 @@ function SignupForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={t("emailPlaceholder")}
-          className="h-20 w-full flex-1 rounded-xl border-2 border-grey-200 bg-white px-4 text-lg text-grey-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/20 sm:h-14 sm:text-base"
+          className="h-20 w-full rounded-xl border-2 border-grey-200 bg-white px-4 text-lg text-grey-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/20 sm:h-14 sm:flex-1 sm:text-base"
         />
         <button
           type="submit"
