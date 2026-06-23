@@ -23,7 +23,7 @@ export function PrelaunchLanding({ countdownTarget }: { countdownTarget: string 
         src="/logos/xportacar-logo.jpg"
         alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 w-[72vw] max-w-[800px] -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.06]"
+        className="pointer-events-none absolute left-1/2 top-1/3 -z-10 w-[72vw] max-w-[800px] -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.16]"
       />
 
       <div className="relative z-10 mx-auto flex min-h-full max-w-3xl flex-col items-center px-4 py-14 text-center sm:px-6 sm:py-20">
