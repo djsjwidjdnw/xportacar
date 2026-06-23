@@ -55,7 +55,7 @@ export function PrelaunchLanding({ countdownTarget }: { countdownTarget: string 
 
         <footer className="mt-16 w-full border-t border-grey-200 pt-6 text-sm text-grey-500">
           <p>
-            <a href="mailto:hello@xportacar.com" className="font-medium text-grey-700 hover:text-brand-600">hello@xportacar.com</a>
+            <a href="mailto:contact@xportacar.com" className="font-medium text-grey-700 hover:text-brand-600">contact@xportacar.com</a>
           </p>
           <p className="mt-2">{t("footerAbout")}</p>
           <p className="mt-2 text-xs text-grey-400">© XportACar — {t("footerRights")}</p>
