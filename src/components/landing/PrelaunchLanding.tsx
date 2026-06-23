@@ -200,7 +200,7 @@ function SignupForm() {
         <button
           type="submit"
           disabled={state === "loading"}
-          className="inline-flex h-20 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-7 text-base font-bold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-700 hover:shadow-xl disabled:opacity-60 sm:h-14"
+          className="inline-flex h-14 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-7 text-base font-bold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-700 hover:shadow-xl disabled:opacity-60"
         >
           {state === "loading" ? t("submitting") : t("notifyCta")}
           {state !== "loading" && <ArrowRight className="size-5" />}
