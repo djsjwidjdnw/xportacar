@@ -13,7 +13,7 @@ export function PrelaunchLanding({ countdownTarget }: { countdownTarget: string 
   const t = useTranslations("prelaunch");
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-gradient-to-b from-brand-50 via-white to-white">
+    <div className="fixed inset-0 z-[100] overflow-y-auto overflow-x-hidden bg-gradient-to-b from-brand-50 via-white to-white">
       <div className="absolute inset-0 -z-10 bg-grid-faint [mask-image:radial-gradient(ellipse_at_top,black_15%,transparent_70%)]" />
       <div className="absolute -top-32 left-1/2 -z-10 size-[55rem] max-w-[100vw] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-300/30 via-brand-200/20 to-transparent blur-3xl" />
 
