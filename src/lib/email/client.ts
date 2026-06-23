@@ -18,6 +18,12 @@ function getClient(): Resend | null {
   return cached;
 }
 
+// Shared accessor for non-email Resend features (e.g. audiences/contacts).
+// Returns null when RESEND_API_KEY is unset so callers can degrade gracefully.
+export function getResendClient(): Resend | null {
+  return getClient();
+}
+
 export interface EmailAttachment { filename: string; content: Buffer; contentType?: string }
 
 export async function sendEmail(
