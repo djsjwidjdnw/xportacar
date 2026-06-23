@@ -17,11 +17,21 @@ export function PrelaunchLanding({ countdownTarget }: { countdownTarget: string 
       <div className="absolute inset-0 -z-10 bg-grid-faint [mask-image:radial-gradient(ellipse_at_top,black_15%,transparent_70%)]" />
       <div className="absolute -top-32 left-1/2 -z-10 size-[55rem] -translate-x-1/2 rounded-full bg-gradient-to-br from-brand-300/30 via-brand-200/20 to-transparent blur-3xl" />
 
-      <div className="mx-auto flex min-h-full max-w-3xl flex-col items-center px-4 py-14 text-center sm:px-6 sm:py-20">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logos/xportacar-logo.jpg" alt="XportACar" className="h-16 w-auto rounded-xl shadow-sm" />
+      {/* Large faded logo watermark, centered behind the content. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logos/xportacar-logo.jpg"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute left-1/2 top-1/2 -z-10 w-[72vw] max-w-[800px] -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.06]"
+      />
 
-        <p className="mt-8 text-sm font-semibold uppercase tracking-[0.2em] text-brand-600">
+      <div className="relative z-10 mx-auto flex min-h-full max-w-3xl flex-col items-center px-4 py-14 text-center sm:px-6 sm:py-20">
+        <p className="text-xl font-extrabold tracking-tight text-grey-900">
+          Xport<span className="text-brand-600">A</span>Car
+        </p>
+
+        <p className="mt-6 text-sm font-semibold uppercase tracking-[0.2em] text-brand-600">
           {t("eyebrow")}
         </p>
         <h1 className="mt-4 text-4xl font-extrabold leading-[1.08] tracking-tight text-grey-900 sm:text-5xl">
