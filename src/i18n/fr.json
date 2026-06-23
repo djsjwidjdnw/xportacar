@@ -325,6 +325,32 @@
     "bidLockedRejectedBody": "Votre vérification a été refusée. Soumettez à nouveau vos documents pour enchérir.",
     "bidLockedCta": "Voir le statut de vérification"
   },
+  "prelaunch": {
+    "eyebrow": "Bientôt disponible",
+    "headline": "Véhicules premium du Golfe, livrés en Europe.",
+    "subheadline": "La première plateforme d'enchères conçue pour acheminer des voitures de luxe des Émirats arabes unis vers l'UE. Inspections, transport, formalités — tout est pris en charge.",
+    "vp1Title": "Inspections en 200 points",
+    "vp1Body": "Des techniciens certifiés inspectent chaque véhicule avant sa mise en ligne.",
+    "vp2Title": "Enchères transparentes",
+    "vp2Body": "Des enchères ouvertes et équitables avec protection de l'acheteur de l'UE.",
+    "vp3Title": "Livraison porte-à-porte",
+    "vp3Body": "Nous gérons le transport et les formalités dans toute l'Europe.",
+    "countdownLabel": "Lancement dans",
+    "unitDay": "Jours",
+    "unitHour": "Heures",
+    "unitMin": "Min",
+    "unitSec": "Sec",
+    "emailPlaceholder": "vous@entreprise.com",
+    "notifyCta": "Me prévenir au lancement",
+    "submitting": "Ajout en cours…",
+    "privacyNote": "Pas de spam — une seule annonce de lancement.",
+    "invalidEmail": "Saisissez une adresse e-mail valide.",
+    "errorGeneric": "Une erreur s'est produite. Veuillez réessayer.",
+    "successTitle": "Vous êtes sur la liste !",
+    "successBody": "Nous vous enverrons un e-mail dès notre lancement.",
+    "footerAbout": "XportACar — enchères premium de véhicules des Émirats arabes unis vers l'UE.",
+    "footerRights": "Tous droits réservés."
+  },
   "admin": {
     "navDashboard": "Tableau de bord",
     "navVehicles": "Véhicules",
@@ -352,7 +378,8 @@
     "activityWhen": "Quand",
     "navCounterOffers": "Counter offers",
     "navInvoices": "Invoices",
-    "navKyc": "KYC review"
+    "navKyc": "KYC review",
+    "navPrelaunch": "Pré-lancement"
   },
   "support": {
     "title": "Assistance",

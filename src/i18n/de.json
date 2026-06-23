@@ -325,6 +325,32 @@
     "bidLockedRejectedBody": "Ihre Verifizierung wurde abgelehnt. Reichen Sie Ihre Dokumente erneut ein, um zu bieten.",
     "bidLockedCta": "Verifizierungsstatus ansehen"
   },
+  "prelaunch": {
+    "eyebrow": "Demnächst",
+    "headline": "Premium-Fahrzeuge aus dem Golf, geliefert nach Europa.",
+    "subheadline": "Die erste Auktionsplattform für den Transport von Luxusautos aus den VAE in die EU. Inspektionen, Transport, Papierkram — alles erledigt.",
+    "vp1Title": "200-Punkte-Inspektionen",
+    "vp1Body": "Zertifizierte Techniker prüfen jedes Fahrzeug, bevor es gelistet wird.",
+    "vp2Title": "Transparente Auktionen",
+    "vp2Body": "Faires, offenes Bieten mit EU-Käuferschutz.",
+    "vp3Title": "Lieferung bis vor die Tür",
+    "vp3Body": "Wir kümmern uns um Transport und Papierkram in ganz Europa.",
+    "countdownLabel": "Start in",
+    "unitDay": "Tage",
+    "unitHour": "Std.",
+    "unitMin": "Min.",
+    "unitSec": "Sek.",
+    "emailPlaceholder": "sie@firma.com",
+    "notifyCta": "Beim Start benachrichtigen",
+    "submitting": "Sie werden hinzugefügt…",
+    "privacyNote": "Kein Spam — nur eine einzige Start-Ankündigung.",
+    "invalidEmail": "Geben Sie eine gültige E-Mail-Adresse ein.",
+    "errorGeneric": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "successTitle": "Sie stehen auf der Liste!",
+    "successBody": "Wir benachrichtigen Sie per E-Mail, sobald wir starten.",
+    "footerAbout": "XportACar — Premium-Fahrzeugauktionen von den VAE in die EU.",
+    "footerRights": "Alle Rechte vorbehalten."
+  },
   "admin": {
     "navDashboard": "Dashboard",
     "navVehicles": "Fahrzeuge",
@@ -352,7 +378,8 @@
     "activityWhen": "Wann",
     "navCounterOffers": "Counter offers",
     "navInvoices": "Invoices",
-    "navKyc": "KYC review"
+    "navKyc": "KYC review",
+    "navPrelaunch": "Pre-Launch"
   },
   "support": {
     "title": "Support",

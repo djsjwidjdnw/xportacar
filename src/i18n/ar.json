@@ -325,6 +325,32 @@
     "bidLockedRejectedBody": "تم رفض التحقق الخاص بك. أعد إرسال مستنداتك للمزايدة.",
     "bidLockedCta": "عرض حالة التحقق"
   },
+  "prelaunch": {
+    "eyebrow": "قريبًا",
+    "headline": "سيارات فاخرة من الخليج، تُسلَّم إلى أوروبا.",
+    "subheadline": "أول منصة مزادات مصمّمة لنقل السيارات الفاخرة من الإمارات إلى الاتحاد الأوروبي. الفحوصات والنقل والمعاملات الورقية — كلها بين أيدينا.",
+    "vp1Title": "فحوصات من 200 نقطة",
+    "vp1Body": "فنيون معتمدون يفحصون كل مركبة قبل إدراجها.",
+    "vp2Title": "مزادات شفافة",
+    "vp2Body": "مزايدة عادلة ومفتوحة مع حماية المشتري في الاتحاد الأوروبي.",
+    "vp3Title": "التوصيل من الباب إلى الباب",
+    "vp3Body": "نتولّى النقل والمعاملات الورقية في جميع أنحاء أوروبا.",
+    "countdownLabel": "الإطلاق خلال",
+    "unitDay": "أيام",
+    "unitHour": "ساعات",
+    "unitMin": "دقائق",
+    "unitSec": "ثواني",
+    "emailPlaceholder": "you@company.com",
+    "notifyCta": "أبلغني عند الإطلاق",
+    "submitting": "جارٍ إضافتك…",
+    "privacyNote": "لا رسائل مزعجة — مجرد إعلان واحد عن الإطلاق.",
+    "invalidEmail": "أدخل عنوان بريد إلكتروني صالحًا.",
+    "errorGeneric": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+    "successTitle": "أنت على القائمة!",
+    "successBody": "سنرسل لك بريدًا إلكترونيًا فور إطلاقنا.",
+    "footerAbout": "XportACar — مزادات مركبات فاخرة من الإمارات إلى الاتحاد الأوروبي.",
+    "footerRights": "جميع الحقوق محفوظة."
+  },
   "admin": {
     "navDashboard": "لوحة التحكم",
     "navVehicles": "المركبات",
@@ -352,7 +378,8 @@
     "activityWhen": "متى",
     "navCounterOffers": "Counter offers",
     "navInvoices": "Invoices",
-    "navKyc": "KYC review"
+    "navKyc": "KYC review",
+    "navPrelaunch": "ما قبل الإطلاق"
   },
   "support": {
     "title": "الدعم",
