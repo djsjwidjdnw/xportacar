@@ -195,12 +195,12 @@ function SignupForm() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder={t("emailPlaceholder")}
-          className="h-14 w-full flex-1 rounded-xl border-2 border-grey-200 bg-white px-4 text-base text-grey-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/20"
+          className="h-20 w-full flex-1 rounded-xl border-2 border-grey-200 bg-white px-4 text-lg text-grey-900 outline-none transition focus:border-brand-500 focus:ring-4 focus:ring-brand-500/20 sm:h-14 sm:text-base"
         />
         <button
           type="submit"
           disabled={state === "loading"}
-          className="inline-flex h-14 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-7 text-base font-bold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-700 hover:shadow-xl disabled:opacity-60"
+          className="inline-flex h-20 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-7 text-base font-bold text-white shadow-lg shadow-brand-500/30 transition-all hover:bg-brand-700 hover:shadow-xl disabled:opacity-60 sm:h-14"
         >
           {state === "loading" ? t("submitting") : t("notifyCta")}
           {state !== "loading" && <ArrowRight className="size-5" />}
