@@ -43,13 +43,14 @@ export function PrelaunchLanding({ countdownTarget }: { countdownTarget: string 
 
         {/* Value props */}
         <div className="mt-12 grid w-full gap-4 sm:grid-cols-3">
-          <ValueProp icon={<ShieldCheck className="size-6" />} title={t("vp1Title")} body={t("vp1Body")} />
-          <ValueProp icon={<Gavel className="size-6" />} title={t("vp2Title")} body={t("vp2Body")} />
+          <ValueProp icon={<Gavel className="size-6" />} title={t("vp1Title")} body={t("vp1Body")} />
+          <ValueProp icon={<ShieldCheck className="size-6" />} title={t("vp2Title")} body={t("vp2Body")} />
           <ValueProp icon={<Truck className="size-6" />} title={t("vp3Title")} body={t("vp3Body")} />
         </div>
 
         {countdownTarget && <Countdown target={countdownTarget} label={t("countdownLabel")} units={{ d: t("unitDay"), h: t("unitHour"), m: t("unitMin"), s: t("unitSec") }} />}
 
+        <h2 className="mt-14 text-xl font-bold text-grey-900 sm:text-2xl">{t("signupHeadline")}</h2>
         <SignupForm />
 
         <footer className="mt-16 w-full border-t border-grey-200 pt-6 text-sm text-grey-500">
@@ -163,7 +164,7 @@ function SignupForm() {
 
   if (state === "success") {
     return (
-      <div className="mt-12 flex w-full max-w-md flex-col items-center rounded-2xl border border-success-200 bg-success-50 px-6 py-8">
+      <div className="mt-5 flex w-full max-w-md flex-col items-center rounded-2xl border border-success-200 bg-success-50 px-6 py-8">
         <CheckCircle2 className="size-9 text-success-600" />
         <p className="mt-3 text-lg font-bold text-grey-900">{t("successTitle")}</p>
         <p className="mt-1 text-sm text-grey-600">{t("successBody")}</p>
@@ -172,7 +173,7 @@ function SignupForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-12 w-full max-w-md">
+    <form onSubmit={onSubmit} className="mt-5 w-full max-w-md">
       <div className="flex flex-col gap-3 sm:flex-row">
         <input
           type="email"
