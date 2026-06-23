@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ShieldCheck, Gavel, Truck, ArrowRight, CheckCircle2 } from "lucide-react";
 
 import { useTranslations } from "@/i18n/provider";
+import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -25,6 +26,13 @@ export function PrelaunchLanding({ countdownTarget }: { countdownTarget: string 
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/3 -z-10 w-[72vw] max-w-[800px] -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.08]"
       />
+
+      {/* Language picker — top-right, subtle, above the content. Locale auto-
+          detects from Accept-Language on first visit (see i18n/server.ts) and
+          persists to the xpc_locale cookie when changed here. */}
+      <div className="absolute right-4 top-4 z-20 sm:right-6 sm:top-6">
+        <LanguageSwitcher variant="outline" align="end" />
+      </div>
 
       <div className="relative z-10 mx-auto flex min-h-full w-full max-w-3xl flex-col items-center px-4 py-12 text-center sm:px-6 sm:py-16">
         {/* Brand wordmark — small, subordinate */}
