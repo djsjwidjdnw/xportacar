@@ -97,7 +97,6 @@ insert into public.vehicles (
   id, vin, make, model, year, mileage_km, fuel_type, transmission,
   drivetrain, engine, exterior_color, interior_color, body_type,
   first_registration, status,
-  seller_name, seller_phone, seller_email,
   listed_price_eur, reserve_price_eur, buy_now_price_eur,
   description, features
 ) values
@@ -107,7 +106,6 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '3.0L Inline-6 Turbo Mild Hybrid',
  'Obsidian Black', 'Macchiato Beige Nappa', 'SUV',
  '2022-03-14', 'in_auction',
- 'Ahmed Al-Suwaidi', '+971 50 111 2233', 'ahmed.s@example.ae',
  68500, 65000, 78000,
  'Single owner from new, full Mercedes-Benz Emirates Motor Company service history. AMG Line exterior and interior, panoramic sunroof, Burmester surround sound, head-up display, 360° camera. Stored in covered parking, never off-road.',
  array['AMG Line','Panoramic Sunroof','Burmester Audio','Head-up Display','360° Camera','Heated & Ventilated Seats','Air Suspension','Keyless Go','Apple CarPlay','Android Auto']),
@@ -118,7 +116,6 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '3.0L Inline-6 TwinPower Turbo',
  'Carbon Black Metallic', 'Cognac Vernasca Leather', 'SUV',
  '2023-06-02', 'in_auction',
- 'Fatima Al-Mazrouei', '+971 56 222 3344', 'fatima.m@example.ae',
  79900, 76000, 89000,
  'BMW Premium Selection certified. M Sport package, 22\" M wheels, laser headlights, Harman Kardon, soft-close doors, gesture control. Two keys, original tyres. GCC specification.',
  array['M Sport Package','Laser Headlights','Harman Kardon','Soft-close Doors','Gesture Control','Heads-up Display','Adaptive Cruise','Wireless Charging']),
@@ -129,7 +126,6 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '2.9L V6 Twin-Turbo',
  'Carrara White Metallic', 'Black/Bordeaux Red Two-Tone Leather', 'SUV',
  '2023-09-19', 'in_auction',
- 'Khalid Bin Rashid', '+971 52 333 4455', 'khalid.r@example.ae',
  102500, 96000, 118000,
  'Porsche Approved Used eligible. Sport Chrono Package, PASM adaptive air suspension, sport exhaust, Bose surround. Configured with significant options — original sticker over AED 520k.',
  array['Sport Chrono','PASM Adaptive Air Suspension','Sport Exhaust','Bose Audio','Power Steering Plus','Lane Change Assist','Panoramic Roof','21\" Wheels']),
@@ -140,7 +136,6 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '3.0L Ingenium I6 MHEV',
  'Santorini Black', 'Ebony Windsor Leather', 'SUV',
  '2022-01-25', 'in_auction',
- 'Hassan Al-Falasi', '+971 50 444 5566', 'hassan.f@example.ae',
  88900, 84000, 99000,
  'Comprehensive service history with Al Tayer Motors. Two-tier 22\" wheels, Meridian sound, gesture tailgate, panoramic roof. Recent full service and four new tyres.',
  array['Meridian Sound','Pano Roof','Heated Steering Wheel','Cooled Seats','Adaptive Dynamics','Off-Road Pack','22\" Wheels']),
@@ -151,7 +146,6 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '3.0L V6 TFSI MHEV',
  'Glacier White Metallic', 'Black Valcona Leather', 'SUV',
  '2023-04-11', 'in_auction',
- 'Aisha Al-Nuaimi', '+971 54 555 6677', 'aisha.n@example.ae',
  86500, 82000, 96000,
  'Single owner, agency maintained at Audi Abu Dhabi. S line exterior, virtual cockpit plus, B&O sound, matrix LED headlights with laser high beam, head-up display.',
  array['S line','Matrix LED Laser','Virtual Cockpit Plus','Bang & Olufsen','Head-up Display','Adaptive Air Suspension','21\" Wheels','Soft-close Doors']),
@@ -162,7 +156,6 @@ insert into public.vehicles (
  'petrol', 'automatic', '4WD', '3.5L V6 Twin-Turbo',
  'Pearl White', 'Tan Leather', 'SUV',
  '2023-02-18', 'in_auction',
- 'Salem Al-Marzouqi', '+971 55 666 7788', 'salem.m@example.ae',
  91900, 88000, 102000,
  'Top of the line VXR with full options. Multi-Terrain Select, Crawl Control, JBL premium audio, rear seat entertainment, refrigerator console. GCC, full Al-Futtaim service history.',
  array['Multi-Terrain Select','Crawl Control','JBL Premium','Rear Entertainment','Refrigerator Console','Cool Box','22\" Wheels','Hydraulic Suspension']),
@@ -173,7 +166,6 @@ insert into public.vehicles (
  'petrol', 'automatic', '4WD', '3.5L V6 Twin-Turbo',
  'Sonic Quartz', 'Rich Cream Semi-Aniline Leather', 'SUV',
  '2022-08-07', 'in_auction',
- 'Reem Al-Qassimi', '+971 50 777 8899', 'reem.q@example.ae',
  124500, 119000, 138000,
  'Four-seat Ultra Luxury executive configuration. Mark Levinson 25-speaker, rear ottoman seats, refrigerator, dual rear entertainment screens. As-new condition.',
  array['Ultra Luxury 4-Seat','Mark Levinson 25-Speaker','Rear Ottoman','Refrigerator','Dual Rear Screens','Massage Seats','Pano Roof','Active Height Control']),
@@ -184,7 +176,6 @@ insert into public.vehicles (
  'petrol', 'automatic', '4WD', '5.6L V8 Endurance',
  'Galaxy Black', 'Almond Quilted Leather', 'SUV',
  '2023-05-24', 'in_auction',
- 'Omar Al-Shamsi', '+971 56 888 9900', 'omar.s@example.ae',
  76900, 73000, 86000,
  'Top-trim Platinum LE with all factory options. Hydraulic body motion control, around view monitor, BOSE 13-speaker, second row captain chairs.',
  array['Platinum LE','Hydraulic Body Motion','Around View Monitor','BOSE 13-Speaker','Captain Chairs','Cool Box','Sunroof','22\" Wheels']),
@@ -195,7 +186,6 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '3.0L Inline-6 EQ Boost',
  'Selenite Grey Magno', 'Macchiato Beige/Magma Grey Nappa', 'Sedan',
  '2022-04-30', 'in_auction',
- 'Yousef Al-Hammadi', '+971 50 999 1122', 'yousef.h@example.ae',
  109800, 105000, 124000,
  'Long wheelbase, fully optioned. Executive rear package, Burmester 4D, rear screens, MBUX rear tablet, chauffeur package. Like-new condition.',
  array['LWB','Executive Rear Package','Burmester 4D','MBUX Rear Tablet','Chauffeur Package','Heated Armrests','Massaging Seats','Magic Vision Control']),
@@ -206,7 +196,6 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '3.0L Inline-6 TwinPower',
  'Aventurin Red Metallic', 'Mocha/Atlas Grey Merino', 'Sedan',
  '2023-07-15', 'in_auction',
- 'Mariam Al-Otaiba', '+971 52 100 2030', 'mariam.o@example.ae',
  119500, 113000, 134000,
  'New generation 7. M Sport Pro, BMW Theatre Screen 31\" 8K rear display, automatic doors, Bowers & Wilkins Diamond. The future of luxury sedans.',
  array['M Sport Pro','BMW Theatre Screen','Automatic Doors','Bowers & Wilkins Diamond','Executive Lounge Seating','Sky Lounge Roof','Crystal Headlights']),
@@ -217,7 +206,6 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '4.0L V8 TFSI',
  'Mythos Black Metallic', 'Cognac Brown Valcona', 'Sedan',
  '2022-06-08', 'in_auction',
- 'Tariq Al-Suwaidi', '+971 55 200 3040', 'tariq.s@example.ae',
  89400, 85000, 99000,
  'Full executive specification. Relaxation rear seats with foot massage, B&O Advanced 3D, HD Matrix laser, predictive active suspension.',
  array['Relaxation Rear Seats','Foot Massager','B&O Advanced 3D','HD Matrix Laser','Predictive Active Suspension','Rear Tablets','Air Quality Package']),
@@ -228,10 +216,27 @@ insert into public.vehicles (
  'petrol', 'automatic', 'AWD', '2.9L V6 Twin-Turbo',
  'Carmine Red', 'Black/GTS Anthracite Race-Tex', 'SUV',
  '2023-03-22', 'in_auction',
- 'Layla Al-Romaithi', '+971 56 300 4050', 'layla.r@example.ae',
  87900, 84000, 98500,
  'GTS specification with Sport Chrono, PASM adaptive air, PSE sport exhaust, GTS interior package. Configured to over AED 480k MSRP.',
  array['GTS Interior Package','Sport Chrono','PASM Air Suspension','PSE Sport Exhaust','Bose Surround','21\" RS Spyder Wheels','Carbon Trim']);
+
+-- =====================================================================
+-- Vehicle sellers  (staff-only child table — seller identity/contact)
+-- Keyed to each vehicle's deterministic id above.
+-- =====================================================================
+insert into public.vehicle_sellers (vehicle_id, seller_name, seller_phone, seller_email) values
+('11111111-0001-0000-0000-000000000001','Ahmed Al-Suwaidi', '+971 50 111 2233', 'ahmed.s@example.ae'),
+('11111111-0001-0000-0000-000000000002','Fatima Al-Mazrouei', '+971 56 222 3344', 'fatima.m@example.ae'),
+('11111111-0001-0000-0000-000000000003','Khalid Bin Rashid', '+971 52 333 4455', 'khalid.r@example.ae'),
+('11111111-0001-0000-0000-000000000004','Hassan Al-Falasi', '+971 50 444 5566', 'hassan.f@example.ae'),
+('11111111-0001-0000-0000-000000000005','Aisha Al-Nuaimi', '+971 54 555 6677', 'aisha.n@example.ae'),
+('11111111-0001-0000-0000-000000000006','Salem Al-Marzouqi', '+971 55 666 7788', 'salem.m@example.ae'),
+('11111111-0001-0000-0000-000000000007','Reem Al-Qassimi', '+971 50 777 8899', 'reem.q@example.ae'),
+('11111111-0001-0000-0000-000000000008','Omar Al-Shamsi', '+971 56 888 9900', 'omar.s@example.ae'),
+('11111111-0001-0000-0000-000000000009','Yousef Al-Hammadi', '+971 50 999 1122', 'yousef.h@example.ae'),
+('11111111-0001-0000-0000-000000000010','Mariam Al-Otaiba', '+971 52 100 2030', 'mariam.o@example.ae'),
+('11111111-0001-0000-0000-000000000011','Tariq Al-Suwaidi', '+971 55 200 3040', 'tariq.s@example.ae'),
+('11111111-0001-0000-0000-000000000012','Layla Al-Romaithi', '+971 56 300 4050', 'layla.r@example.ae');
 
 -- =====================================================================
 -- Vehicle photos  (Unsplash, 1600px, automotive — curated per make)

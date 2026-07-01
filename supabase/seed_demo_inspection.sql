@@ -18,6 +18,9 @@ delete from public.vehicle_photos
 delete from public.vehicle_damages
   where vehicle_id = '11111111-0002-0000-0000-000000000998'
      or vehicle_id in (select id from public.vehicles where vin = 'WDC4632F6PX998877');
+delete from public.vehicle_sellers
+  where vehicle_id = '11111111-0002-0000-0000-000000000998'
+     or vehicle_id in (select id from public.vehicles where vin = 'WDC4632F6PX998877');
 delete from public.vehicles
   where id = '11111111-0002-0000-0000-000000000998'
      or vin = 'WDC4632F6PX998877';
@@ -35,7 +38,6 @@ insert into public.vehicles (
   id, vin, make, model, year, mileage_km, fuel_type, transmission,
   drivetrain, engine, exterior_color, interior_color, body_type,
   first_registration, location_city, location_country, status,
-  seller_name, seller_phone, seller_email,
   inspector_id, description
 ) values (
   '11111111-0002-0000-0000-000000000998',
@@ -44,9 +46,14 @@ insert into public.vehicles (
   'Obsidian Black', 'Black Nappa Leather', 'SUV',
   '2023-04-15', 'Dubai', 'UAE',
   'inspection_scheduled',
-  'Demo Seller', '+971 50 000 0001', 'demo.seller.g63@example.ae',
   (select id from public.profiles where email = 'inspector@xportacar.com'),
   'Demo inspection assignment for App Store screenshots.'
+);
+
+-- ---- Seller (staff-only child table) --------------------------------
+insert into public.vehicle_sellers (vehicle_id, seller_name, seller_phone, seller_email) values (
+  '11111111-0002-0000-0000-000000000998',
+  'Demo Seller', '+971 50 000 0001', 'demo.seller.g63@example.ae'
 );
 
 commit;

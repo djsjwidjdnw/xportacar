@@ -246,8 +246,7 @@ def check_rls() -> None:
     status, text = request(
         "POST", f"{SUPABASE_URL}/rest/v1/vehicles", ANON_KEY,
         body={"vin": "SMOKETEST00000000", "make": "X", "model": "Y", "year": 2024,
-              "fuel_type": "petrol", "transmission": "automatic",
-              "seller_name": "smoke", "seller_phone": "0"},
+              "fuel_type": "petrol", "transmission": "automatic"},
     )
     if status in (401, 403):
         record("pass", "anon CANNOT insert vehicles", f"rejected HTTP {status}")

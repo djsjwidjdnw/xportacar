@@ -70,16 +70,23 @@ for (const v of VEHICLES) {
     continue;
   }
 
-  const { error } = await sb.from("vehicles").insert({
-    ...v,
+  // Seller identity/contact lives in the staff-only vehicle_sellers table,
+  // no longer on vehicles — strip it out of the vehicles insert.
+  const { seller_name, seller_phone, ...vehicleData } = v;
+  const { data: created, error } = await sb.from("vehicles").insert({
+    ...vehicleData,
     fuel_type: "petrol",
     transmission: "automatic",
     location_country: "UAE",
     status: "inspection_scheduled",
     inspector_id: inspector.id,
     created_by: inspector.id,
-  });
+  }).select("id").single();
   if (error) { console.log(`  ✗ insert ${v.vin}: ${error.message}`); continue; }
+  const { error: sellerError } = await sb
+    .from("vehicle_sellers")
+    .upsert({ vehicle_id: created.id, seller_name, seller_phone }, { onConflict: "vehicle_id" });
+  if (sellerError) { console.log(`  ⚠ seller ${v.vin}: ${sellerError.message}`); }
   inserted++;
   console.log(`  ✓ scheduled ${v.year} ${v.make} ${v.model}`);
 }

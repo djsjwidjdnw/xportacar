@@ -25,6 +25,9 @@ delete from public.vehicle_photos
 delete from public.vehicle_damages
   where vehicle_id = '11111111-0001-0000-0000-000000000999'
      or vehicle_id in (select id from public.vehicles where vin = 'WP0AB2A99NS227001');
+delete from public.vehicle_sellers
+  where vehicle_id = '11111111-0001-0000-0000-000000000999'
+     or vehicle_id in (select id from public.vehicles where vin = 'WP0AB2A99NS227001');
 delete from public.vehicles
   where id = '11111111-0001-0000-0000-000000000999'
      or vin = 'WP0AB2A99NS227001';
@@ -34,7 +37,6 @@ insert into public.vehicles (
   id, vin, make, model, year, mileage_km, fuel_type, transmission,
   drivetrain, engine, exterior_color, interior_color, body_type,
   first_registration, location_city, location_country, status,
-  seller_name, seller_phone, seller_email,
   listed_price_eur, reserve_price_eur, buy_now_price_eur,
   description, features
 ) values (
@@ -43,10 +45,15 @@ insert into public.vehicles (
   'petrol', 'automatic', 'RWD', '3.0L Twin-Turbo Flat-6 (8-speed PDK)',
   'Guards Red', 'Black Leather', 'Coupe',
   '2022-05-10', 'Dubai', 'UAE', 'in_auction',
-  'Demo Seller', '+971 50 000 0000', 'demo.seller@example.ae',
   95000, 90000, 110000,
   'Demo vehicle for end-to-end testing. 992-generation 911 Carrera S in Guards Red with Sport Chrono, PASM, BOSE surround and full Porsche service history. Single owner, GCC specification.',
   array['Sport Chrono Package','PASM','Sport Exhaust','BOSE Surround','Adaptive Sport Seats Plus','LED Matrix Headlights','20/21" Carrera S Wheels','Apple CarPlay']
+);
+
+-- ---- Seller (staff-only child table) --------------------------------
+insert into public.vehicle_sellers (vehicle_id, seller_name, seller_phone, seller_email) values (
+  '11111111-0001-0000-0000-000000000999',
+  'Demo Seller', '+971 50 000 0000', 'demo.seller@example.ae'
 );
 
 -- ---- Photos (9: exterior/interior/engine/undercarriage) -------------
