@@ -287,8 +287,16 @@ async function notifyOutbid(
     title, body,
     data:    { auction_id: auctionId, vehicle_id: vehicleId, amount_eur: newBidEur },
   });
-  const { data: profile } = await supabase
-    .from("profiles").select("email, full_name, language").eq("id", outbidUserId).single();
+  // Read the outbid user's contact via the service-role client: profiles SELECT
+  // is restricted to self+staff (migration 027) and the bidder is neither.
+  // Best-effort — skip the email if the admin client is unavailable.
+  type OutbidContact = { email?: string | null; full_name?: string | null; language?: string | null };
+  let profile: OutbidContact | null = null;
+  try {
+    const { data } = await createAdminClient()
+      .from("profiles").select("email, full_name, language").eq("id", outbidUserId).single();
+    profile = (data as unknown as OutbidContact | null) ?? null;
+  } catch { /* admin client not configured — skip outbid email */ }
   if (profile?.email) {
     await sendOutbidEmail({ to: profile.email, name: profile.full_name ?? "", vehicleTitle: vehicle ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : "your auction", newBidEur, auctionId, locale: (profile as { language?: string }).language });
   }

@@ -10,6 +10,7 @@ import { LandingHowItWorks } from "@/components/landing/LandingHowItWorks";
 import { LandingCta } from "@/components/landing/LandingCta";
 import { TrustBadges } from "@/components/landing/TrustBadges";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { cn } from "@/lib/utils";
 import { getTranslations } from "@/i18n/server";
 
@@ -19,6 +20,16 @@ import { getTranslations } from "@/i18n/server";
 export async function MarketingHome() {
   const supabase = await createClient();
   const t = await getTranslations("landing");
+
+  // profiles SELECT is restricted to self+staff (migration 027), so the public
+  // buyer counts must run via the service-role client rather than the anon one.
+  // Fall back to the anon client if the service-role key is unavailable.
+  let profilesDb: ReturnType<typeof createAdminClient>;
+  try {
+    profilesDb = createAdminClient();
+  } catch {
+    profilesDb = supabase as unknown as ReturnType<typeof createAdminClient>;
+  }
 
   // Live numbers for the hero stats.  All four come straight from the DB —
   // see LandingHeroStats for how they're rendered.
@@ -31,10 +42,10 @@ export async function MarketingHome() {
   ] = await Promise.all([
     supabase.from("vehicles").select("*", { count: "exact", head: true })
       .in("status", ["listed", "in_auction"]),
-    supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "buyer"),
+    profilesDb.from("profiles").select("*", { count: "exact", head: true }).eq("role", "buyer"),
     supabase.from("auctions").select("*", { count: "exact", head: true }).eq("status", "active"),
     supabase.from("auctions").select("*", { count: "exact", head: true }),
-    supabase.from("profiles").select("country").eq("role", "buyer").not("country", "is", null),
+    profilesDb.from("profiles").select("country").eq("role", "buyer").not("country", "is", null),
   ]);
 
   const countries = new Set(
