@@ -28,8 +28,28 @@ export async function signInAction(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { ok: false, error: error.message };
+
+  // Account separation: inspectors have a dedicated Inspector app and must not
+  // sign into the buyer web. Admins / superadmins may use either surface.
+  const uid = data.user?.id;
+  if (uid) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", uid)
+      .single();
+    if ((profile as { role?: string } | null)?.role === "inspector") {
+      await supabase.auth.signOut();
+      return {
+        ok: false,
+        error:
+          "This is an inspector account. Please use the XportACar Inspector app to sign in.",
+      };
+    }
+  }
+
   redirect(next);
 }
 

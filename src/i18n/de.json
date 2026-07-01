@@ -325,6 +325,10 @@
     "bidLockedRejectedBody": "Ihre Verifizierung wurde abgelehnt. Reichen Sie Ihre Dokumente erneut ein, um zu bieten.",
     "bidLockedCta": "Verifizierungsstatus ansehen"
   },
+  "inspectorConfirm": {
+    "title": "E-Mail bestätigt",
+    "body": "Die E-Mail Ihres Inspektor-Kontos ist bestätigt. Öffnen Sie die XportACar Inspector-App und melden Sie sich an, um loszulegen."
+  },
   "prelaunch": {
     "eyebrow": "Demnächst",
     "headline": "Der Marktplatz für Premium-Fahrzeuge aus dem Golf.",

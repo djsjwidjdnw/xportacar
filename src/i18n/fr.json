@@ -325,6 +325,10 @@
     "bidLockedRejectedBody": "Votre vérification a été refusée. Soumettez à nouveau vos documents pour enchérir.",
     "bidLockedCta": "Voir le statut de vérification"
   },
+  "inspectorConfirm": {
+    "title": "E-mail confirmé",
+    "body": "L’e-mail de votre compte inspecteur est confirmé. Ouvrez l’application Inspecteur XportACar et connectez-vous pour commencer."
+  },
   "prelaunch": {
     "eyebrow": "Bientôt disponible",
     "headline": "La marketplace des véhicules premium du Golfe.",

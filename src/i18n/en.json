@@ -325,6 +325,10 @@
     "bidLockedRejectedBody": "Your verification was declined. Re-submit your documents to bid.",
     "bidLockedCta": "View verification status"
   },
+  "inspectorConfirm": {
+    "title": "Email confirmed",
+    "body": "Your inspector account email is confirmed. Open the XportACar Inspector app and sign in to get started."
+  },
   "prelaunch": {
     "eyebrow": "Launching soon",
     "headline": "The marketplace for premium GCC vehicles.",
