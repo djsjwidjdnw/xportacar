@@ -125,7 +125,7 @@ export default async function VehicleDetailPage({
       return (ia === -1 ? 999 : ia) - (ib === -1 ? 999 : ib);
     });
 
-  const v: VehicleWithMedia = normalizeVehicleRow(vehicle as unknown as Record<string, unknown>);
+  const v: VehicleWithMedia = normalizeVehicleRow(vehicle as unknown as Record<string, unknown>, { stripSeller: true });
   const paintThicknessUrl =
     v.vehicle_photos.find((p) => p.category === "paint_thickness")?.url ?? null;
   const galleryPhotos = v.vehicle_photos

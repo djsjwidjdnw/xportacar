@@ -86,7 +86,7 @@ export async function fetchVehiclesPage(
   const { data } = await q.range(offset, offset + limit);
   const rows = (data ?? []) as Record<string, unknown>[];
   const hasMore = rows.length > limit;
-  return { vehicles: normalizeVehicleRows(hasMore ? rows.slice(0, limit) : rows), hasMore };
+  return { vehicles: normalizeVehicleRows(hasMore ? rows.slice(0, limit) : rows, { stripSeller: true }), hasMore };
 }
 
 /** Total matching count for the header — head-only, no rows transferred. */

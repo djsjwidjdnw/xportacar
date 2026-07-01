@@ -27,7 +27,7 @@ export default async function AuctionsPage() {
 
   // Exclude any auction whose end_time has already passed — the DB status can
   // lag, so "active" alone isn't enough to call it live.
-  const list: VehicleWithMedia[] = normalizeVehicleRows(data as unknown as Record<string, unknown>[])
+  const list: VehicleWithMedia[] = normalizeVehicleRows(data as unknown as Record<string, unknown>[], { stripSeller: true })
     .filter((v) => auctionPhase(v.auctions[0]) === "live");
   list.sort((a, b) => {
     const ae = a.auctions[0]?.end_time;

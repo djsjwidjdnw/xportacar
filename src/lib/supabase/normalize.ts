@@ -13,10 +13,23 @@ function arrayify<T>(value: T | T[] | null | undefined): T[] {
   return Array.isArray(value) ? value : [value];
 }
 
+export type NormalizeOpts = {
+  /**
+   * Drop seller identity/contact (seller_name / seller_phone / seller_email)
+   * from the returned object. Buyer-facing surfaces MUST pass this so seller
+   * PII never reaches a client component / RSC payload. Admin/inspector
+   * surfaces omit it and keep full access.
+   */
+  stripSeller?: boolean;
+};
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function normalizeVehicleRow(row: any): VehicleWithMedia {
+export function normalizeVehicleRow(row: any, opts?: NormalizeOpts): VehicleWithMedia {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { seller_name, seller_phone, seller_email, ...rest } = row;
+  const base = opts?.stripSeller ? rest : row;
   return {
-    ...(row as Vehicle),
+    ...(base as Vehicle),
     vehicle_photos:  arrayify<VehiclePhoto>(row.vehicle_photos),
     vehicle_damages: arrayify<VehicleDamage>(row.vehicle_damages),
     auctions:        arrayify<Auction>(row.auctions),
@@ -24,6 +37,6 @@ export function normalizeVehicleRow(row: any): VehicleWithMedia {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function normalizeVehicleRows(rows: any[] | null | undefined): VehicleWithMedia[] {
-  return (rows ?? []).map(normalizeVehicleRow);
+export function normalizeVehicleRows(rows: any[] | null | undefined, opts?: NormalizeOpts): VehicleWithMedia[] {
+  return (rows ?? []).map((r) => normalizeVehicleRow(r, opts));
 }

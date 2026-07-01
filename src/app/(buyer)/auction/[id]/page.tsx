@@ -39,6 +39,13 @@ export default async function AuctionPage({
   const auction = auctionRow as unknown as Auction & { vehicle: VehicleWithMedia };
   const v = auction.vehicle;
 
+  // Strip seller PII before `v` / `auction.vehicle` reach the client components
+  // (SpecsGrid + BidPanel both serialize into the browser payload). Same object
+  // reference, so deleting here also sanitizes what BidPanel receives.
+  for (const k of ["seller_name", "seller_phone", "seller_email"] as const) {
+    delete (v as unknown as Record<string, unknown>)[k];
+  }
+
   const [{ data: bidsRows }, { data: { user } }] = await Promise.all([
     supabase
       .from("bids")
