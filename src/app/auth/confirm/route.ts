@@ -32,17 +32,34 @@ export async function GET(req: NextRequest) {
 
   const supabase = await createClient();
 
+  // After a successful verify the browser holds a live session. Account
+  // separation: inspectors must NOT get a buyer-web session — sign them back
+  // out and send them to the inspector confirmation page. Their email is still
+  // confirmed (verifyOtp already did that); they sign in via the Inspector app.
+  async function finish(): Promise<NextResponse> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: profile } = await supabase
+        .from("profiles").select("role").eq("id", user.id).single();
+      if ((profile as { role?: string } | null)?.role === "inspector") {
+        await supabase.auth.signOut();
+        return NextResponse.redirect(new URL("/inspector-confirmed", url.origin));
+      }
+    }
+    return NextResponse.redirect(new URL(next, url.origin));
+  }
+
   if (tokenHash) {
     // Try the template's type first, then the common email-confirmation types,
     // so the handler works whether the template uses type=signup or type=email.
     const candidates = [...new Set([type, "signup", "email"])] as EmailOtpType[];
     for (const ty of candidates) {
       const { error } = await supabase.auth.verifyOtp({ type: ty, token_hash: tokenHash });
-      if (!error) return NextResponse.redirect(new URL(next, url.origin));
+      if (!error) return finish();
     }
   } else if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) return NextResponse.redirect(new URL(next, url.origin));
+    if (!error) return finish();
   }
 
   return NextResponse.redirect(new URL("/login?error=confirm", url.origin));

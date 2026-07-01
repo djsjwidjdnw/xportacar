@@ -18,6 +18,17 @@
 -- app only reads its own profile; the inspector app's admin lookup works
 -- because inspectors are is_staff; all other cross-user reads already use the
 -- service-role/admin client or run from a staff session.)
+--
+-- KNOWN BEHAVIOR CHANGE (intended): the web auction bid history embeds the
+-- bidder's profile — src/app/(buyer)/auction/[id]/page.tsx embeds
+-- bidder:profiles!bidder_id(full_name, company_name, country, avatar_url) via
+-- the viewer's own/anon client. Under this policy a viewer only resolves their
+-- OWN bids' bidder row; other bidders render anonymized ("Bidder") in BidPanel.
+-- This HIDES competitor identity/PII from bidders (a bidder-PII fix in the same
+-- spirit as the seller work). If you instead want bidder names shown, repoint
+-- that embed to the service-role client (like MarketingHome/notifyOutbid).
+-- The buyer mobile auction screen is unaffected (it selects bids without any
+-- profile embed).
 
 drop policy if exists "profiles are viewable by everyone" on public.profiles;
 

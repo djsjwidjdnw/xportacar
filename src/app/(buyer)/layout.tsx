@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { redirect } from "next/navigation";
 
 import { BuyerNav } from "@/components/layout/BuyerNav";
 import { Footer } from "@/components/layout/Footer";
@@ -30,6 +31,14 @@ export default async function BuyerLayout({
     ]);
     profile = (p as Profile | null) ?? null;
     notifications = (n as Notification[] | null) ?? [];
+
+    // Account-separation backstop: a signed-in inspector must not use the buyer
+    // web (e.g. via a session created by the email-confirm or password-reset
+    // flow). Send them to the inspector confirmation page. Admins/superadmins
+    // are allowed on both surfaces.
+    if (profile?.role === "inspector") {
+      redirect("/inspector-confirmed");
+    }
   }
 
   return (
