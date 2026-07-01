@@ -389,18 +389,29 @@ export async function createVehicleAction(input: {
       location_city: "Dubai",
       location_country: "UAE",
       status: "inspection_scheduled",
-      seller_name: input.sellerName?.trim() || "Walk-in",
-      seller_phone: input.sellerPhone?.trim() || null,
       created_by: user.id,
     })
     .select("id")
     .single();
   if (error) return { ok: false, error: error.message };
 
+  const vehicleId = (data as { id: string }).id;
+  // Seller identity/contact lives in the staff-only vehicle_sellers table, not
+  // on the buyer-readable vehicles row.
+  const { error: sellerErr } = await supabase.from("vehicle_sellers").upsert(
+    {
+      vehicle_id: vehicleId,
+      seller_name: input.sellerName?.trim() || "Walk-in",
+      seller_phone: input.sellerPhone?.trim() || null,
+    },
+    { onConflict: "vehicle_id" },
+  );
+  if (sellerErr) return { ok: false, error: sellerErr.message };
+
   revalidatePath("/admin/vehicles");
   revalidatePath("/admin/dashboard");
   revalidatePath("/admin/inspections");
-  return { ok: true, id: (data as { id: string }).id };
+  return { ok: true, id: vehicleId };
 }
 
 // --------------------------------------------------------------------
@@ -454,8 +465,6 @@ export async function scheduleInspectionAction(input: {
         location_city: "Dubai",
         location_country: "UAE",
         status: "inspection_scheduled",
-        seller_name: nv?.sellerName?.trim() || "Walk-in",
-        seller_phone: nv?.sellerPhone?.trim() || null,
         inspector_id: input.inspectorId,
         created_by: user?.id,
       })
@@ -463,6 +472,17 @@ export async function scheduleInspectionAction(input: {
       .single();
     if (error) return { ok: false, error: error.message };
     vehicleId = (data as { id: string }).id;
+
+    // Seller contact -> staff-only vehicle_sellers (not the buyer-readable row).
+    const { error: sellerErr } = await supabase.from("vehicle_sellers").upsert(
+      {
+        vehicle_id: vehicleId,
+        seller_name: nv?.sellerName?.trim() || "Walk-in",
+        seller_phone: nv?.sellerPhone?.trim() || null,
+      },
+      { onConflict: "vehicle_id" },
+    );
+    if (sellerErr) return { ok: false, error: sellerErr.message };
   } else {
     if (!vehicleId) return { ok: false, error: "Select a vehicle to inspect." };
     const { error } = await supabase

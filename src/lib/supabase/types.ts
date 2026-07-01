@@ -75,9 +75,8 @@ export interface Vehicle {
   location_city: string;
   location_country: string;
   status: VehicleStatus;
-  seller_name: string;
-  seller_phone: string;
-  seller_email: string | null;
+  // Seller identity/contact moved to the staff-only vehicle_sellers table
+  // (migrations 028/029). Never present on a buyer-readable vehicles row.
   inspector_id: string | null;
   inspection_date: string | null;
   inspection_notes: string | null;

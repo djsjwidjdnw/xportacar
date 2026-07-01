@@ -54,6 +54,13 @@ export default async function AdminVehicleDetailPage({
     .from("profiles").select("id, full_name, email").eq("role", "inspector");
   const inspectors = (inspectorsRaw ?? []) as { id: string; full_name: string | null; email: string | null }[];
 
+  // Seller identity/contact now lives in the staff-only vehicle_sellers table
+  // (no longer on the buyer-readable vehicles row). Admins are is_staff, so RLS
+  // permits this read.
+  const { data: sellerRow } = await supabase
+    .from("vehicle_sellers").select("seller_name, seller_phone").eq("vehicle_id", id).maybeSingle();
+  const seller = (sellerRow ?? null) as { seller_name: string | null; seller_phone: string | null } | null;
+
   const valuation = await getVehicleValuation({
     make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km, vehicleId: v.id,
   });
@@ -198,8 +205,8 @@ export default async function AdminVehicleDetailPage({
               <Row label="Reserve" value={formatEur(v.reserve_price_eur)} />
               <Row label="Buy now" value={formatEur(v.buy_now_price_eur)} />
               <Row label="Last update" value={formatRelativeTime(v.updated_at)} />
-              <Row label="Seller" value={v.seller_name} />
-              <Row label="Seller phone" value={v.seller_phone} />
+              <Row label="Seller" value={seller?.seller_name ?? "—"} />
+              <Row label="Seller phone" value={seller?.seller_phone ?? "—"} />
             </dl>
           </div>
 
