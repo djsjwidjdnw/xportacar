@@ -35,6 +35,7 @@ These three were the last applied to production:
 
 ## Applied 2026-10-07
 - **031** `031_marketplace_mode.sql` — fixed-price marketplace: `app_settings.bidding_enabled` (false), `public.bidding_enabled()`, bids + counter_offers INSERT policies gated on it (`buy_now()` unaffected — SECURITY DEFINER, table owner), and re-applies the guarded `sync_vehicle_eur_from_aed()` that commit e57586f wrote into 015 but never applied. Creates no table. Rehearsed in a rolled-back transaction, applied, read back (cluster 7634664568297872568).
+- **032** `032_invoice_writes_via_function.sql` — invoice money hole: drops "buyers update own invoices" (a buyer could PATCH their own `status`/`total_eur`), narrows "staff update invoices" (included inspectors) to "admins update invoices", and adds `public.finalize_my_invoice()` — SECURITY DEFINER, `search_path = ''`, EXECUTE for `authenticated` only — the buyer's one write path (shipping, address, extras, confirm) on their own pending invoice, re-pricing every euro amount in SQL (port of `serverShippingEur`/`serverPriceExtras`; 45/45 parity cases against the TS). Creates no table. Rehearsed with a negative control (old policy restored in the rolled-back transaction → the buyer PATCH succeeded), applied, read back.
 
 ## Grants rule (from 30 Oct 2026)
 New tables in `public` are no longer auto-granted to the Data API. Every migration

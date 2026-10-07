@@ -12,12 +12,35 @@ import { serverShippingEur, serverPriceExtras } from "@/lib/distance";
 // (POST /api/invoice/[id]/finalize) so the email fires no matter the platform.
 //
 // `db` is an RLS-scoped client authenticated AS THE BUYER (cookie session on web,
-// bearer token on mobile). The buyer can read + UPDATE their own invoice (RLS
-// policies "buyers see/update own invoices"), so no service-role key is needed —
-// the caller has already authenticated the user; RLS enforces ownership. Recomputes
-// total = hammer + 2.9% fee + shipping + extras. Email is best-effort.
+// bearer token on mobile). Buyers cannot UPDATE invoices (migration 032): the
+// write goes through the SECURITY DEFINER RPC finalize_my_invoice(), which only
+// touches the caller's own PENDING invoice and prices everything in the database
+// (total = hammer + 2.9% fee + shipping + extras). Only the buyer's choices are
+// sent — never an amount — and the email uses the amounts the database stored.
+// Email is best-effort.
 
-const PLATFORM_FEE_PCT = 0.029;
+// What finalize_my_invoice() stored (numeric columns arrive as JSON numbers).
+interface FinalizedInvoice {
+  invoice_number: string | null;
+  shipping_method: "standard" | "door_to_door";
+  shipping_eur: number;
+  shipping_distance_km: number | null;
+  shipping_address: string | null;
+  extras: { name: string; price_eur: number }[];
+  extras_eur: number;
+  amount_eur: number;
+  platform_fee_eur: number;
+  total_eur: number;
+}
+
+const RPC_ERRORS: Record<string, string> = {
+  AUTH_REQUIRED: "Sign in to confirm your order.",
+  INVOICE_NOT_FOUND: "Invoice not found.",
+  INVOICE_NOT_PENDING: "This invoice can no longer be changed.",
+};
+
+const finiteOrNull = (v: number | null | undefined) =>
+  typeof v === "number" && Number.isFinite(v) ? v : null;
 
 export interface FinalizeInvoiceInput {
   invoiceId: string;
@@ -41,7 +64,7 @@ export async function finalizeInvoiceAndEmail(
   const { data: inv } = await db
     .from("invoices")
     .select(
-      "id, amount_eur, invoice_number, vehicle:vehicles!vehicle_id(year, make, model, trim), buyer:profiles!buyer_id(email, language)",
+      "id, invoice_number, vehicle:vehicles!vehicle_id(year, make, model, trim), buyer:profiles!buyer_id(email, language)",
     )
     .eq("id", input.invoiceId)
     .maybeSingle();
@@ -49,48 +72,43 @@ export async function finalizeInvoiceAndEmail(
   const i = inv as any;
   if (!i) return { ok: false, error: "Invoice not found." };
 
-  // SECURITY: never trust client-supplied euro amounts. Recompute shipping from
-  // the method + (geocoded coords or country/city), and re-price extras against
-  // the server catalog. input.shippingEur / input.distanceKm / extras[].price_eur
-  // are ignored — a buyer cannot deflate total_eur (which flows to Stripe).
-  const { eur: shippingEur, distanceKm: shippingDistanceKm } = serverShippingEur(
-    input.shippingMethod,
-    { lat: input.shippingLatitude, lon: input.shippingLongitude, country: input.shippingCountry, city: input.shippingCity },
-  );
-  const extras = serverPriceExtras(input.extras);
-  const extrasEur = extras.reduce((s, e) => s + e.price_eur, 0);
-  const hammer = Number(i.amount_eur) || 0;
-  const feeEur = Math.round(hammer * PLATFORM_FEE_PCT * 100) / 100;
-  const totalEur = Math.round((hammer + feeEur + shippingEur + extrasEur) * 100) / 100;
+  // SECURITY: never send a euro amount. input.shippingEur / input.distanceKm /
+  // extras[].price_eur are dropped here; the RPC re-prices shipping and extras
+  // itself, so a buyer cannot deflate total_eur (which flows to Stripe).
+  const { data: stored, error } = await db.rpc("finalize_my_invoice", {
+    p_invoice_id: input.invoiceId,
+    p_shipping_method: input.shippingMethod,
+    p_line1: input.shippingLine1?.trim() || null,
+    p_line2: input.shippingLine2?.trim() || null,
+    p_city: input.shippingCity?.trim() || null,
+    p_postal_code: input.shippingPostalCode?.trim() || null,
+    p_country: input.shippingCountry?.trim()?.toUpperCase() || null,
+    p_latitude: finiteOrNull(input.shippingLatitude),
+    p_longitude: finiteOrNull(input.shippingLongitude),
+    p_extras: (Array.isArray(input.extras) ? input.extras : []).map((e) => ({ name: String(e?.name ?? "") })),
+  });
+  if (error) return { ok: false, error: RPC_ERRORS[error.message] ?? error.message };
+  const f = stored as FinalizedInvoice;
+  const shippingEur = Number(f.shipping_eur);
+  const shippingDistanceKm = f.shipping_distance_km;
+  const formattedAddress = f.shipping_address;
+  const extras = Array.isArray(f.extras) ? f.extras : [];
+  const hammer = Number(f.amount_eur) || 0;
+  const feeEur = Number(f.platform_fee_eur);
+  const totalEur = Number(f.total_eur);
 
-  const structuredLines = [
-    input.shippingLine1?.trim(),
-    input.shippingLine2?.trim(),
-    [input.shippingPostalCode?.trim(), input.shippingCity?.trim()].filter(Boolean).join(" "),
-    input.shippingCountry?.trim()?.toUpperCase(),
-  ].filter((l): l is string => !!l && l.length > 0);
-  const formattedAddress = structuredLines.length > 0 ? structuredLines.join("\n") : null;
-
-  const { error } = await db
-    .from("invoices")
-    .update({
-      shipping_method: input.shippingMethod,
-      shipping_eur: shippingEur,
-      shipping_distance_km: shippingDistanceKm,
-      shipping_address: formattedAddress,
-      shipping_line1: input.shippingLine1?.trim() || null,
-      shipping_line2: input.shippingLine2?.trim() || null,
-      shipping_city: input.shippingCity?.trim() || null,
-      shipping_postal_code: input.shippingPostalCode?.trim() || null,
-      shipping_country: input.shippingCountry?.trim()?.toUpperCase() || null,
-      shipping_latitude: input.shippingLatitude ?? null,
-      shipping_longitude: input.shippingLongitude ?? null,
-      extras,
-      extras_eur: extrasEur,
-      total_eur: totalEur,
-    })
-    .eq("id", input.invoiceId);
-  if (error) return { ok: false, error: error.message };
+  // The database prices the order; these TS helpers price what the buyer was
+  // shown. They are ports of each other — log loudly if they ever drift apart.
+  const shown = serverShippingEur(input.shippingMethod, {
+    lat: input.shippingLatitude, lon: input.shippingLongitude, country: input.shippingCountry, city: input.shippingCity,
+  });
+  const shownExtras = serverPriceExtras(input.extras).reduce((s, e) => s + e.price_eur, 0);
+  if (shown.eur !== shippingEur || shownExtras !== Number(f.extras_eur)) {
+    console.warn(
+      `[finalize] invoice ${input.invoiceId}: DB priced shipping ${shippingEur} + extras ${f.extras_eur}, ` +
+        `TS helpers say ${shown.eur} + ${shownExtras} — keep distance.ts and migration 032 in sync`,
+    );
+  }
 
   const pdfUrl = signedInvoicePdfUrl(input.invoiceId);
 
@@ -105,7 +123,7 @@ export async function finalizeInvoiceAndEmail(
       ? `${veh.year} ${veh.make} ${veh.model}${veh.trim ? ` ${veh.trim}` : ""}`
       : "Vehicle";
     const shippingLabel =
-      input.shippingMethod === "door_to_door"
+      f.shipping_method === "door_to_door"
         ? shippingDistanceKm
           ? `Door-to-door delivery (${shippingDistanceKm} km)`
           : "Door-to-door delivery"

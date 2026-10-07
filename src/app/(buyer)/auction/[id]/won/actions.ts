@@ -255,7 +255,8 @@ export async function finalizeInvoiceShippingAction(input: {
   if (!user) return { ok: false, error: "Sign in to confirm your order." };
 
   // Verify ownership here; pass the cookie-scoped client to the core (RLS lets
-  // the buyer read + update their own invoice — no service-role key needed).
+  // the buyer read their own invoice; the write goes through the
+  // finalize_my_invoice() RPC — no service-role key needed).
   const { data: inv } = await supabase
     .from("invoices").select("id, buyer_id").eq("id", input.invoiceId).single();
   if (!inv || (inv as { buyer_id: string }).buyer_id !== user.id) {
