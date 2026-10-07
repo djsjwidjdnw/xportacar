@@ -290,12 +290,16 @@ async function notifyOutbid(
   const body = vehicle
     ? `${vehicle.year} ${vehicle.make} ${vehicle.model} — new top bid €${newBidEur.toLocaleString("en-GB")}`
     : `New top bid €${newBidEur.toLocaleString("en-GB")}`;
-  await supabase.from("notifications").insert({
-    user_id: outbidUserId,
-    type:    "outbid",
-    title, body,
-    data:    { auction_id: auctionId, vehicle_id: vehicleId, amount_eur: newBidEur },
-  });
+  // Service role: the outbid user is someone else, and since migration 033 a
+  // session may only insert notifications addressed to itself. Best-effort.
+  try {
+    await createAdminClient().from("notifications").insert({
+      user_id: outbidUserId,
+      type:    "outbid",
+      title, body,
+      data:    { auction_id: auctionId, vehicle_id: vehicleId, amount_eur: newBidEur },
+    });
+  } catch { /* admin client not configured — skip the in-app notification */ }
   // Read the outbid user's contact via the service-role client: profiles SELECT
   // is restricted to self+staff (migration 027) and the bidder is neither.
   // Best-effort — skip the email if the admin client is unavailable.

@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { sendKycApprovedEmail, sendKycRejectedEmail } from "@/lib/email";
 import { LISTING_MS } from "@/lib/listing";
-import type { VehicleStatus } from "@/types";
+import type { NotificationType, VehicleStatus } from "@/types";
 
 export interface AdminResult {
   ok: boolean;
@@ -41,6 +42,22 @@ async function requireAdmin() {
     return { supabase, error: "Admin only." };
   }
   return { supabase, error: null };
+}
+
+// Notifications go through the service role: since migration 033 a signed-in
+// session may only insert notifications addressed to itself, and these are for
+// inspectors and buyers. Every caller has already passed the admin gate.
+// Best-effort, as before — a failed notification never fails the action.
+async function notifyUser(row: {
+  user_id: string;
+  type: NotificationType;
+  title: string;
+  body: string;
+  data?: Record<string, unknown>;
+}) {
+  try {
+    await createAdminClient().from("notifications").insert(row);
+  } catch { /* notifications are best-effort */ }
 }
 
 export async function setVehicleStatusAction(
@@ -242,7 +259,7 @@ async function applyAssignment(
   if (error) return { ok: false, error: error.message };
 
   if (inspectorId) {
-    await supabase.from("notifications").insert({
+    await notifyUser({
       user_id: inspectorId,
       type:    "status_update",
       title:   "New vehicle assigned",
@@ -330,7 +347,7 @@ export async function autoAssignInspectorsAction(): Promise<AdminResult & { assi
     cursor = (start + 1 + i) % n;
     const v = vehicles[i];
     await supabase.from("vehicles").update({ inspector_id: inspectors[cursor].id, status: "inspection_scheduled" }).eq("id", v.id);
-    await supabase.from("notifications").insert({
+    await notifyUser({
       user_id: inspectors[cursor].id,
       type:    "status_update",
       title:   "New vehicle assigned",
@@ -495,7 +512,7 @@ export async function scheduleInspectionAction(input: {
 
   const { data: v } = await supabase
     .from("vehicles").select("year, make, model").eq("id", vehicleId).single();
-  await supabase.from("notifications").insert({
+  await notifyUser({
     user_id: input.inspectorId,
     type: "status_update",
     title: "New inspection assigned",
@@ -574,7 +591,7 @@ export async function setUserKycStatusAction(
   if (error) return { ok: false, error: error.message };
 
   // Notification — close the loop with the buyer.
-  await supabase.from("notifications").insert({
+  await notifyUser({
     user_id: userId,
     type:    "status_update",
     title:   kycStatus === "verified"
@@ -640,7 +657,7 @@ export async function requestChangesAction(vehicleId: string, notes: string): Pr
 
   const inspectorId = (vehicle as { inspector_id?: string | null } | null)?.inspector_id;
   if (inspectorId) {
-    await supabase.from("notifications").insert({
+    await notifyUser({
       user_id: inspectorId,
       type: "status_update",
       title: "Changes requested",
