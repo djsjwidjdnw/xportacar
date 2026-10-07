@@ -34,7 +34,7 @@ in App Store Connect. Declare the following there:
 - **Identifiers:** User ID; Device ID (push token) — *App Functionality.*
 - **Financial Info:** Payment Info (proof-of-payment documents the buyer uploads) — *App Functionality.* Linked to identity.
 - **User Content:** Photos/Documents (payment proof) — *App Functionality.*
-- **Usage Data:** Product Interaction (bids, watchlist) — *App Functionality.*
+- **Usage Data:** Product Interaction (purchases, watchlist) — *App Functionality.*
 - **Tracking:** No. Data is **not** used for tracking or third-party ads.
 
 ### Inspector app (com.xportacar.inspector)

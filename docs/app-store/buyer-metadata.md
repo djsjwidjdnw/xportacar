@@ -6,83 +6,90 @@
 - **Primary category:** Business
 - **Secondary category:** Shopping
 - **Age rating:** 17+ (see questionnaire below)
-- **Support URL:** https://xportacar.vercel.app/support
-- **Marketing URL:** https://xportacar.vercel.app
+- **Support URL:** https://www.xportacar.com/support
+- **Marketing URL:** https://www.xportacar.com
 - **Privacy policy URL:** https://xportacar.vercel.app/support _(placeholder — replace with a dedicated /privacy page when available)_
 - **Privacy contact email:** privacy@xportacar.com _(placeholder)_
 - **Copyright:** © 2026 XportACar _(placeholder — finalize once Simon provides the legal entity)_
 
 ---
 
+> **Fixed-price marketplace wording (2026-10-07).** Sourced from the live site
+> (`landing.*`, `support.q*`, `listing.*` in `src/i18n/en.json`). en-US is the only
+> App Store localization. **Promotional text is live** (saved + re-read via the App
+> Store Connect API). **Description and keywords below are NOT live yet:** Apple
+> refuses edits on the live 1.0 version (`409 STATE_ERROR … cannot be edited at
+> this time`); they go in when the next App Store version (1.0.1) is created.
+
 ## Subtitle (max 30)
 ```
-UAE-to-EU car auctions
+UAE-to-EU vehicle marketplace
 ```
-(22 chars)
+(29 chars — the live listing currently has no subtitle)
 
-## Promotional text (max 170)
+## Promotional text (max 170) — LIVE
 ```
-Bid on inspected UAE vehicles in timed online auctions and import them to Europe. Live bidding, transparent condition reports, and door-to-door shipping in one app.
+Buy inspected UAE vehicles at a fixed price and import them to Europe. 7-day listings, transparent condition reports and door-to-door shipping in one app.
 ```
-(168 chars)
+(154 chars)
 
-## Keywords (max 100, comma-separated)
+## Keywords (max 100, comma-separated) — for the next version
 ```
-car auction,vehicle import,used cars,Dubai,UAE,Europe,luxury cars,bidding,car shipping,RoRo,buy car
+car marketplace,vehicle import,used cars,Dubai,UAE,Europe,luxury cars,car shipping,RoRo,buy car
 ```
-(99 chars)
+(95 chars)
 
-## Description (max 4000)
+## Description (max 4000) — for the next version
 ```
-XportACar connects European buyers with quality, privately owned vehicles in the United Arab Emirates — inspected on the ground, listed in timed online auctions, and shipped to the EU.
+XportACar connects European buyers with quality, privately owned vehicles in the United Arab Emirates — inspected on the ground, listed at a fixed price, and shipped to the EU.
 
-Browse a curated marketplace of inspected cars, follow live auctions, place bids, and manage the full purchase through to delivery — all from your phone.
+Browse a curated marketplace of inspected cars, buy any live listing at its listed price, and manage the full purchase through to delivery — all from your phone.
 
 WHY XPORTACAR
 • Every vehicle is inspected by a UAE field team before listing
 • Transparent condition reports with photos, damage details and a paint-thickness reading
-• Real-time auctions with live bid updates and a countdown timer
-• Clear, fixed platform fee — no hidden surprises
+• Fixed prices and 7-day listings — one clear price per car, no haggling, no waiting
+• Transparent pricing: vehicle price + 2.9% platform fee + shipping — no hidden margins
 
-BIDDING
-• Place a bid or set a maximum (proxy) bid and let the app bid for you up to your limit
-• See the current bid, bid count and time remaining at a glance
-• Buy Now on eligible listings to secure a vehicle instantly
+BUYING
+• Every car carries one clear price and stays listed for 7 days
+• Review the full inspection, then buy instantly at the listed price
+• The first confirmed purchase secures the vehicle
 
-WINNING & PAYMENT
-• A clear two-step flow after you win: confirm within 36 hours, then complete your wire transfer within 5 working days
+ORDER & PAYMENT
+• A clear two-step flow after you buy: confirm payment within 36 hours, then complete your wire transfer within 5 working days
 • Upload proof of payment directly in the app
-• Itemized invoice with hammer price, platform fee and your chosen shipping
+• Itemized invoice with vehicle price, platform fee and your chosen shipping
 
 SHIPPING & DELIVERY
 • Choose warehouse pickup in Dubai, RoRo or container shipping to major EU ports, or door-to-door delivery
-• Add optional German TÜV / registration paperwork
+• Add optional German Registration (TÜV)
 • Import duties, customs and VAT are clearly disclosed as the buyer's responsibility
 
 ACCOUNTS
 • Register as a business or individual buyer
-• Complete KYC verification to bid securely
-• Track your bids, watchlist and won vehicles
+• Complete KYC verification before you buy
+• Track your purchases, orders and watchlist
 
-XportACar is built for serious cross-border buyers. Bids are binding and purchases involve real financial commitments, so the app is intended for adults.
+XportACar is built for serious cross-border buyers. Purchases are binding and involve real financial commitments, so the app is intended for adults.
 
-Questions? Visit https://xportacar.vercel.app/support
+Questions? Visit https://www.xportacar.com/support
 ```
+(1739 chars)
 
-## What's New — version 1.0.0 (max 4000)
+## What's New — version 1.0.1 (max 4000)
 ```
-Welcome to XportACar 1.0.
+XportACar is now a fixed-price marketplace.
 
-• Browse a marketplace of inspected UAE vehicles
-• Follow live, timed auctions with real-time bid updates and countdowns
-• Place bids, set a maximum (proxy) bid, or Buy Now on eligible listings
+• Every car has one clear price and stays listed for 7 days — buy instantly at the listed price
+• New Purchases tab with your orders and invoices
+• Refreshed XportACar logo and app icon
 • Detailed condition reports with photos, damage entries and paint-thickness readings
 • Two-step payment: confirm within 36 hours, then wire within 5 working days, with in-app proof upload
-• Flexible shipping: Dubai warehouse pickup, RoRo/container to EU ports, or door-to-door, plus optional German TÜV paperwork
-• Watchlist, bid history and won-vehicle tracking
+• Flexible shipping: Dubai warehouse pickup, RoRo/container to EU ports, or door-to-door, plus optional German Registration (TÜV)
 • Available in English, German, French and Arabic
 
-Thank you for trying XportACar. We'd love your feedback at support@xportacar.com.
+Thank you for using XportACar. We'd love your feedback at support@xportacar.com.
 ```
 
 ---
@@ -113,7 +120,7 @@ transactions intended for adult business buyers**. See the flag at the bottom.
 **To present 17+:** in the current App Store Connect age-rating flow you may set
 the rating to reflect mature/financial use. If the questionnaire computes a
 lower minimum and Apple does not allow manually raising it, accept the computed
-rating and rely on the in-app terms (binding bids, adult B2B audience). **Confirm
+rating and rely on the in-app terms (binding purchases, adult B2B audience). **Confirm
 the achievable rating in App Store Connect — see SUBMISSION_CHECKLIST.md.**
 
 ## Data collected (for App Store Connect "App Privacy")
@@ -121,6 +128,6 @@ the achievable rating in App Store Connect — see SUBMISSION_CHECKLIST.md.**
 - Identifiers: user ID; device token (push notifications)
 - Financial info: payment-proof documents (uploaded by the buyer)
 - User content: uploaded files/photos (payment proof)
-- Usage data: bids, watchlist, app interactions (for app functionality)
+- Usage data: purchases, watchlist, app interactions (for app functionality)
 - **Tracking:** None. Data is not used for third-party advertising or tracking.
 ```

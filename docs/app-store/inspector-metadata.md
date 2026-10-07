@@ -6,8 +6,8 @@
 - **Primary category:** Business
 - **Secondary category:** Productivity
 - **Age rating:** 17+ (per project decision — see note below)
-- **Support URL:** https://xportacar.vercel.app/support
-- **Marketing URL:** https://xportacar.vercel.app
+- **Support URL:** https://www.xportacar.com/support
+- **Marketing URL:** https://www.xportacar.com
 - **Privacy policy URL:** https://xportacar.vercel.app/support _(placeholder — replace with /privacy when available)_
 - **Privacy contact email:** privacy@xportacar.com _(placeholder)_
 - **Copyright:** © 2026 XportACar _(placeholder — finalize with Simon)_
@@ -24,11 +24,17 @@ Vehicle inspection field tool
 ```
 (29 chars)
 
-## Promotional text (max 170)
+> **Fixed-price marketplace wording (2026-10-07).** en-US is the only App Store
+> localization. **Promotional text is live** (saved + re-read via the App Store
+> Connect API). **The description below is NOT live yet:** Apple refuses edits on
+> the live 1.0 version (`409 STATE_ERROR`); it goes in with the next App Store
+> version (1.0.1). Keywords are unchanged.
+
+## Promotional text (max 170) — LIVE
 ```
-The field tool for XportACar inspectors: capture vehicle details, photos, damage and paint-thickness readings, then submit listings for auction — all from your phone.
+The field tool for XportACar inspectors: capture vehicle details, photos, damage and paint-thickness readings, then submit vehicles for listing — all from your phone.
 ```
-(165 chars)
+(166 chars)
 
 ## Keywords (max 100, comma-separated)
 ```
@@ -36,9 +42,9 @@ vehicle inspection,car inspection,damage report,VIN,paint gauge,condition report
 ```
 (95 chars)
 
-## Description (max 4000)
+## Description (max 4000) — for the next version
 ```
-XportACar Inspection is the field tool used by XportACar's inspection teams in the United Arab Emirates to document privately owned vehicles and prepare them for listing on the XportACar auction platform.
+XportACar Inspection is the field tool used by XportACar's inspection teams in the United Arab Emirates to document privately owned vehicles and prepare them for sale on the XportACar marketplace.
 
 This app is intended for authorized XportACar inspectors. A valid inspector account is required to sign in.
 
@@ -48,7 +54,7 @@ GUIDED INSPECTION WIZARD
 • Record a Paint Thickness Test photo to document the gauge reading
 • Log damage by panel with severity and a photo for each issue
 • Attach documents (registration, service book, insurance)
-• Add a market-based price recommendation for the admin team to review
+• Suggest an asking price from market data for the admin team to review
 
 DESIGNED FOR THE FIELD
 • Works step by step so nothing is missed before submission
@@ -56,10 +62,11 @@ DESIGNED FOR THE FIELD
 • Uploads photos to secure storage as you go
 • Submits the completed inspection for office review and listing
 
-Once submitted, the office team reviews the inspection, finalizes pricing and lists the vehicle for auction in the XportACar buyer app.
+Once submitted, the office team reviews the inspection, sets the final fixed price and lists the vehicle for sale in the XportACar buyer app.
 
-Support: https://xportacar.vercel.app/support
+Support: https://www.xportacar.com/support
 ```
+(1188 chars)
 
 ## What's New — version 1.0.0 (max 4000)
 ```
@@ -80,7 +87,7 @@ Feedback is welcome at support@xportacar.com.
 ---
 
 ## Age rating questionnaire (project decision: 17+)
-This is a B2B inspection tool with **no auction, bidding, payment, violence,
+This is a B2B inspection tool with **no buying, selling, payment, violence,
 sexual or gambling content**, so the questionnaire will compute a **low rating
 (≈4+)**. The 17+ here is a project-wide decision for consistency with the buyer
 app; it is **not driven by content**. Recommend either accepting the computed

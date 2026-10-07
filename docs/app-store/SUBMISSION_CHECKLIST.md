@@ -71,18 +71,19 @@ folder; this checklist is the work that must be done by hand in
 - [ ] **Contact:** Simon's name, email, phone (TBD).
 - [ ] **Review notes** — paste something like:
 
-  > XportACar is a UAE-to-EU online vehicle auction platform. Field teams in the
-  > UAE inspect privately owned cars and list them in timed online auctions;
-  > registered European buyers bid and import the vehicles.
+  > XportACar is a UAE-to-EU online vehicle marketplace. Field teams in the UAE
+  > inspect privately owned cars and list them at a fixed price for 7 days;
+  > verified European buyers buy them at the listed price and import them.
   >
   > How to test the BUYER app:
   > 1. Sign in with buyer@xportacar.com / Demo!1234.
-  > 2. Open the Marketplace and tap a vehicle to view its condition report.
-  > 3. Open the live auction (a demo "Porsche 911 Carrera S" auction is seeded).
-  > 4. Place a bid, or tap "Buy Now" to win instantly.
-  > 5. On the win screen, tap "Confirm payment" to see the proof-upload flow
-  >    (PDF/JPG/PNG). This is upload-only; no real payment is taken in-app —
-  >    settlement is a manual bank wire handled off-app.
+  > 2. Open the Marketplace and tap a listed vehicle to view its condition report.
+  > 3. Tap "Buy now", then "Confirm purchase" (a binding purchase at the listed
+  >    price; the 2.9% platform fee and shipping are added on the invoice).
+  > 4. On the order screen, choose shipping and tap "Confirm order", then
+  >    "Confirm payment" to see the proof-upload flow (PDF/JPG/PNG). This is
+  >    upload-only; no real payment is taken in-app — settlement is a manual
+  >    bank wire handled off-app.
   >
   > How to test the INSPECTOR app:
   > 1. Sign in with inspector@xportacar.com / Demo!1234.
@@ -90,9 +91,14 @@ folder; this checklist is the work that must be done by hand in
   >    documents → review. The Damage step includes a "Paint Thickness Test"
   >    photo capture.
   >
-  > Note: no in-app purchases or payments occur inside the apps. Auction
-  > settlement is a B2B bank transfer arranged outside the app. Bids are binding,
-  > so the apps are intended for adult business users.
+  > Note: no in-app purchases or payments occur inside the apps. Settlement is
+  > a B2B bank transfer arranged outside the app. Purchases are binding, so the
+  > apps are intended for adult business users.
+  >
+  > (2026-10-07: the App Review notes saved on the live buyer 1.0 version were
+  > rewritten to this fixed-price flow through the App Store Connect API, so the
+  > next version inherits them. The marketplace must have at least one listing
+  > for the reviewer to buy.)
 
 ## 6) Export compliance
 - [ ] Both apps set `ITSAppUsesNonExemptEncryption = false` in `app.json`, so the
@@ -114,7 +120,7 @@ folder; this checklist is the work that must be done by hand in
 - [ ] Add for review → **Submit**.
 - [ ] Choose manual or automatic release.
 - [ ] Watch for Apple messages in **Resolution Center**; the review notes above
-      pre-empt the most common questions (sign-in, what the auctions are, no
+      pre-empt the most common questions (sign-in, how buying works, no
       in-app payment).
 
 ---
