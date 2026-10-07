@@ -2,9 +2,8 @@ import "server-only";
 
 // Auction settlement.
 //
-// There is no cron/trigger that closes an auction when its end_time passes,
-// so a finished auction can sit at status='active' indefinitely.  These
-// helpers settle such auctions lazily — whenever a page that cares about the
+// The close-expired-auctions cron (every 2 min) is the main writer; these
+// helpers settle a just-expired auction lazily — whenever a page that cares about the
 // outcome (watchlist, dashboard) is viewed, it asks us to settle the auctions
 // it just read.  Everything is best-effort and idempotent: settlement only
 // touches rows that are still 'active' with a past end_time, so re-running is
@@ -73,6 +72,14 @@ export async function settleEndedAuctions(auctionIds: string[]): Promise<void> {
         .eq("id", a.id)
         .eq("status", "active");
       if (updErr) continue;
+
+      // Unsold (always, in the fixed-price marketplace): put the vehicle back
+      // to 'listed' — the same outcome as the close-expired-auctions sweep — so
+      // the admin can relist it. The in_auction guard never touches a vehicle
+      // that buy_now() just sold.
+      if (!winnerId) {
+        await admin.from("vehicles").update({ status: "listed" }).eq("id", a.vehicle_id).eq("status", "in_auction");
+      }
 
       if (winnerId) {
         await admin.from("vehicles").update({ status: "sold", sold_at: new Date().toISOString() }).eq("id", a.vehicle_id);
