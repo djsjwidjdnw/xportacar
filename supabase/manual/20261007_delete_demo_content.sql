@@ -1,7 +1,16 @@
 -- =====================================================================
--- 2026-10-07 — DELETE the demo/test content.          *** NOT APPLIED ***
+-- 2026-10-07 — DELETE the demo/test content.     *** APPLIED 2026-10-07 ***
 --
 -- Category: DELETES EXISTING ROWS (production data). Hand-run only.
+--
+-- APPLIED 2026-10-07 08:59 UTC (approved by Chase), fingerprint
+-- 7634664568297872568. The three DELETEs below ran verbatim inside one DO block
+-- that asserted the before/after counts equal the rehearsal (they did):
+-- vehicles 2->0, auctions 2->0, bids 7->0, invoices 1->0, vehicle_photos 42->0,
+-- paint_thickness_readings 10->0, notifications 22->13, profiles 13, auth.users 14.
+-- Storage: remove-demo-storage-20261007.mjs --confirm removed all 53 objects.
+-- Numbering: invoice_number_seq restarted (setval 1, false) -> XPC-2026-000001.
+-- The recovery_20261007_* tables are KEPT.
 --
 -- Recovery copies already taken (applied 2026-10-07, RLS on, anon +
 -- authenticated revoked): public.recovery_20261007_vehicles, _vehicle_photos,
