@@ -33,6 +33,35 @@ These three were the last applied to production:
 - **012** introduced the admin audit log for live-listing edits and inspection
   re-opens.
 
+## Grants rule (from 30 Oct 2026)
+New tables in `public` are no longer auto-granted to the Data API. Every migration
+that creates a table carries its `grant` lines in the same file — start from
+`supabase/MIGRATION_TEMPLATE.sql`. The full rule is in `CLAUDE.md`.
+
+### Grants audit (2026-10-07, read-only — nothing changed)
+Live privileges come from the project's default ACL (`postgres` and `supabase_admin`
+default-grant ALL on new `public` tables to `anon`, `authenticated`, `service_role`).
+None of the creating migrations grants table privileges, so **every table below would
+return `permission denied` on a fresh database** (preview branch, `supabase db reset`)
+once the old automatic grant is gone:
+
+| Migration | Tables relying on the automatic grant |
+|---|---|
+| 001 | profiles, vehicles, vehicle_photos, vehicle_damages, auctions, bids, watchlist, notifications |
+| 002 | counter_offers, invoices, saved_searches, shipping_quotes, kyc_submissions, push_tokens |
+| 003_platform_settings | platform_settings |
+| 004 | vehicle_valuations, shipping_rates |
+| 012 | admin_audit_log |
+| 013 | inspector_applications |
+| 015 | paint_thickness_readings |
+| 016 | vehicle_status_events, automated_email_log |
+| 019 | vin_decode_cache, vincario_usage_log |
+| 025 | prelaunch_signups, app_settings |
+| 028 | vehicle_sellers |
+
+27 of 27 live `public` tables. All have RLS enabled. Fixing them is a separate,
+deliberate migration (not done in the 2026-10-07 run).
+
 ## Applying a new migration
 Dashboard → SQL Editor → paste the file → Run. Or, with a Supabase PAT:
 ```bash

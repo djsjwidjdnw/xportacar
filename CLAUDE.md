@@ -305,6 +305,29 @@ xportacar/
 10. Use proper TypeScript types, no 'any'
 11. Seed data should look real — use actual car specs, realistic prices in EUR, actual Unsplash photo URLs
 
+## Supabase grants rule (standing, effective 30 October 2026)
+
+Supabase stops auto-granting Data API access to new tables in `public`. A table
+created without grants exists but returns `permission denied` through supabase-js,
+PostgREST and GraphQL — including on preview branches and after a local
+`supabase db reset`.
+
+**Every migration that CREATEs a table in `public` carries, in the same file:**
+```sql
+grant select on public.<table> to anon;
+grant select, insert, update, delete on public.<table> to authenticated;
+grant select, insert, update, delete on public.<table> to service_role;
+```
+- Omit the `anon` line for admin-only tables.
+- This sits alongside existing RLS, `REVOKE` and `ALTER DEFAULT PRIVILEGES` work, not
+  instead of it — grants open the Data API door, RLS still decides which rows a role sees.
+- Start new migrations from `supabase/MIGRATION_TEMPLATE.sql`.
+- Audit (2026-10-07): all 27 tables created by migrations 001–028 rely on the old
+  automatic grant (none of those migrations grants table privileges). They work on the
+  live project today because its default ACL still grants anon/authenticated/service_role,
+  but a fresh database (preview branch, `db reset`) would deny them. See
+  `docs/MIGRATIONS.md` → "Grants audit".
+
 ## Environment Variables Needed
 ```
 NEXT_PUBLIC_SUPABASE_URL=
