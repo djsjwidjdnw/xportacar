@@ -70,16 +70,9 @@ Support: https://www.xportacar.com/support
 
 ## What's New — version 1.0.1 (max 4000)
 ```
-XportACar Inspection 1.0.1
-
-• Suggest an asking price for each vehicle — the admin team sets the final fixed price when it is listed for sale
-• Clearer email-confirmation and sign-in messages for inspector accounts
-• Refreshed XportACar logo and app icon
-
-Feedback is welcome at contact@xportacar.com.
+XportACar is now a fixed-price marketplace, with no more live offers: every vehicle has one price and a Buy button, listings run for 7 days, plus new branding and a new icon.
 ```
-(Sourced from the inspector commits between build 8 and build 9: 767577d asking
-price, 562e35a confirm/sign-in copy, 2d8f871 brand assets.)
+(Wording chosen by Chase, 2026-10-07; same text in both apps.)
 
 ---
 

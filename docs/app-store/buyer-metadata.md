@@ -80,18 +80,9 @@ Questions? Visit https://www.xportacar.com/support
 
 ## What's New — version 1.0.1 (max 4000)
 ```
-XportACar is now a fixed-price marketplace.
-
-• Every car has one clear price and stays listed for 7 days — buy instantly at the listed price
-• New Purchases tab with your orders and invoices
-• Refreshed XportACar logo and app icon
-• Detailed condition reports with photos, damage entries and paint-thickness readings
-• Two-step payment: confirm within 36 hours, then wire within 5 working days, with in-app proof upload
-• Flexible shipping: Dubai warehouse pickup, RoRo/container to EU ports, or door-to-door, plus optional German Registration (TÜV)
-• Available in English, German, French and Arabic
-
-Thank you for using XportACar. We'd love your feedback at contact@xportacar.com.
+XportACar is now a fixed-price marketplace, with no more live offers: every vehicle has one price and a Buy button, listings run for 7 days, plus new branding and a new icon.
 ```
+(Wording chosen by Chase, 2026-10-07; same text in both apps.)
 
 ---
 
