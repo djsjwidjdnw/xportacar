@@ -51,9 +51,9 @@ folder; this checklist is the work that must be done by hand in
 - [ ] **App icon:** upload `buyer-icon-1024.png` / `inspector-icon-1024.png`
       (1024×1024, RGB, no alpha — already prepared in this folder; Apple usually
       pulls the icon from the build, but have these ready).
-- [ ] **Screenshots:** upload 6.7", 6.5" and 5.5" sets. Capture per
-      `screenshots.md`, frame with `scripts/screenshots/make-mockups.py`, upload
-      the framed PNGs.
+- [x] **Screenshots (1.0.1):** the live 1.0 screenshots, copied byte for byte
+      onto both 1.0.1 versions at every size (iPhone 6.5" + iPad 13"), by Chase's
+      decision of 2026-10-07 — see `screenshots.md`.
 
 ## 4) App Privacy (per app)
 - [ ] Complete the **App Privacy** questionnaire using the data types listed in
@@ -79,11 +79,16 @@ folder; this checklist is the work that must be done by hand in
       their roles, say purchases are paid by bank transfer outside the app, and
       give account deletion: buyer app → Profile tab → "Delete account";
       inspector app → Profile tab → "Delete account".
-- [ ] **Before submitting the buyer app:** at least one REAL live listing must
-      exist, or the reviewer has nothing to buy. The reviewer's test purchase is
-      a real order in production: it marks that listing sold and issues an
-      invoice (emailed to the Gmail alias above) — cancel it and relist after
-      review.
+- [x] **Something to buy:** one demo listing is live for App Review — vehicle
+      `5f4e3424-89fa-43e8-b05d-d9fe795e31ff`, auction
+      `84326b8b-7140-40df-bf21-69f97da3e2a5`, 2019 Mercedes-Benz AMG GT
+      "C Roadster — Demo listing for App Review, not for sale", €104,900, live
+      2026-10-07 13:02 UTC → 2026-10-14 13:02 UTC. Stock photos, credited in
+      `demo-photo-credits.md`. The reviewer's purchase is a real order in
+      production (marks it sold, issues an invoice emailed to the Gmail alias);
+      a rolled-back rehearsal of exactly that purchase passed on 2026-10-07.
+      **If review is still pending on day 6 (2026-10-13), relist it** (admin
+      Publish/Relist restarts the 7 days).
 
 ## 6) Export compliance
 - [ ] Both apps set `ITSAppUsesNonExemptEncryption = false` in `app.json`, so the
@@ -101,12 +106,28 @@ folder; this checklist is the work that must be done by hand in
       - Create a public link or add testers by email / groups.
 
 ## 8) Submit for review (per app)
-- [ ] Version 1.0.0 status → **Prepare for Submission** complete (no missing fields).
-- [ ] Add for review → **Submit**.
-- [ ] Choose manual or automatic release.
+- [x] **1.0.1 submitted 2026-10-07** through the App Store Connect API, after a
+      pre-submit gate passed (screenshots = live 1.0, no auction/bid/bidding/reserve
+      outside What's New, builds attached, contact filled, demo listing live):
+      - XportACar 1.0.1 (build 12): submission `9967211e-10bd-43d1-9885-8399333cf223`,
+        13:09:01 UTC → **Waiting for Review**
+      - XportACar Inspector 1.0.1 (build 9): submission `8966b875-e8ff-4336-bcf1-f25c1218cd82`,
+        13:09:12 UTC → **Waiting for Review**
+- [x] Release: **automatic after approval** (`AFTER_APPROVAL`) on both versions.
 - [ ] Watch for Apple messages in **Resolution Center**; the review notes above
       pre-empt the most common questions (sign-in, how buying works, no
       in-app payment).
+
+## 9) After BOTH apps are approved — cleanup (pre-approved by Chase)
+1. Copy to recovery tables first: the demo vehicle with its photos, paint
+   readings, auction, bids, invoice, payment proofs, notifications, email-log rows
+   and audit rows, plus anything the reviewers created (e.g. an inspection the
+   inspector reviewer submitted), and the Storage objects' keys.
+2. Delete them, including the 20 Storage objects listed in `demo-photo-credits.md`.
+3. Restart invoice numbering — `setval('public.invoice_number_seq', 1, false)`
+   while no invoice exists — so the first real invoice is **XPC-2026-000001**.
+
+Landing mode (`app_settings.landing_mode_enabled`) stays **ON** until Chase flips it.
 
 ---
 

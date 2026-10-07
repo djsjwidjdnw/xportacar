@@ -328,6 +328,27 @@ grant select, insert, update, delete on public.<table> to service_role;
   but a fresh database (preview branch, `db reset`) would deny them. See
   `docs/MIGRATIONS.md` → "Grants audit".
 
+## Current state — App Store 1.0.1 in review (as of 2026-10-07)
+
+- **Both apps are in App Review.** XportACar 1.0.1 (build 12) and XportACar Inspector
+  1.0.1 (build 9) were submitted 2026-10-07 13:09 UTC and read **Waiting for Review**.
+  Release is automatic after approval. Details: `docs/app-store/SUBMISSION_CHECKLIST.md`.
+- **Demo listing for App Review (production):** vehicle
+  `5f4e3424-89fa-43e8-b05d-d9fe795e31ff`, auction `84326b8b-7140-40df-bf21-69f97da3e2a5`,
+  "2019 Mercedes-Benz AMG GT C Roadster — Demo listing for App Review, not for sale",
+  €104,900, live until **2026-10-14 13:02 UTC**. Stock photos, credited in
+  `docs/app-store/demo-photo-credits.md`. **If review is still pending on day 6
+  (2026-10-13), relist it** (admin Publish/Relist restarts the 7 days).
+- **Cleanup, pre-approved by Chase once BOTH apps are approved:** copy the demo
+  listing and everything the reviewers created to recovery tables, then delete them
+  (Storage objects included), then restart invoice numbering
+  (`setval('public.invoice_number_seq', 1, false)` while no invoice exists) so the first
+  real invoice is XPC-2026-000001. Steps: SUBMISSION_CHECKLIST.md section 9.
+- **Landing mode stays ON** (`app_settings.landing_mode_enabled`) until Chase flips it.
+- **ReFit** (`C:\Users\chase\projects\hardware-memory`): its `eas.json` `ascApiKeyPath`
+  still points at `C:\Users\chase\AuthKey_A29TQJT273.p8`, which was deleted on
+  2026-10-07, so ReFit's `eas submit` needs a new key path.
+
 ## Environment Variables Needed
 ```
 NEXT_PUBLIC_SUPABASE_URL=
