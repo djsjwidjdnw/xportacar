@@ -2,8 +2,8 @@
 
 Covers both apps. Everything Claude Code could generate is in this `docs/app-store/`
 folder; this checklist is the work that must be done by hand in
-[App Store Connect](https://appstoreconnect.apple.com) (team: **Jon Anderson,
-PJ93UCU3CM**).
+[App Store Connect](https://appstoreconnect.apple.com) (team: **Chase Bitz,
+2FVWM2KU8D**).
 
 | App | Bundle ID | Metadata file |
 |---|---|---|

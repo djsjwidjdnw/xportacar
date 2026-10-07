@@ -1,7 +1,7 @@
 # App Store metadata — XportACar (Buyer app)
 
 - **Bundle ID:** `com.xportacar.buyer`
-- **Team:** Jon Anderson (PJ93UCU3CM)
+- **Team:** Chase Bitz (2FVWM2KU8D) — transferred from Jon Anderson's team in 2026
 - **Price:** Free
 - **Primary category:** Business
 - **Secondary category:** Shopping
