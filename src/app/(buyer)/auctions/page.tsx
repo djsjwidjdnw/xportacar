@@ -1,8 +1,10 @@
+import { redirect } from "next/navigation";
 import { Gavel } from "lucide-react";
 
 import { VehicleCard } from "@/components/marketplace/VehicleCard";
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { createClient } from "@/lib/supabase/server";
+import { getAppSettings } from "@/lib/settings";
 import { normalizeVehicleRows } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
 import { auctionPhase } from "@/lib/utils";
@@ -11,6 +13,9 @@ import type { VehicleWithMedia } from "@/types";
 export const metadata = { title: "Live auctions" };
 
 export default async function AuctionsPage() {
+  // Live auctions only exist while bidding is enabled; otherwise the
+  // marketplace already lists everything that is for sale.
+  if (!(await getAppSettings()).biddingEnabled) redirect("/marketplace");
   const supabase = await createClient();
   const t = await getTranslations();
   const { data: { user } } = await supabase.auth.getUser();

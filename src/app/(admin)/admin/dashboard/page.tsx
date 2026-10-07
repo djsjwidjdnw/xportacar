@@ -16,6 +16,7 @@ import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
+import { getAppSettings } from "@/lib/settings";
 import { adminNotificationHref, formatEur, formatRelativeTime } from "@/lib/utils";
 import type { Vehicle, VehicleStatus } from "@/types";
 
@@ -24,6 +25,7 @@ export const metadata = { title: "Operations dashboard" };
 export default async function AdminDashboardPage() {
   const supabase = await createClient();
   const t = await getTranslations("admin");
+  const { biddingEnabled } = await getAppSettings();
 
   const [
     { data: vehicles },
@@ -38,7 +40,7 @@ export default async function AdminDashboardPage() {
     // Bounded to the most recently-updated 500 — the Kanban pipeline + status
     // chart operate on this window, never the whole (100k+) vehicles table.
     supabase.from("vehicles").select("*").order("updated_at", { ascending: false }).limit(500),
-    supabase.from("auctions").select("*", { count: "exact", head: true }).eq("status", "active"),
+    supabase.from("auctions").select("*", { count: "exact", head: true }).eq("status", "active").gt("end_time", new Date().toISOString()),
     supabase.from("profiles").select("*", { count: "exact", head: true }).eq("role", "buyer"),
     // Accurate total of non-terminal vehicles for the stat card (head-only).
     supabase.from("vehicles").select("id", { count: "exact", head: true }).not("status", "in", "(sold,delivered)"),
@@ -153,7 +155,7 @@ export default async function AdminDashboardPage() {
       {/* Stat cards — consistent shadow + spacing */}
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label={t("statActiveVehicles")}   value={String(activeVehicles)}    iconName="car"        delta={{ value: "+12%", positive: true }} accent="brand" />
-        <StatCard label={t("statLiveAuctions")}     value={String(liveAuctions ?? 0)} iconName="gavel"      delta={{ value: "+3",   positive: true }} accent="warning" />
+        <StatCard label={t(biddingEnabled ? "statLiveAuctions" : "statLiveListings")}     value={String(liveAuctions ?? 0)} iconName="gavel"      delta={{ value: "+3",   positive: true }} accent="warning" />
         <StatCard label={t("statMonthlyRevenue")}   value={formatEur(monthlyRevenue)} iconName="badge-euro" delta={{ value: "+8%",  positive: true }} accent="success" />
         <StatCard label={t("statRegisteredBuyers")} value={String(buyers ?? 0)}       iconName="users"      delta={{ value: "+24",  positive: true }} accent="brand" />
       </section>
@@ -240,12 +242,12 @@ export default async function AdminDashboardPage() {
                       <TableCell className="hidden xl:table-cell max-w-[280px] truncate text-sm text-grey-700">
                         {href ? (
                           <Link href={href} className="block truncate hover:text-grey-900">
-                            New bid by{" "}
+                            {biddingEnabled ? "New bid by" : "Purchase by"}{" "}
                             <span className="font-medium text-grey-900">{bidderName}</span>
                           </Link>
                         ) : (
                           <>
-                            New bid by{" "}
+                            {biddingEnabled ? "New bid by" : "Purchase by"}{" "}
                             <span className="font-medium text-grey-900">{bidderName}</span>
                           </>
                         )}

@@ -23,6 +23,14 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
   );
 
+  // Auction-only notice ("ending soon", "you've been outbid"): dormant while
+  // the platform runs as a fixed-price marketplace (app_settings.bidding_enabled).
+  const { data: flag } = await admin
+    .from("app_settings").select("value").eq("key", "bidding_enabled").maybeSingle();
+  if ((flag as { value?: unknown } | null)?.value !== true) {
+    return json({ ok: true, skipped: "bidding disabled", sent: 0 });
+  }
+
   const now = Date.now();
   const windowStart = new Date(now + 24 * 60 * 60 * 1000).toISOString();
   const windowEnd = new Date(now + 25 * 60 * 60 * 1000).toISOString();

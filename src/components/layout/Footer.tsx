@@ -6,7 +6,7 @@ import { Mail, MapPin } from "lucide-react";
 import { Logo } from "@/components/shared/Logo";
 import { useTranslations } from "@/i18n/provider";
 
-export function Footer() {
+export function Footer({ biddingEnabled = false }: { biddingEnabled?: boolean }) {
   const t = useTranslations("landing");
   const year = new Date().getFullYear();
 
@@ -40,7 +40,7 @@ export function Footer() {
           <div className="grid gap-8 sm:grid-cols-3 lg:col-span-7">
             <FooterCol title={t("footerCol1")} links={[
               { href: "/marketplace", label: t("footerLinkMarketplace") },
-              { href: "/auctions",    label: t("footerLinkAuctions") },
+              ...(biddingEnabled ? [{ href: "/auctions", label: t("footerLinkAuctions") }] : []),
               { href: "/watchlist",   label: "Watchlist" },
               { href: "/dashboard",   label: "Dashboard" },
             ]}/>
@@ -63,9 +63,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-wrap items-center justify-between gap-3 border-t border-grey-200 pt-6 text-xs text-grey-500">
           <p>{t("footerCopy", { year })}</p>
-          <p className="text-grey-400">
-            UAE → EUROPE · Inspected · Auctioned · Delivered
-          </p>
+          <p className="text-grey-400">{t("footerStrap")}</p>
         </div>
       </div>
     </footer>

@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { AdminSidebar, AdminTopBar } from "@/components/layout/AdminSidebar";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
+import { BiddingProvider } from "@/lib/bidding";
+import { getAppSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/types";
 
@@ -35,7 +37,10 @@ export default async function AdminLayout({
   const pendingKyc = new Set((pendingRows ?? []).map((r) => (r as { user_id: string }).user_id)).size;
   const badges = { "/admin/kyc": pendingKyc, "/admin/prelaunch": prelaunchCount ?? 0 };
 
+  const { biddingEnabled } = await getAppSettings();
+
   return (
+    <BiddingProvider enabled={biddingEnabled}>
     <div className="min-h-screen bg-grey-50">
       <AdminSidebar profile={profile} badges={badges} />
       <AdminTopBar profile={profile} badges={badges} />
@@ -51,5 +56,6 @@ export default async function AdminLayout({
         </div>
       </main>
     </div>
+    </BiddingProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +8,7 @@ import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { createClient } from "@/lib/supabase/server";
+import { getAppSettings } from "@/lib/settings";
 import { getTranslations } from "@/i18n/server";
 import { auctionPhase } from "@/lib/utils";
 import type { Auction, BidWithBidder, KycStatus, VehicleWithMedia } from "@/types";
@@ -38,6 +39,10 @@ export default async function AuctionPage({
 
   const auction = auctionRow as unknown as Auction & { vehicle: VehicleWithMedia };
   const v = auction.vehicle;
+
+  // Fixed-price marketplace: there is no bidding page — the vehicle page is the
+  // listing (price, days left, Buy). Old links and notifications land there.
+  if (!(await getAppSettings()).biddingEnabled) redirect(`/vehicle/${auction.vehicle_id}`);
 
   // Strip seller PII before `v` / `auction.vehicle` reach the client components
   // (SpecsGrid + BidPanel both serialize into the browser payload). Same object

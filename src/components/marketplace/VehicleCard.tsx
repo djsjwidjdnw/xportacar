@@ -6,8 +6,10 @@ import { Clock, Fuel, Gauge, Gavel, Hourglass, MapPin } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { ListingCard } from "@/components/marketplace/ListingCard";
 import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
 import { useTranslations, useLocale } from "@/i18n/provider";
+import { useBiddingEnabled } from "@/lib/bidding";
 import { useCurrency } from "@/lib/currency";
 import {
   auctionPhase, cn, formatKm, formatTimeRemaining, isEndingSoon,
@@ -26,15 +28,22 @@ const localeMap: Record<string, string> = {
   en: "en-GB", de: "de-DE", ar: "ar-AE", fr: "fr-FR",
 };
 
-export function VehicleCard({
-  vehicle,
-  isWatching = false,
-  isAuthenticated = false,
-}: {
+interface VehicleCardProps {
   vehicle: VehicleCardData;
   isWatching?: boolean;
   isAuthenticated?: boolean;
-}) {
+}
+
+/** Fixed-price listing card, or the auction card when bidding is enabled. */
+export function VehicleCard(props: VehicleCardProps) {
+  return useBiddingEnabled() ? <AuctionVehicleCard {...props} /> : <ListingCard {...props} />;
+}
+
+function AuctionVehicleCard({
+  vehicle,
+  isWatching = false,
+  isAuthenticated = false,
+}: VehicleCardProps) {
   const t = useTranslations("common");
   const locale = useLocale();
   const intlLocale = localeMap[locale] ?? "en-GB";

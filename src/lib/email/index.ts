@@ -29,6 +29,7 @@ import { statusDeliveredEmail } from "./templates/statusDelivered";
 import { watchlistMatchEmail } from "./templates/watchlistMatch";
 import { auctionEndingSoonEmail } from "./templates/auctionEndingSoon";
 import { orderInvoiceEmail } from "./templates/orderInvoice";
+import { purchaseConfirmedEmail } from "./templates/purchaseConfirmed";
 
 export type { EmailContent, EmailLocale } from "./templates/layout";
 export { toEmailLocale } from "./templates/layout";
@@ -51,6 +52,7 @@ export { statusDeliveredEmail } from "./templates/statusDelivered";
 export { watchlistMatchEmail } from "./templates/watchlistMatch";
 export { auctionEndingSoonEmail } from "./templates/auctionEndingSoon";
 export { orderInvoiceEmail } from "./templates/orderInvoice";
+export { purchaseConfirmedEmail } from "./templates/purchaseConfirmed";
 
 export async function sendWelcomeEmail(args: { to: string; name: string; locale?: string }) {
   await sendEmail(args.to, welcomeEmail({ name: args.name, locale: toEmailLocale(args.locale) }));
@@ -94,6 +96,24 @@ export async function sendAuctionWonEmail(args: {
   );
 }
 
+/** Fixed-price purchase (buy_now()) — sent instead of the auction-won email while bidding is off. */
+export async function sendPurchaseConfirmedEmail(args: {
+  to: string;
+  vehicleTitle: string;
+  amountEur: number;
+  auctionId: string;
+  locale?: string;
+}) {
+  await sendEmail(
+    args.to,
+    purchaseConfirmedEmail({
+      vehicleTitle: args.vehicleTitle,
+      amountEur: args.amountEur,
+      auctionId: args.auctionId,
+      locale: toEmailLocale(args.locale),
+    }),
+  );
+}
 export async function sendBidConfirmationEmail(args: {
   to: string;
   name?: string;

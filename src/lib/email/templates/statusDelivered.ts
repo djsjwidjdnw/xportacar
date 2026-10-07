@@ -23,7 +23,7 @@ const COPY: Localized<Copy> = {
     heading: (name) => `Your vehicle has been delivered, ${name}`,
     headingNoName: "Your vehicle has been delivered",
     bodyHtml: (titleHtml) =>
-      `<strong>${titleHtml}</strong> has arrived and been delivered. Thank you for buying with XportACar — we hope to see you in our next auction cycle.`,
+      `<strong>${titleHtml}</strong> has arrived and been delivered. Thank you for buying with XportACar — we hope to see you back on the marketplace soon.`,
     noteLabel: "Note from our team",
     ctaLabel: "View your order",
   },
@@ -32,7 +32,7 @@ const COPY: Localized<Copy> = {
     heading: (name) => `Ihr Fahrzeug wurde geliefert, ${name}`,
     headingNoName: "Ihr Fahrzeug wurde geliefert",
     bodyHtml: (titleHtml) =>
-      `<strong>${titleHtml}</strong> ist angekommen und wurde geliefert. Vielen Dank für Ihren Kauf bei XportACar — wir freuen uns, Sie beim nächsten Auktionszyklus wiederzusehen.`,
+      `<strong>${titleHtml}</strong> ist angekommen und wurde geliefert. Vielen Dank für Ihren Kauf bei XportACar — wir freuen uns, Sie bald wieder auf dem Marktplatz zu begrüßen.`,
     noteLabel: "Hinweis unseres Teams",
     ctaLabel: "Bestellung ansehen",
   },
@@ -41,7 +41,7 @@ const COPY: Localized<Copy> = {
     heading: (name) => `Votre véhicule a été livré, ${name}`,
     headingNoName: "Votre véhicule a été livré",
     bodyHtml: (titleHtml) =>
-      `<strong>${titleHtml}</strong> est arrivé et a été livré. Merci d'avoir acheté avec XportACar — nous espérons vous revoir lors de notre prochain cycle d'enchères.`,
+      `<strong>${titleHtml}</strong> est arrivé et a été livré. Merci d'avoir acheté avec XportACar — nous espérons vous revoir bientôt sur le marché.`,
     noteLabel: "Note de notre équipe",
     ctaLabel: "Voir votre commande",
   },
@@ -50,7 +50,7 @@ const COPY: Localized<Copy> = {
     heading: (name) => `تم تسليم مركبتك، ${name}`,
     headingNoName: "تم تسليم مركبتك",
     bodyHtml: (titleHtml) =>
-      `وصلت <strong>${titleHtml}</strong> وتم تسليمها. شكرًا لشرائك عبر XportACar — نتطلّع إلى رؤيتك في دورة المزاد القادمة.`,
+      `وصلت <strong>${titleHtml}</strong> وتم تسليمها. شكرًا لشرائك عبر XportACar — نتطلّع إلى رؤيتك مجددًا في السوق قريبًا.`,
     noteLabel: "ملاحظة من فريقنا",
     ctaLabel: "عرض طلبك",
   },

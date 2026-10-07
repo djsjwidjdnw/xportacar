@@ -23,9 +23,9 @@ const geistMono = Geist_Mono({
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-const SITE_TITLE = "XportACar — UAE-to-EU Online Car Auctions";
+const SITE_TITLE = "XportACar — UAE-to-EU Vehicle Marketplace";
 const SITE_DESCRIPTION =
-  "Premium UAE vehicles, inspected and auctioned to verified European trade buyers. Door-to-door logistics included.";
+  "Premium UAE vehicles, inspected and sold at fixed prices to verified European trade buyers. Door-to-door logistics included.";
 
 export const metadata: Metadata = {
   title: {
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   manifest: "/manifest.json",
   applicationName: "XportACar",
   keywords: [
-    "UAE car auction", "Dubai cars", "import car Europe",
+    "UAE car marketplace", "Dubai cars", "import car Europe",
     "RoRo shipping", "German TÜV", "European trade buyers",
-    "luxury car auction", "Mercedes Dubai", "BMW UAE", "Porsche UAE",
+    "luxury cars for sale", "Mercedes Dubai", "BMW UAE", "Porsche UAE",
   ],
   authors: [{ name: "XportACar" }],
   creator: "XportACar",

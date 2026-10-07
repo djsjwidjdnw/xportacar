@@ -5,7 +5,9 @@ import { BuyerNav } from "@/components/layout/BuyerNav";
 import { Footer } from "@/components/layout/Footer";
 import { KycBanner } from "@/components/shared/KycBanner";
 import { WelcomeToast } from "@/components/shared/WelcomeToast";
+import { BiddingProvider } from "@/lib/bidding";
 import { CurrencyProvider } from "@/lib/currency";
+import { getAppSettings } from "@/lib/settings";
 import { createClient } from "@/lib/supabase/server";
 import type { Notification, Profile } from "@/types";
 
@@ -15,7 +17,10 @@ export default async function BuyerLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const [{ data: { user } }, { biddingEnabled }] = await Promise.all([
+    supabase.auth.getUser(),
+    getAppSettings(),
+  ]);
 
   let profile: Profile | null = null;
   let notifications: Notification[] = [];
@@ -42,14 +47,16 @@ export default async function BuyerLayout({
   }
 
   return (
-    <CurrencyProvider>
-      <BuyerNav profile={profile} notifications={notifications} />
-      <KycBanner status={profile?.kyc_status ?? null} />
-      <Suspense fallback={null}>
-        <WelcomeToast />
-      </Suspense>
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </CurrencyProvider>
+    <BiddingProvider enabled={biddingEnabled}>
+      <CurrencyProvider>
+        <BuyerNav profile={profile} notifications={notifications} />
+        <KycBanner status={profile?.kyc_status ?? null} />
+        <Suspense fallback={null}>
+          <WelcomeToast />
+        </Suspense>
+        <main className="flex-1">{children}</main>
+        <Footer biddingEnabled={biddingEnabled} />
+      </CurrencyProvider>
+    </BiddingProvider>
   );
 }

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Gavel, Heart, Info, LayoutDashboard, Menu, ShoppingBag, TrendingUp, X } from "lucide-react";
+import { Gavel, Heart, Info, LayoutDashboard, Menu, Receipt, ShoppingBag, TrendingUp, X } from "lucide-react";
 import { useState } from "react";
 
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { useTranslations } from "@/i18n/provider";
+import { useBiddingEnabled } from "@/lib/bidding";
 import { cn } from "@/lib/utils";
 import type { Notification, Profile } from "@/types";
 
@@ -25,12 +26,20 @@ interface NavLink {
   authOnly?: boolean;
 }
 
-// Public links (shown to everyone) + authed-only "My Bids" / "Dashboard" /
+// Public links (shown to everyone) + authed-only "My purchases" / "Dashboard" /
 // "Watchlist".  Profile lives in the avatar dropdown, NOT here.
-// "My Bids" anchors to the bids section of the dashboard; "Dashboard" lands
-// at the top with the stat cards.  Same page, two entry points — matches
-// what the buyer's testing feedback asked for.
+// "My purchases" anchors to the purchases section of the dashboard; "Dashboard"
+// lands at the top with the stat cards.  Same page, two entry points.
+// With app_settings.bidding_enabled on, the auction links come back instead.
 const LINKS: NavLink[] = [
+  { href: "/marketplace",         key: "marketplace", icon: ShoppingBag },
+  { href: "/about",               key: "about",       icon: Info },
+  { href: "/dashboard#purchases", key: "myPurchases", icon: Receipt,        authOnly: true },
+  { href: "/dashboard",           key: "dashboard",   icon: LayoutDashboard, authOnly: true },
+  { href: "/watchlist",           key: "watchlist",   icon: Heart,          authOnly: true },
+];
+
+const BIDDING_LINKS: NavLink[] = [
   { href: "/marketplace",     key: "marketplace", icon: ShoppingBag },
   { href: "/auctions",        key: "auctions",    icon: Gavel },
   { href: "/about",           key: "about",       icon: Info },
@@ -49,8 +58,9 @@ export function BuyerNav({
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const biddingEnabled = useBiddingEnabled();
 
-  const visibleLinks = LINKS.filter((l) => !l.authOnly || !!profile);
+  const visibleLinks = (biddingEnabled ? BIDDING_LINKS : LINKS).filter((l) => !l.authOnly || !!profile);
 
   return (
     <header className="sticky top-0 z-40 border-b border-grey-200 bg-white/85 backdrop-blur supports-[backdrop-filter]:bg-white/65">
@@ -173,6 +183,6 @@ function isActive(pathname: string, href: string): boolean {
   const cleanHref = href.split(/[?#]/)[0];
   if (cleanHref === "/marketplace") return pathname === "/marketplace" || pathname.startsWith("/vehicle/");
   if (cleanHref === "/dashboard")   return pathname === "/dashboard" && href === "/dashboard";
-  if (href === "/dashboard#bids")   return false; // never sticky-highlight the anchor entry
+  if (href.startsWith("/dashboard#")) return false; // never sticky-highlight the anchor entries
   return pathname === cleanHref || pathname.startsWith(cleanHref + "/");
 }

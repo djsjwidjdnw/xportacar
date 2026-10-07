@@ -87,7 +87,7 @@ export function emailText(opts: {
   if (ctaUrl) {
     parts.push("", `${ctaLabel ?? "Open XportACar"}: ${ctaUrl}`);
   }
-  parts.push("", "—", MANAGE_LINE_TEXT, "© XportACar — UAE-to-EU vehicle auctions.");
+  parts.push("", "—", MANAGE_LINE_TEXT, "© XportACar — UAE-to-EU vehicle marketplace.");
   return parts.join("\n");
 }
 
@@ -121,7 +121,7 @@ export function emailShell(opts: {
     </div>
     <div style="border-top:1px solid #eaecf0;padding:16px 24px;font-size:11px;color:#98a2b3;">
       You're receiving this transactional email because you have an XportACar account. Manage preferences: <a href="${SITE_URL}/profile" style="color:#1570EF;text-decoration:underline;">${SITE_URL}/profile</a><br/>
-      © XportACar — UAE-to-EU vehicle auctions.
+      © XportACar — UAE-to-EU vehicle marketplace.
     </div>
   </div>
 </body></html>`;

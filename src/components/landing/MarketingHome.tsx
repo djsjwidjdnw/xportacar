@@ -43,7 +43,8 @@ export async function MarketingHome() {
     supabase.from("vehicles").select("*", { count: "exact", head: true })
       .in("status", ["listed", "in_auction"]),
     profilesDb.from("profiles").select("*", { count: "exact", head: true }).eq("role", "buyer"),
-    supabase.from("auctions").select("*", { count: "exact", head: true }).eq("status", "active"),
+    // Live = active and not past its end time (listings run 7 days).
+    supabase.from("auctions").select("*", { count: "exact", head: true }).eq("status", "active").gt("end_time", new Date().toISOString()),
     supabase.from("auctions").select("*", { count: "exact", head: true }),
     profilesDb.from("profiles").select("country").eq("role", "buyer").not("country", "is", null),
   ]);
@@ -145,7 +146,7 @@ export async function MarketingHome() {
           <LandingFeatureGrid
             features={[
               { iconName: "camera",      titleKey: "feature1Title", bodyKey: "feature1Body" },
-              { iconName: "gavel",       titleKey: "feature2Title", bodyKey: "feature2Body" },
+              { iconName: "calendar",    titleKey: "feature2Title", bodyKey: "feature2Body" },
               { iconName: "user-check",  titleKey: "feature3Title", bodyKey: "feature3Body" },
               { iconName: "container",   titleKey: "feature4Title", bodyKey: "feature4Body" },
               { iconName: "badge-euro",  titleKey: "feature5Title", bodyKey: "feature5Body" },
@@ -169,7 +170,7 @@ export async function MarketingHome() {
           <LandingHowItWorks
             steps={[
               { iconName: "search", titleKey: "howStep1Title", bodyKey: "howStep1Body" },
-              { iconName: "gavel",  titleKey: "howStep2Title", bodyKey: "howStep2Body" },
+              { iconName: "check-circle", titleKey: "howStep2Title", bodyKey: "howStep2Body" },
               { iconName: "truck",  titleKey: "howStep3Title", bodyKey: "howStep3Body" },
             ]}
           />

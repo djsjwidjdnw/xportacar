@@ -28,6 +28,7 @@ import {
 import { finalizeInvoiceShippingAction } from "@/app/(buyer)/auction/[id]/won/actions";
 import { toast } from "@/components/ui/toast";
 import { useCurrency } from "@/lib/currency";
+import { useTranslations } from "@/i18n/provider";
 
 export const PLATFORM_FEE_PCT = 0.029;
 const CONFIRM_WINDOW_HOURS = 36;
@@ -73,6 +74,7 @@ export function WonInvoice({
   createdAtIso: string | null;
   confirmedAtIso: string | null;
 }) {
+  const tPurchase = useTranslations("purchase");
   const { format } = useCurrency();
   const [shipping, setShipping] = useState<ShippingChoice>({ method: { kind: "port", port: "Hamburg" }, tuv: false });
   const [address, setAddress] = useState<DeliveryAddress>(EMPTY_DELIVERY_ADDRESS);
@@ -286,7 +288,7 @@ export function WonInvoice({
         </dl>
 
         <div className="mt-5 border-t border-grey-100 pt-5 space-y-2.5">
-          <LineItem label="Hammer price" value={format(hammerEur)} />
+          <LineItem label={tPurchase("vehiclePrice")} value={format(hammerEur)} />
           <LineItem label="Platform fee (2.9%)" value={format(feeEur)} />
           <LineItem
             label={isDoor ? `Door-to-Door Delivery (${distanceKm ?? 0} km)` : describeMethod(shipping.method)}

@@ -8,10 +8,11 @@ import {
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { LoadMoreLink } from "@/components/admin/LoadMoreLink";
 import { createClient } from "@/lib/supabase/server";
+import { getAppSettings } from "@/lib/settings";
 import { formatEur, formatRelativeTime } from "@/lib/utils";
 import type { AuctionStatus } from "@/types";
 
-export const metadata = { title: "Auctions · Admin" };
+export const metadata = { title: "Listings · Admin" };
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "all",       label: "All statuses" },
@@ -39,6 +40,15 @@ export default async function AdminAuctionsPage({
 }) {
   const sp = await searchParams;
   const supabase = await createClient();
+  // Fixed-price marketplace: each row is a 7-day listing (active = live, ended = expired).
+  const { biddingEnabled } = await getAppSettings();
+  const noun = biddingEnabled ? "Auctions" : "Listings";
+  const nowMs = Date.now();
+  const statusLabel = (status: string, end?: string | null) =>
+    biddingEnabled ? status
+    : status === "ended" ? "expired"
+    : status === "active" ? (end && new Date(end).getTime() > nowMs ? "live" : "expired")
+    : status;
   const show = Math.min(Math.max(Number(sp.show) || 20, 20), 5000);
   const statusFilter = sp.status && sp.status !== "all" ? sp.status : null;
 
@@ -72,17 +82,17 @@ export default async function AdminAuctionsPage({
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
-      <Breadcrumbs className="mb-5" items={[{ label: "Auctions" }]} />
+      <Breadcrumbs className="mb-5" items={[{ label: noun }]} />
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="flex items-center gap-3 text-3xl font-extrabold tracking-tight text-grey-900">
             <span className="grid size-10 place-items-center rounded-xl bg-brand-50 text-brand-700 ring-1 ring-brand-100">
               <Gavel className="size-5" />
             </span>
-            Auctions
+            {noun}
           </h1>
           <p className="mt-2 text-grey-600">
-            {total} {statusFilter ? `${statusFilter} ` : ""}auctions
+            {total} {statusFilter ? `${statusLabel(statusFilter)} ` : ""}{noun.toLowerCase()}
           </p>
         </div>
       </header>
@@ -104,7 +114,7 @@ export default async function AdminAuctionsPage({
                   : "border-grey-200 bg-white text-grey-700 hover:border-grey-300")
               }
             >
-              {opt.label}
+              {biddingEnabled ? opt.label : opt.value === "active" ? "Live" : opt.value === "ended" ? "Expired" : opt.label}
               <span className={
                 "rounded-full px-1.5 text-[10px] " +
                 (active ? "bg-white/20 text-white" : "bg-grey-100 text-grey-600")
@@ -123,9 +133,9 @@ export default async function AdminAuctionsPage({
               <TableHead className="hidden lg:table-cell">Start</TableHead>
               <TableHead className="hidden lg:table-cell">End</TableHead>
               <TableHead className="hidden 2xl:table-cell text-right">Start price</TableHead>
-              <TableHead className="text-right">Current bid</TableHead>
-              <TableHead className="hidden 2xl:table-cell text-right">Bids</TableHead>
-              <TableHead className="hidden 2xl:table-cell">Winner</TableHead>
+              <TableHead className="text-right">{biddingEnabled ? "Current bid" : "Price"}</TableHead>
+              {biddingEnabled && <TableHead className="hidden 2xl:table-cell text-right">Bids</TableHead>}
+              <TableHead className="hidden 2xl:table-cell">{biddingEnabled ? "Winner" : "Buyer"}</TableHead>
               <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
@@ -155,8 +165,11 @@ export default async function AdminAuctionsPage({
                   </TableCell>
                   <TableCell>
                     <Badge className={`${STATUS_STYLE[a.status as AuctionStatus] ?? "bg-grey-100 text-grey-700 ring-grey-200"} ring-1 capitalize`}>
-                      {a.status}
+                      {statusLabel(a.status, a.end_time)}
                     </Badge>
+                    {!biddingEnabled && v && statusLabel(a.status, a.end_time) === "expired" && (
+                      <Link href={`/admin/vehicles/${v.id}`} className="mt-1 block text-[11px] font-medium text-brand-700 hover:underline">Relist →</Link>
+                    )}
                   </TableCell>
                   <TableCell className="hidden lg:table-cell text-xs text-grey-600">
                     {a.start_time ? formatRelativeTime(a.start_time) : "—"}
@@ -168,12 +181,14 @@ export default async function AdminAuctionsPage({
                     {formatEur(a.starting_price_eur)}
                   </TableCell>
                   <TableCell className="text-right font-semibold tabular-nums text-grey-900">
-                    {formatEur(a.current_bid_eur)}
+                    {formatEur(biddingEnabled ? a.current_bid_eur : a.buy_now_price_eur)}
                   </TableCell>
-                  <TableCell className="hidden 2xl:table-cell text-right text-sm">
-                    <span className="font-semibold text-grey-900">{a.bid_count ?? 0}</span>
-                    <span className="ml-1 text-[11px] text-grey-500">/ {a.bidder_count ?? 0} bidders</span>
-                  </TableCell>
+                  {biddingEnabled && (
+                    <TableCell className="hidden 2xl:table-cell text-right text-sm">
+                      <span className="font-semibold text-grey-900">{a.bid_count ?? 0}</span>
+                      <span className="ml-1 text-[11px] text-grey-500">/ {a.bidder_count ?? 0} bidders</span>
+                    </TableCell>
+                  )}
                   <TableCell className="hidden 2xl:table-cell text-sm">
                     {w ? (
                       <span className="block max-w-[180px] truncate font-medium text-grey-900">
@@ -185,8 +200,8 @@ export default async function AdminAuctionsPage({
                   </TableCell>
                   <TableCell>
                     <Link
-                      href={`/auction/${a.id}`}
-                      aria-label="View auction"
+                      href={biddingEnabled || !v ? `/auction/${a.id}` : `/vehicle/${v.id}`}
+                      aria-label={biddingEnabled ? "View auction" : "View listing"}
                       className="grid size-7 place-items-center rounded-md text-grey-400 transition-colors hover:bg-grey-100 hover:text-brand-700"
                     >
                       <ExternalLink className="size-3.5" />

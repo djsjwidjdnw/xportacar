@@ -33,6 +33,9 @@ These three were the last applied to production:
 - **012** introduced the admin audit log for live-listing edits and inspection
   re-opens.
 
+## Applied 2026-10-07
+- **031** `031_marketplace_mode.sql` — fixed-price marketplace: `app_settings.bidding_enabled` (false), `public.bidding_enabled()`, bids + counter_offers INSERT policies gated on it (`buy_now()` unaffected — SECURITY DEFINER, table owner), and re-applies the guarded `sync_vehicle_eur_from_aed()` that commit e57586f wrote into 015 but never applied. Creates no table. Rehearsed in a rolled-back transaction, applied, read back (cluster 7634664568297872568).
+
 ## Grants rule (from 30 Oct 2026)
 New tables in `public` are no longer auto-granted to the Data API. Every migration
 that creates a table carries its `grant` lines in the same file — start from

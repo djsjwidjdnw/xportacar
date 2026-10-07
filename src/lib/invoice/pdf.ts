@@ -120,7 +120,7 @@ export async function renderInvoicePdf(
   const buyerSubName = inv.buyer?.full_name && inv.buyer?.company_name ? inv.buyer.full_name : null;
 
   const lineItems: InvoiceLineItem[] = [
-    { label: "Winning hammer bid", amount: hammer },
+    { label: "Vehicle price", amount: hammer },
     { label: "Platform fee (2.9%)", amount: fee },
     { label: shippingLabel, amount: shippingEur },
     ...extrasList.map((e) => ({ label: e.name || "Extra", amount: Number(e.price_eur) || 0 })),

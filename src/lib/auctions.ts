@@ -13,6 +13,7 @@ import "server-only";
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendAuctionWonEmail } from "@/lib/email";
+import { getAppSettings } from "@/lib/settings";
 
 interface DueAuction {
   id: string;
@@ -31,6 +32,10 @@ export async function settleEndedAuctions(auctionIds: string[]): Promise<void> {
 
   try {
     const admin = createAdminClient();
+    // Runs inside after() callbacks, where request cookies are unavailable, so
+    // read the flag with the service-role client. With bidding off, an expired
+    // listing is never awarded to a bidder — a sale only happens via buy_now().
+    const { biddingEnabled } = await getAppSettings(admin);
     const { data: due } = await admin
       .from("auctions")
       .select("id, vehicle_id, current_bid_eur, reserve_price_eur")
@@ -54,7 +59,7 @@ export async function settleEndedAuctions(auctionIds: string[]): Promise<void> {
         : a.current_bid_eur != null ? Number(a.current_bid_eur)
         : null;
       const reserveMet = reserve == null || (finalBid != null && finalBid >= reserve);
-      const winnerId = top?.bidder_id && reserveMet ? (top.bidder_id as string) : null;
+      const winnerId = biddingEnabled && top?.bidder_id && reserveMet ? (top.bidder_id as string) : null;
 
       // The `.eq("status","active")` guard makes this safe against a double
       // settle from two concurrent page loads — only the first wins.

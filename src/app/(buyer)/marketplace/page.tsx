@@ -5,6 +5,7 @@ import { SaveSearchButton } from "@/components/marketplace/SaveSearchButton";
 import { MarketplaceResults } from "@/components/marketplace/MarketplaceResults";
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
 import { createClient } from "@/lib/supabase/server";
+import { getAppSettings } from "@/lib/settings";
 import { getTranslations } from "@/i18n/server";
 import { fetchVehiclesPage, fetchVehiclesCount, type MarketplaceSearchParams } from "./query";
 
@@ -18,12 +19,15 @@ export default async function MarketplacePage({
   const sp = await searchParams;
   const supabase = await createClient();
   const t = await getTranslations();
-  const { data: { user } } = await supabase.auth.getUser();
+  const [{ data: { user } }, { biddingEnabled }] = await Promise.all([
+    supabase.auth.getUser(),
+    getAppSettings(),
+  ]);
 
   // Page 0 only (20 rows) + a head-only total count — never the whole table.
   const [{ vehicles: page0, hasMore }, total] = await Promise.all([
-    fetchVehiclesPage(supabase, sp, 0),
-    fetchVehiclesCount(supabase, sp),
+    fetchVehiclesPage(supabase, sp, 0, biddingEnabled),
+    fetchVehiclesCount(supabase, sp, biddingEnabled),
   ]);
 
   // Watch state for just the first page's vehicles.

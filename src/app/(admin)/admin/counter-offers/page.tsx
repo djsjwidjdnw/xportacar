@@ -7,12 +7,14 @@ import {
 } from "@/components/ui/table";
 import { CounterOfferActions } from "@/components/admin/CounterOfferActions";
 import { createClient } from "@/lib/supabase/server";
+import { getAppSettings } from "@/lib/settings";
 import { formatEur, formatRelativeTime } from "@/lib/utils";
 
 export const metadata = { title: "Counter offers · Admin" };
 
 export default async function AdminCounterOffersPage() {
   const supabase = await createClient();
+  const { biddingEnabled } = await getAppSettings();
 
   const { data: rowsRaw } = await supabase
     .from("counter_offers")
@@ -31,6 +33,11 @@ export default async function AdminCounterOffersPage() {
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
+      {!biddingEnabled && (
+        <div className="mb-6 rounded-xl border-l-4 border-warning-500 bg-warning-50 px-5 py-4 text-sm text-grey-800">
+          <strong>Counter-offers are off.</strong> The platform runs as a fixed-price marketplace (app_settings.bidding_enabled = false); buyers cannot send new offers. Existing offers stay listed here.
+        </div>
+      )}
       <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-grey-900">

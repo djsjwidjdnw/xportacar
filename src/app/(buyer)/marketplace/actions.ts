@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAppSettings } from "@/lib/settings";
 import { fetchVehiclesPage, type MarketplaceSearchParams } from "./query";
 import type { VehicleWithMedia } from "@/types";
 
@@ -12,9 +13,12 @@ export async function loadMoreVehiclesAction(
   offset: number,
 ): Promise<{ vehicles: VehicleWithMedia[]; hasMore: boolean; watching: string[] }> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const [{ data: { user } }, { biddingEnabled }] = await Promise.all([
+    supabase.auth.getUser(),
+    getAppSettings(),
+  ]);
 
-  const { vehicles, hasMore } = await fetchVehiclesPage(supabase, sp, offset);
+  const { vehicles, hasMore } = await fetchVehiclesPage(supabase, sp, offset, biddingEnabled);
 
   let watching: string[] = [];
   if (user && vehicles.length > 0) {

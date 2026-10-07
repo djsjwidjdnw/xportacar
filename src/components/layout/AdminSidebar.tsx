@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useTranslations } from "@/i18n/provider";
+import { useBiddingEnabled } from "@/lib/bidding";
 import { cn, initials } from "@/lib/utils";
 import type { Profile } from "@/types";
 
@@ -36,9 +37,13 @@ const NAV = [
 function NavBody({ onNavigate, badges = {} }: { onNavigate?: () => void; badges?: Record<string, number> }) {
   const pathname = usePathname();
   const t = useTranslations("admin");
+  // Fixed-price marketplace: "Auctions" lists the 7-day listings and counter-
+  // offers are dormant until app_settings.bidding_enabled is switched on.
+  const bidding = useBiddingEnabled();
+  const items = NAV.filter((i) => bidding || i.key !== "navCounterOffers");
   return (
     <nav className="flex flex-col gap-1 px-3 py-4">
-      {NAV.map((item) => {
+      {items.map((item) => {
         const Icon = item.icon;
         const active = pathname.startsWith(item.href);
         const badge = badges[item.href] ?? 0;
@@ -55,7 +60,7 @@ function NavBody({ onNavigate, badges = {} }: { onNavigate?: () => void; badges?
             )}
           >
             <Icon className={cn("size-4", active ? "text-brand-400" : "text-grey-400 group-hover:text-grey-200")} />
-            <span className="flex-1">{t(item.key)}</span>
+            <span className="flex-1">{t(!bidding && item.key === "navAuctions" ? "navListings" : item.key)}</span>
             {badge > 0 && (
               <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-500 px-1.5 text-[11px] font-bold text-white">
                 {badge}

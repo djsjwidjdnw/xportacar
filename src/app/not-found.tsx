@@ -3,13 +3,15 @@ import { ArrowRight, Car, Search } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getTranslations } from "@/i18n/server";
 
-export const metadata = {
-  title: "Vehicle not found · XportACar",
-  description: "We couldn't find the page you were looking for. Browse our live UAE-to-EU auctions instead.",
-};
+export async function generateMetadata() {
+  const t = await getTranslations("notFound");
+  return { title: "Vehicle not found · XportACar", description: t("metaDescription") };
+}
 
-export default function NotFound() {
+export default async function NotFound() {
+  const t = await getTranslations("notFound");
   return (
     <div className="flex min-h-[70vh] items-center bg-gradient-to-b from-brand-50/50 via-white to-white">
       <div className="mx-auto w-full max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
@@ -53,14 +55,8 @@ export default function NotFound() {
               href="/marketplace"
               className={cn(buttonVariants({ variant: "default", size: "lg" }), "h-11 px-5")}
             >
-              Browse marketplace
+              {t("browseCta")}
               <ArrowRight className="size-4" />
-            </Link>
-            <Link
-              href="/auctions"
-              className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 px-5")}
-            >
-              View live auctions
             </Link>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowRight, Gavel, Hourglass, MapPin, Sparkles } from "lucide-react";
+import { ArrowRight, CalendarClock, Gavel, Hourglass, MapPin, Sparkles } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,13 +13,16 @@ import { MarketValueBar } from "@/components/vehicle/MarketValueBar";
 import { PaintThicknessReport } from "@/components/vehicle/PaintThicknessReport";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { VehiclePriceCard } from "@/components/vehicle/VehiclePriceCard";
+import { BuyPanel } from "@/components/vehicle/BuyPanel";
 import { WatchlistButton } from "@/components/marketplace/WatchlistButton";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
+import { getAppSettings } from "@/lib/settings";
+import { daysLeftLabel, listingPrice, listingState } from "@/lib/listing";
 import { getVehicleValuation } from "@/lib/valuation-server";
 import { auctionPhase, cn, formatEur, pickThumbnailPhoto } from "@/lib/utils";
-import type { VehicleWithMedia } from "@/types";
+import type { KycStatus, VehicleWithMedia } from "@/types";
 
 // Generate OG/Twitter metadata per vehicle so shared links render with
 // the car's photo + title + asking price.
@@ -44,8 +47,8 @@ export async function generateMetadata(
     .sort((a: { sort_order: number }, b: { sort_order: number }) => a.sort_order - b.sort_order)[0];
   const title = `${v.year} ${v.make} ${v.model}${v.trim ? ` ${v.trim}` : ""}`;
   const description = [
-    `${v.year} ${v.make} ${v.model} — auctioned from ${v.location_city}, ${v.location_country}.`,
-    v.listed_price_eur ? `Listed from €${Number(v.listed_price_eur).toLocaleString("en-GB")}.` : "",
+    `${v.year} ${v.make} ${v.model} — in ${v.location_city}, ${v.location_country}.`,
+    v.listed_price_eur ? `Price €${Number(v.listed_price_eur).toLocaleString("en-GB")}.` : "",
     "Inspected by XportACar's UAE field team and shipped door-to-port across the EU.",
   ].filter(Boolean).join(" ");
 
@@ -82,23 +85,31 @@ export default async function VehicleDetailPage({
       *,
       vehicle_photos ( id, url, sort_order, caption, category ),
       vehicle_damages ( id, location, description, severity, photo_url ),
-      auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, bid_count, bidder_count )
+      auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, buy_now_price_eur, winner_id, bid_count, bidder_count )
     `)
     .eq("id", id)
     .single();
 
   if (error || !vehicle) notFound();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const [{ data: { user } }, { biddingEnabled }] = await Promise.all([
+    supabase.auth.getUser(),
+    getAppSettings(),
+  ]);
   let watching = false;
+  let kycStatus: KycStatus | null = null;
   if (user) {
-    const { data: w } = await supabase
-      .from("watchlist")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("vehicle_id", id)
-      .maybeSingle();
+    const [{ data: w }, { data: prof }] = await Promise.all([
+      supabase
+        .from("watchlist")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("vehicle_id", id)
+        .maybeSingle(),
+      supabase.from("profiles").select("kyc_status").eq("id", user.id).single(),
+    ]);
     watching = !!w;
+    kycStatus = (prof as { kyc_status?: KycStatus } | null)?.kyc_status ?? null;
   }
 
   // Paint-thickness gauge readings, ordered front-to-back by canonical panel.
@@ -140,10 +151,14 @@ export default async function VehicleDetailPage({
   ).map((p) => ({ url: p.url, caption: p.caption }));
   const auction = v.auctions[0];
   const phase = auctionPhase(auction);
-  const auctionLive = phase === "live";
-  const headlinePrice = phase === "live" || phase === "ended"
-    ? (auction.current_bid_eur ?? auction.starting_price_eur)
-    : v.listed_price_eur;
+  // Fixed-price marketplace (bidding off): one price, a 7-day listing window.
+  const state = listingState(auction);
+  const auctionLive = biddingEnabled ? phase === "live" : state === "live";
+  const headlinePrice = !biddingEnabled
+    ? listingPrice(auction, v)
+    : phase === "live" || phase === "ended"
+      ? (auction.current_bid_eur ?? auction.starting_price_eur)
+      : v.listed_price_eur;
 
   const valuation = await getVehicleValuation({
     make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km, vehicleId: v.id,
@@ -171,7 +186,11 @@ export default async function VehicleDetailPage({
           priceCurrency: "EUR",
           price: headlinePrice,
           itemCondition: "https://schema.org/UsedCondition",
-          availability: auctionLive ? "https://schema.org/InStock" : "https://schema.org/PreOrder",
+          availability: auctionLive
+            ? "https://schema.org/InStock"
+            : !biddingEnabled && state === "sold" ? "https://schema.org/SoldOut"
+            : !biddingEnabled ? "https://schema.org/OutOfStock"
+            : "https://schema.org/PreOrder",
           seller: { "@type": "Organization", name: "XportACar" },
           areaServed: ["Germany", "Netherlands", "Italy", "Spain", "France", "Austria", "Belgium"],
         }
@@ -193,11 +212,11 @@ export default async function VehicleDetailPage({
           ]}
         />
 
-        {/* Above-the-fold CTA — visible before the user scrolls.
+        {/* Above-the-fold auction banners — only while bidding is enabled.
             Auction live → current bid + "Go to Auction" button.
             Auction scheduled → "Coming soon" notice.
             Listed only → "View auction" disabled link. */}
-        {auctionLive && auction && (
+        {biddingEnabled && auctionLive && auction && (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-error-200 bg-error-50/70 p-4 shadow-sm sm:p-5">
             <div className="flex items-center gap-4">
               <span className="inline-flex size-10 items-center justify-center rounded-full bg-error-600 text-white">
@@ -225,7 +244,7 @@ export default async function VehicleDetailPage({
             </Link>
           </div>
         )}
-        {phase === "scheduled" && auction && (
+        {biddingEnabled && phase === "scheduled" && auction && (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-warning-200 bg-warning-50/70 p-4 shadow-sm sm:p-5">
             <div className="flex items-center gap-3">
               <Hourglass className="size-5 text-warning-700" />
@@ -239,7 +258,7 @@ export default async function VehicleDetailPage({
             </div>
           </div>
         )}
-        {phase === "ended" && auction && (
+        {biddingEnabled && phase === "ended" && auction && (
           <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-grey-200 bg-grey-100 p-4 shadow-sm sm:p-5">
             <div className="flex items-center gap-3">
               <span className="inline-flex size-10 items-center justify-center rounded-full bg-grey-800 text-white">
@@ -268,15 +287,27 @@ export default async function VehicleDetailPage({
             <PhotoGallery photos={photos} alt={`${v.year} ${v.make} ${v.model}`} />
 
             <header>
-              <div className="flex items-center gap-2">
-                {phase === "live" && (
+              <div className="flex flex-wrap items-center gap-2">
+                {biddingEnabled && phase === "live" && (
                   <Badge className="bg-error-50 text-error-700 ring-1 ring-error-100">
                     <span className="mr-1 inline-block size-1.5 animate-pulse rounded-full bg-error-600" />
                     {t("common.live")}
                   </Badge>
                 )}
-                {phase === "ended" && (
+                {biddingEnabled && phase === "ended" && (
                   <Badge className="bg-grey-800 text-white">{t("common.ended")}</Badge>
+                )}
+                {!biddingEnabled && state === "live" && (
+                  <Badge className="bg-brand-50 text-brand-700 ring-1 ring-brand-100">
+                    <CalendarClock className="mr-1 size-3" />
+                    {t("listing.liveBadge")} · {daysLeftLabel(t, auction?.end_time)}
+                  </Badge>
+                )}
+                {!biddingEnabled && state === "sold" && (
+                  <Badge className="bg-grey-900 text-white">{t("listing.sold")}</Badge>
+                )}
+                {!biddingEnabled && state === "expired" && (
+                  <Badge className="bg-grey-800 text-white">{t("listing.expired")}</Badge>
                 )}
                 <Badge variant="outline" className="border-grey-200 text-grey-600">
                   {v.body_type}
@@ -353,21 +384,41 @@ export default async function VehicleDetailPage({
           {/* Sticky right rail */}
           <aside className="lg:col-span-4">
             <div className="lg:sticky lg:top-24 space-y-3">
-              <VehiclePriceCard
-                auction={auction ? {
-                  id: auction.id,
-                  status: auction.status,
-                  start_time: auction.start_time,
-                  end_time: auction.end_time,
-                  bid_count: auction.bid_count,
-                  bidder_count: auction.bidder_count,
-                } : null}
-                headlinePriceEur={headlinePrice ?? null}
-                buyNowPriceEur={v.buy_now_price_eur}
-                reservePriceEur={v.reserve_price_eur}
-                locationCity={v.location_city}
-                locationCountry={v.location_country}
-              />
+              {biddingEnabled ? (
+                <VehiclePriceCard
+                  auction={auction ? {
+                    id: auction.id,
+                    status: auction.status,
+                    start_time: auction.start_time,
+                    end_time: auction.end_time,
+                    bid_count: auction.bid_count,
+                    bidder_count: auction.bidder_count,
+                  } : null}
+                  headlinePriceEur={headlinePrice ?? null}
+                  buyNowPriceEur={auction?.buy_now_price_eur ?? v.buy_now_price_eur}
+                  reservePriceEur={v.reserve_price_eur}
+                  locationCity={v.location_city}
+                  locationCountry={v.location_country}
+                />
+              ) : (
+                <BuyPanel
+                  vehicleId={v.id}
+                  vehicleTitle={`${v.year} ${v.make} ${v.model}`}
+                  listing={auction ? {
+                    id: auction.id,
+                    status: auction.status,
+                    start_time: auction.start_time,
+                    end_time: auction.end_time,
+                    winner_id: auction.winner_id,
+                  } : null}
+                  priceEur={headlinePrice ?? null}
+                  isAuthenticated={!!user}
+                  currentUserId={user?.id ?? null}
+                  kycStatus={kycStatus}
+                  locationCity={v.location_city}
+                  locationCountry={v.location_country}
+                />
+              )}
               <WatchlistButton
                 vehicleId={v.id}
                 initiallyWatching={watching}

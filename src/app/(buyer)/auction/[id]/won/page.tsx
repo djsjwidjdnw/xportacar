@@ -14,11 +14,15 @@ import {
 } from "@/components/buyer/StatusTimeline";
 import { createClient } from "@/lib/supabase/server";
 import { settleEndedAuctions } from "@/lib/auctions";
+import { getAppSettings } from "@/lib/settings";
 import { isStripeConfigured } from "@/lib/stripe";
 import { getTranslations } from "@/i18n/server";
 import { auctionPhase, cn } from "@/lib/utils";
 
-export const metadata = { title: "Auction won" };
+export async function generateMetadata() {
+  const t = await getTranslations("purchase");
+  return { title: t("metaTitle") };
+}
 
 export default async function AuctionWonPage({
   params,
@@ -28,8 +32,12 @@ export default async function AuctionWonPage({
   const { id } = await params;
   const supabase = await createClient();
   const t = await getTranslations("timeline");
+  const tp = await getTranslations("purchase");
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const [{ data: { user } }, { biddingEnabled }] = await Promise.all([
+    supabase.auth.getUser(),
+    getAppSettings(),
+  ]);
   if (!user) redirect(`/login?next=/auction/${id}/won`);
 
   const { data: auctionRow, error } = await supabase
@@ -115,7 +123,7 @@ export default async function AuctionWonPage({
             <Trophy className="size-9 text-white" />
           </div>
           <h1 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl">
-            {isWinner ? "Congratulations! You won this auction" : "Auction closed"}
+            {!isWinner ? tp("headingClosed") : biddingEnabled ? tp("headingWonAuction") : tp("heading")}
           </h1>
           {v && (
             <p className="mt-2 text-base font-semibold text-white/95">
@@ -123,9 +131,7 @@ export default async function AuctionWonPage({
             </p>
           )}
           {isWinner && (
-            <p className="mt-2 text-sm text-white/90">
-              Confirm your payment within 36 hours to secure this vehicle.
-            </p>
+            <p className="mt-2 text-sm text-white/90">{tp("confirmWithin")}</p>
           )}
         </div>
 
@@ -162,9 +168,7 @@ export default async function AuctionWonPage({
         {!isWinner && (
           <div className="rounded-2xl border border-grey-200 bg-white p-8 text-center shadow-sm">
             <CheckCircle2 className="mx-auto size-8 text-grey-400" />
-            <p className="mt-3 text-grey-600">
-              This auction has ended. Thanks for participating — keep an eye on the marketplace for similar vehicles.
-            </p>
+            <p className="mt-3 text-grey-600">{tp("closedBody")}</p>
           </div>
         )}
 
@@ -176,16 +180,16 @@ export default async function AuctionWonPage({
 
         <div className="flex flex-wrap justify-center gap-3 pt-2">
           <Link
-            href={`/auction/${id}`}
+            href={v ? `/vehicle/${v.id}` : `/auction/${id}`}
             className={cn(buttonVariants({ variant: "outline", size: "lg" }), "h-11 px-5")}
           >
-            View auction page
+            {tp("viewListing")}
           </Link>
           <Link
             href="/dashboard"
             className={cn(buttonVariants({ variant: "default", size: "lg" }), "h-11 px-5")}
           >
-            View dashboard
+            {tp("viewDashboard")}
             <ArrowRight className="size-4" />
           </Link>
         </div>

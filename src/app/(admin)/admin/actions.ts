@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendKycApprovedEmail, sendKycRejectedEmail } from "@/lib/email";
+import { LISTING_MS } from "@/lib/listing";
 import type { VehicleStatus } from "@/types";
 
 export interface AdminResult {
@@ -582,7 +583,7 @@ export async function setUserKycStatusAction(
         ? "KYC verification was rejected"
         : "KYC review pending",
     body: kycStatus === "verified"
-      ? "Welcome aboard — you can now bid on live auctions."
+      ? "Welcome aboard — you can now buy vehicles on the marketplace."
       : kycStatus === "rejected"
         ? "Our compliance team rejected your submission. Please re-upload clear documents."
         : "Your account has been moved back to pending review.",
@@ -745,5 +746,87 @@ export async function createAuctionAction(
   revalidatePath("/auctions");
   const auctionId = (data as { id: string }).id;
   revalidatePath(`/auction/${auctionId}`);
+  return { ok: true, auctionId };
+}
+
+// =====================================================================
+// Fixed-price marketplace: publish (or relist) a 7-day listing.
+//
+// A listing is the vehicle's single auctions row (vehicle_id is unique):
+// status 'active', start now, end now + 7 days, and the fixed price carried in
+// buy_now_price_eur — the value the buy_now() RPC charges and the invoice
+// trigger bills. starting_price_eur (NOT NULL) mirrors the price; reserve and
+// bid counters are cleared. The vehicle moves to in_auction with its EUR price
+// fields mirrored so marketplace filters and sorts match what buyers pay.
+// Relisting an expired listing is the same call: it restarts the 7 days.
+// =====================================================================
+export async function publishListingAction(input: {
+  vehicleId: string;
+  priceEur: number;
+}): Promise<AdminResult & { auctionId?: string }> {
+  const { supabase, error: authErr } = await requireAdmin();
+  if (authErr) return { ok: false, error: authErr };
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const price = Math.round(Number(input.priceEur) * 100) / 100;
+  if (!Number.isFinite(price) || price <= 0) return { ok: false, error: "Enter a valid price." };
+
+  const { data: current, error: curErr } = await supabase
+    .from("vehicles")
+    .select("id, status, auctions ( id, status, winner_id, buy_now_price_eur, end_time )")
+    .eq("id", input.vehicleId)
+    .single();
+  if (curErr || !current) return { ok: false, error: "Vehicle not found." };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const cur = current as any;
+  const existing = Array.isArray(cur.auctions) ? cur.auctions[0] : cur.auctions;
+  if (existing?.status === "sold" || existing?.winner_id) {
+    return { ok: false, error: "This vehicle has been sold — it cannot be listed again." };
+  }
+
+  const start = new Date();
+  const end = new Date(start.getTime() + LISTING_MS);
+  const { data, error } = await supabase
+    .from("auctions")
+    .upsert({
+      vehicle_id: input.vehicleId,
+      status: "active",
+      start_time: start.toISOString(),
+      end_time: end.toISOString(),
+      starting_price_eur: price,
+      reserve_price_eur: null,
+      buy_now_price_eur: price,
+      current_bid_eur: null,
+      bid_count: 0,
+      bidder_count: 0,
+      winner_id: null,
+    }, { onConflict: "vehicle_id" })
+    .select("id")
+    .single();
+  if (error) return { ok: false, error: error.message };
+
+  const { error: vErr } = await supabase
+    .from("vehicles")
+    .update({ status: "in_auction", listed_price_eur: price, buy_now_price_eur: price })
+    .eq("id", input.vehicleId);
+  if (vErr) return { ok: false, error: vErr.message };
+
+  const auctionId = (data as { id: string }).id;
+  if (user) {
+    const { error: logErr } = await supabase.from("admin_audit_log").insert({
+      actor_id: user.id, entity_type: "auction", entity_id: auctionId,
+      action: existing ? "relist_listing" : "publish_listing",
+      changes: {
+        buy_now_price_eur: { from: existing?.buy_now_price_eur ?? null, to: price },
+        end_time: { from: existing?.end_time ?? null, to: end.toISOString() },
+      },
+    });
+    if (logErr) console.error("[audit] insert failed:", logErr.message);
+  }
+
+  revalidateAdmin(input.vehicleId);
+  revalidatePath("/admin/auctions");
+  revalidatePath("/marketplace");
+  revalidatePath(`/vehicle/${input.vehicleId}`);
   return { ok: true, auctionId };
 }

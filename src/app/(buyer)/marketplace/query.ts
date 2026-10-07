@@ -22,8 +22,24 @@ export interface MarketplaceSearchParams {
 const SELECT = `
   *,
   vehicle_photos ( url, sort_order, caption, category ),
-  auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, reserve_price_eur, bid_count, bidder_count )
+  auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, reserve_price_eur, buy_now_price_eur, bid_count, bidder_count )
 `;
+
+// Fixed-price mode: only vehicles whose listing is live right now. The !inner
+// join drops vehicles without a matching listing; end_time is compared to the
+// clock so a listing leaves the marketplace the instant its 7 days are up,
+// even before the close-expired-auctions sweep flips its status.
+const SELECT_LISTED = `
+  *,
+  vehicle_photos ( url, sort_order, caption, category ),
+  auctions!inner ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, reserve_price_eur, buy_now_price_eur, bid_count, bidder_count )
+`;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function onlyLiveListings(q: any) {
+  const nowIso = new Date().toISOString();
+  return q.eq("auctions.status", "active").lte("auctions.start_time", nowIso).gt("auctions.end_time", nowIso);
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function applyFilters(q: any, sp: MarketplaceSearchParams) {
@@ -77,9 +93,11 @@ export async function fetchVehiclesPage(
   supabase: any,
   sp: MarketplaceSearchParams,
   offset: number,
+  biddingEnabled: boolean,
   limit = PAGE_SIZE,
 ): Promise<{ vehicles: VehicleWithMedia[]; hasMore: boolean }> {
-  let q = supabase.from("vehicles").select(SELECT).in("status", ["listed", "in_auction"]);
+  let q = supabase.from("vehicles").select(biddingEnabled ? SELECT : SELECT_LISTED).in("status", ["listed", "in_auction"]);
+  if (!biddingEnabled) q = onlyLiveListings(q);
   q = applyFilters(q, sp);
   q = applySort(q, sp.sort);
   // Fetch one extra row to detect whether another page exists.
@@ -94,8 +112,13 @@ export async function fetchVehiclesCount(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   sp: MarketplaceSearchParams,
+  biddingEnabled: boolean,
 ): Promise<number> {
-  let q = supabase.from("vehicles").select("id", { count: "exact", head: true }).in("status", ["listed", "in_auction"]);
+  let q = supabase
+    .from("vehicles")
+    .select(biddingEnabled ? "id" : "id, auctions!inner(id)", { count: "exact", head: true })
+    .in("status", ["listed", "in_auction"]);
+  if (!biddingEnabled) q = onlyLiveListings(q);
   q = applyFilters(q, sp);
   const { count } = await q;
   return count ?? 0;

@@ -8,14 +8,20 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { bidIncrement } from "@/lib/constants";
-import { sendOutbidEmail, sendAuctionWonEmail } from "@/lib/email";
+import { sendOutbidEmail, sendAuctionWonEmail, sendPurchaseConfirmedEmail } from "@/lib/email";
 import { sendPushToUser } from "@/lib/push";
+import { getAppSettings } from "@/lib/settings";
 
 export interface ActionResult {
   ok: boolean;
   error?: string;
   data?: Record<string, unknown>;
 }
+
+/** Why a purchase failed, so the client can show a translated message. */
+export type BuyErrorCode = "AUTH" | "KYC" | "UNAVAILABLE" | "GENERIC";
+
+const BIDDING_OFF = "Bidding is not available on this marketplace.";
 
 // KYC gate. Returns an error string when the signed-in buyer is not verified
 // ('verified' is the approved state of the kyc_status enum). The DB enforces
@@ -31,8 +37,8 @@ async function kycGate(
   const status = (profile as { kyc_status?: string } | null)?.kyc_status;
   if (status === "verified") return null;
   return status === "rejected"
-    ? "Your verification was declined. Re-submit your documents from your profile to bid."
-    : "Your account is pending verification. You can bid once an admin approves your documents.";
+    ? "Your verification was declined. Re-submit your documents from your profile to continue."
+    : "Your account is pending verification. You can continue once an admin approves your documents.";
 }
 
 // --------------------------------------------------------------------
@@ -51,6 +57,10 @@ export async function placeBidAction(input: {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in to place a bid." };
+
+  // Dormant unless app_settings.bidding_enabled is on (the bids INSERT policy
+  // enforces the same flag in the DB).
+  if (!(await getAppSettings()).biddingEnabled) return { ok: false, error: BIDDING_OFF };
 
   const kycErr = await kycGate(supabase, user.id);
   if (kycErr) return { ok: false, error: kycErr };
@@ -126,75 +136,61 @@ export async function placeBidAction(input: {
 }
 
 // --------------------------------------------------------------------
-// Buy Now — close the auction, set winner, mark vehicle sold
+// Buy — the fixed-price purchase (also Buy Now on an auction)
+//
+// Runs the buy_now() RPC, the single purchase path shared with the buyer app:
+// KYC gate, row lock on the listing, live/price checks, records the purchase as
+// a bid at the fixed price, closes the listing as sold (trg_auctions_invoice
+// creates the invoice) and marks the vehicle sold — all in one transaction, so
+// two buyers can never both win the same car. (This action used to re-implement
+// those steps with separate service-role writes and no lock.)
 // --------------------------------------------------------------------
 export async function buyNowAction(input: {
   auctionId: string;
-}): Promise<ActionResult> {
+}): Promise<ActionResult & { code?: BuyErrorCode }> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sign in to buy this vehicle." };
+  if (!user) return { ok: false, code: "AUTH", error: "Sign in to buy this vehicle." };
 
   const kycErr = await kycGate(supabase, user.id);
-  if (kycErr) return { ok: false, error: kycErr };
+  if (kycErr) return { ok: false, code: "KYC", error: kycErr };
 
-  const { data: auction, error: aErr } = await supabase
+  const { error: rpcErr } = await supabase.rpc("buy_now", { p_auction_id: input.auctionId });
+  if (rpcErr) {
+    const m = rpcErr.message ?? "";
+    const code: BuyErrorCode =
+      m.includes("KYC_REQUIRED") ? "KYC"
+      : m.includes("AUTH_REQUIRED") ? "AUTH"
+      : /AUCTION_NOT_FOUND|AUCTION_NOT_ACTIVE|AUCTION_ENDED|BUY_NOW_UNAVAILABLE/.test(m) ? "UNAVAILABLE"
+      : "GENERIC";
+    return { ok: false, code, error: m };
+  }
+
+  // Read the closed listing back (service role: buyers can't read every column
+  // they need through RLS joins) for the invoice guard, notification and email.
+  const admin = createAdminClient();
+  const { data: auction } = await admin
     .from("auctions")
-    .select("id, status, end_time, vehicle_id, buy_now_price_eur, current_bid_eur, starting_price_eur")
+    .select("id, vehicle_id, current_bid_eur, buy_now_price_eur, vehicle:vehicles!vehicle_id ( year, make, model )")
     .eq("id", input.auctionId)
     .single();
+  const a = auction as unknown as {
+    id: string; vehicle_id: string; current_bid_eur: number | null; buy_now_price_eur: number | null;
+    vehicle: { year: number; make: string; model: string } | null;
+  } | null;
+  if (!a) return { ok: true, data: { auctionId: input.auctionId } };
+  const price = Number(a.current_bid_eur ?? a.buy_now_price_eur ?? 0);
 
-  if (aErr || !auction) return { ok: false, error: "Auction not found." };
-  if (auction.status !== "active") return { ok: false, error: "Auction is not live." };
-  if (new Date(auction.end_time).getTime() <= Date.now()) {
-    return { ok: false, error: "Auction has ended." };
-  }
-  if (auction.buy_now_price_eur == null) return { ok: false, error: "Buy Now is not available." };
-
-  const price = auction.buy_now_price_eur as number;
-
-  const { error: bidErr } = await supabase
-    .from("bids")
-    .insert({ auction_id: auction.id, bidder_id: user.id, amount_eur: price });
-  if (bidErr) return { ok: false, error: bidErr.message };
-
-  // RLS on `auctions` only allows staff to UPDATE, so we use the service-
-  // role admin client to close the auction.  Same for the vehicle.
-  const admin = createAdminClient();
-  const { error: aupErr } = await admin
-    .from("auctions")
-    .update({
-      status: "sold",
-      winner_id: user.id,
-      end_time: new Date().toISOString(),
-      current_bid_eur: price,
-    })
-    .eq("id", auction.id);
-  // Surface the failure instead of silently sending the buyer to a "closed"
-  // page — this is what made Buy Now appear broken.
-  if (aupErr) return { ok: false, error: `Could not close the auction: ${aupErr.message}` };
-
-  const { error: vupErr } = await admin
-    .from("vehicles")
-    .update({ status: "sold", sold_at: new Date().toISOString() })
-    .eq("id", auction.vehicle_id);
-  // Surface a vehicle-update failure too (was previously unchecked), so a
-  // half-closed sale (auction sold but vehicle still 'listed') can never pass
-  // silently. Both writes use the service-role admin client, so neither is
-  // blocked by the staff-only RLS on vehicles/auctions.
-  if (vupErr) return { ok: false, error: `Could not mark the vehicle sold: ${vupErr.message}` };
-
-  // The DB trigger creates the invoice when status flips to sold. Defensively
-  // ensure one exists (idempotent on the unique auction_id) so the won page can
-  // always offer confirm + Pay Now even if the trigger isn't deployed.
-  const fee = Math.round(price * 0.029 * 100) / 100;
+  // trg_auctions_invoice creates the invoice inside buy_now(). Keep the old
+  // belt-and-braces guard (idempotent on the unique auction_id).
   const { data: existingInvoice } = await admin
-    .from("invoices").select("id").eq("auction_id", auction.id).maybeSingle();
+    .from("invoices").select("id").eq("auction_id", a.id).maybeSingle();
   if (!existingInvoice) {
+    const fee = Math.round(price * 0.029 * 100) / 100;
     await admin.from("invoices").insert({
-      auction_id: auction.id,
+      auction_id: a.id,
       buyer_id:   user.id,
-      vehicle_id: auction.vehicle_id,
+      vehicle_id: a.vehicle_id,
       amount_eur: price,
       platform_fee_eur: fee,
       total_eur: price + fee,
@@ -202,31 +198,41 @@ export async function buyNowAction(input: {
     });
   }
 
-  // "You won" notification.
+  const { biddingEnabled } = await getAppSettings();
+  const vehicleTitle = a.vehicle ? `${a.vehicle.year} ${a.vehicle.make} ${a.vehicle.model}` : "";
+
+  // Notifications are stored in canonical English (read across apps).
   await supabase.from("notifications").insert({
     user_id: user.id,
     type: "auction_won",
-    title: "You won this auction!",
-    body: `Your Buy-Now purchase has been recorded. Our team will be in touch about shipping.`,
-    data: { auction_id: auction.id, amount_eur: price },
+    title: biddingEnabled ? "You won this auction!" : "Purchase confirmed",
+    body: biddingEnabled
+      ? `Your Buy-Now purchase has been recorded. Our team will be in touch about shipping.`
+      : `${vehicleTitle ? `${vehicleTitle} is yours. ` : ""}Choose shipping and confirm your order to receive your invoice.`,
+    data: { auction_id: a.id, vehicle_id: a.vehicle_id, amount_eur: price },
   });
 
-  // Best-effort auction-won email (localized to the winner's language).
+  // Best-effort email, localized to the buyer's language.
   const { data: profile } = await supabase
     .from("profiles").select("email, full_name, language").eq("id", user.id).single();
   if (profile?.email) {
-    await sendAuctionWonEmail({
-      to: profile.email,
-      name: profile.full_name ?? "",
-      auctionId: auction.id,
-      amountEur: price,
-      locale: (profile as { language?: string }).language,
-    });
+    const locale = (profile as { language?: string }).language;
+    if (biddingEnabled) {
+      await sendAuctionWonEmail({
+        to: profile.email, name: profile.full_name ?? "", auctionId: a.id, amountEur: price, locale,
+      });
+    } else {
+      await sendPurchaseConfirmedEmail({
+        to: profile.email, vehicleTitle, amountEur: price, auctionId: a.id, locale,
+      });
+    }
   }
 
-  revalidatePath(`/auction/${auction.id}`);
+  revalidatePath(`/auction/${a.id}`);
+  revalidatePath(`/vehicle/${a.vehicle_id}`);
+  revalidatePath("/marketplace");
   revalidatePath("/dashboard");
-  return { ok: true, data: { auctionId: auction.id } };
+  return { ok: true, data: { auctionId: a.id } };
 }
 
 // --------------------------------------------------------------------
@@ -240,6 +246,9 @@ export async function placeCounterOfferAction(input: {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sign in to make a counter offer." };
+
+  // Counter-offers sit behind the same flag as bidding (and the same DB gate).
+  if (!(await getAppSettings()).biddingEnabled) return { ok: false, error: BIDDING_OFF };
 
   const kycErr = await kycGate(supabase, user.id);
   if (kycErr) return { ok: false, error: kycErr };

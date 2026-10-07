@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Check, MessageSquareWarning, PencilLine } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { useBiddingEnabled } from "@/lib/bidding";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,8 @@ export function VehicleReviewPanel({
   buyNowPriceEur: number | null;
   description: string | null;
 }) {
+  // Reserve is an auction-only field: hidden while the marketplace is fixed-price.
+  const bidding = useBiddingEnabled();
   const router = useRouter();
   const [pending, start] = useTransition();
   const [mode, setMode] = useState<null | "changes" | "edit">(null);
@@ -121,7 +124,7 @@ export function VehicleReviewPanel({
         <div className="mt-4 space-y-3 rounded-xl border border-grey-200 bg-white p-3">
           <div className="grid grid-cols-3 gap-2">
             <Field label="Listed (€)"><Input value={listed} onChange={(e) => setListed(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" className="border-grey-300 bg-white" /></Field>
-            <Field label="Reserve (€)"><Input value={reserve} onChange={(e) => setReserve(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" className="border-grey-300 bg-white" /></Field>
+            {bidding && (<Field label="Reserve (€)"><Input value={reserve} onChange={(e) => setReserve(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" className="border-grey-300 bg-white" /></Field>)}
             <Field label="Buy now (€)"><Input value={buyNow} onChange={(e) => setBuyNow(e.currentTarget.value.replace(/[^0-9]/g, ""))} inputMode="numeric" className="border-grey-300 bg-white" /></Field>
           </div>
           <Field label="Description">

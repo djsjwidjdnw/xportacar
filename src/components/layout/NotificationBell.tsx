@@ -203,6 +203,8 @@ export function NotificationBell({
 
 function notificationLink(n: Notification): string | null {
   const data = (n.data ?? {}) as { auction_id?: string; vehicle_id?: string };
+  // A purchase (or auction win) lands on its order page.
+  if (data.auction_id && n.type === "auction_won") return `/auction/${data.auction_id}/won`;
   if (data.auction_id) return `/auction/${data.auction_id}`;
   if (data.vehicle_id) return `/vehicle/${data.vehicle_id}`;
   return null;

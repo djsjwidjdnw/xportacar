@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ShieldCheck, Gavel, Truck, ArrowRight, CheckCircle2 } from "lucide-react";
+import { ShieldCheck, BadgeEuro, Truck, ArrowRight, CheckCircle2 } from "lucide-react";
 
 import { useTranslations } from "@/i18n/provider";
 import { LanguageSwitcher } from "@/components/shared/LanguageSwitcher";
@@ -69,7 +69,7 @@ export function PrelaunchLanding({ countdownTarget }: { countdownTarget: string 
 
         {/* Supporting value props — smaller, below the signup */}
         <div className="mt-14 grid w-full gap-3 sm:grid-cols-3">
-          <ValueProp icon={<Gavel className="size-5" />} title={t("vp1Title")} body={t("vp1Body")} />
+          <ValueProp icon={<BadgeEuro className="size-5" />} title={t("vp1Title")} body={t("vp1Body")} />
           <ValueProp icon={<ShieldCheck className="size-5" />} title={t("vp2Title")} body={t("vp2Body")} />
           <ValueProp icon={<Truck className="size-5" />} title={t("vp3Title")} body={t("vp3Body")} />
         </div>

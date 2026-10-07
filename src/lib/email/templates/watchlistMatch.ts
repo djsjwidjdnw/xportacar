@@ -24,9 +24,9 @@ const COPY: Localized<Copy> = {
     heading: (name) => `A new match for you, ${name}`,
     headingNoName: "A new match for your watchlist",
     bodyHtml: (titleHtml) =>
-      `A vehicle matching your watchlist preferences has just been listed: <strong>${titleHtml}</strong>. Take a look before it goes to auction.`,
+      `A vehicle matching your watchlist preferences has just been listed: <strong>${titleHtml}</strong>. Take a look before it sells.`,
     bodyHtmlWithPrice: (titleHtml, priceHtml) =>
-      `A vehicle matching your watchlist preferences has just been listed: <strong>${titleHtml}</strong>, available to Buy Now for <strong>${priceHtml}</strong>. Take a look before it goes to auction.`,
+      `A vehicle matching your watchlist preferences has just been listed: <strong>${titleHtml}</strong>, listed at <strong>${priceHtml}</strong>. Take a look before it sells.`,
     ctaLabel: "View vehicle",
   },
   de: {
@@ -34,9 +34,9 @@ const COPY: Localized<Copy> = {
     heading: (name) => `Ein neuer Treffer für Sie, ${name}`,
     headingNoName: "Ein neuer Treffer für Ihre Merkliste",
     bodyHtml: (titleHtml) =>
-      `Ein Fahrzeug, das zu Ihren Merklisten-Präferenzen passt, wurde gerade eingestellt: <strong>${titleHtml}</strong>. Werfen Sie einen Blick darauf, bevor es in die Auktion geht.`,
+      `Ein Fahrzeug, das zu Ihren Merklisten-Präferenzen passt, wurde gerade eingestellt: <strong>${titleHtml}</strong>. Werfen Sie einen Blick darauf, bevor es verkauft ist.`,
     bodyHtmlWithPrice: (titleHtml, priceHtml) =>
-      `Ein Fahrzeug, das zu Ihren Merklisten-Präferenzen passt, wurde gerade eingestellt: <strong>${titleHtml}</strong>, sofort kaufbar für <strong>${priceHtml}</strong>. Werfen Sie einen Blick darauf, bevor es in die Auktion geht.`,
+      `Ein Fahrzeug, das zu Ihren Merklisten-Präferenzen passt, wurde gerade eingestellt: <strong>${titleHtml}</strong>, zum Festpreis von <strong>${priceHtml}</strong>. Werfen Sie einen Blick darauf, bevor es verkauft ist.`,
     ctaLabel: "Fahrzeug ansehen",
   },
   fr: {
@@ -44,9 +44,9 @@ const COPY: Localized<Copy> = {
     heading: (name) => `Une nouvelle correspondance pour vous, ${name}`,
     headingNoName: "Une nouvelle correspondance pour votre liste de suivi",
     bodyHtml: (titleHtml) =>
-      `Un véhicule correspondant à vos préférences de liste de suivi vient d'être mis en ligne : <strong>${titleHtml}</strong>. Jetez-y un œil avant qu'il ne passe aux enchères.`,
+      `Un véhicule correspondant à vos préférences de liste de suivi vient d'être mis en ligne : <strong>${titleHtml}</strong>. Jetez-y un œil avant qu'il ne soit vendu.`,
     bodyHtmlWithPrice: (titleHtml, priceHtml) =>
-      `Un véhicule correspondant à vos préférences de liste de suivi vient d'être mis en ligne : <strong>${titleHtml}</strong>, disponible en Achat immédiat pour <strong>${priceHtml}</strong>. Jetez-y un œil avant qu'il ne passe aux enchères.`,
+      `Un véhicule correspondant à vos préférences de liste de suivi vient d'être mis en ligne : <strong>${titleHtml}</strong>, proposé à <strong>${priceHtml}</strong>. Jetez-y un œil avant qu'il ne soit vendu.`,
     ctaLabel: "Voir le véhicule",
   },
   ar: {
@@ -54,9 +54,9 @@ const COPY: Localized<Copy> = {
     heading: (name) => `تطابق جديد من أجلك، ${name}`,
     headingNoName: "تطابق جديد لقائمة متابعتك",
     bodyHtml: (titleHtml) =>
-      `تم للتو إدراج مركبة تطابق تفضيلات قائمة متابعتك: <strong>${titleHtml}</strong>. ألقِ نظرة عليها قبل طرحها في المزاد.`,
+      `تم للتو إدراج مركبة تطابق تفضيلات قائمة متابعتك: <strong>${titleHtml}</strong>. ألقِ نظرة عليها قبل أن تُباع.`,
     bodyHtmlWithPrice: (titleHtml, priceHtml) =>
-      `تم للتو إدراج مركبة تطابق تفضيلات قائمة متابعتك: <strong>${titleHtml}</strong>، متاحة للشراء الفوري بسعر <strong>${priceHtml}</strong>. ألقِ نظرة عليها قبل طرحها في المزاد.`,
+      `تم للتو إدراج مركبة تطابق تفضيلات قائمة متابعتك: <strong>${titleHtml}</strong>، معروضة بسعر <strong>${priceHtml}</strong>. ألقِ نظرة عليها قبل أن تُباع.`,
     ctaLabel: "عرض المركبة",
   },
 };

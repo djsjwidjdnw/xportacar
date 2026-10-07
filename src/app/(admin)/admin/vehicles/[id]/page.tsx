@@ -11,11 +11,14 @@ import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
 import { LifecycleActions } from "@/components/admin/LifecycleActions";
 import { InspectorAssign } from "@/components/admin/InspectorAssign";
 import { CreateAuctionButton } from "@/components/admin/CreateAuctionButton";
+import { PublishListingButton } from "@/components/admin/PublishListingButton";
 import { VehicleReviewPanel } from "@/components/admin/VehicleReviewPanel";
 import { EditVehicleDialog } from "@/components/admin/EditVehicleDialog";
 import { ReopenInspectionButton } from "@/components/admin/ReopenInspectionButton";
 import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
+import { getAppSettings } from "@/lib/settings";
+import { listingDaysLeft, listingPrice, listingState } from "@/lib/listing";
 import { getVehicleValuation } from "@/lib/valuation-server";
 import { formatEur, formatRelativeTime } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
@@ -36,12 +39,13 @@ export default async function AdminVehicleDetailPage({
       *,
       vehicle_photos ( id, url, sort_order, caption, category ),
       vehicle_damages ( id, location, description, severity, photo_url ),
-      auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, reserve_price_eur, buy_now_price_eur, bid_count, bidder_count )
+      auctions ( id, status, start_time, end_time, current_bid_eur, starting_price_eur, reserve_price_eur, buy_now_price_eur, bid_count, bidder_count, winner_id )
     `)
     .eq("id", id)
     .single();
 
   if (error || !vehicle) notFound();
+  const { biddingEnabled } = await getAppSettings();
   const v: VehicleWithMedia = normalizeVehicleRow(vehicle as unknown as Record<string, unknown>);
   const paintThicknessUrl = v.vehicle_photos.find((p) => p.category === "paint_thickness")?.url ?? null;
   const photos = v.vehicle_photos
@@ -49,6 +53,9 @@ export default async function AdminVehicleDetailPage({
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((p) => ({ url: p.url, caption: p.caption }));
   const auction = v.auctions[0];
+  // Fixed-price listing view of the same auctions row (bidding off).
+  const lstate = listingState(auction);
+  const lprice = listingPrice(auction, v);
 
   const { data: inspectorsRaw } = await supabase
     .from("profiles").select("id, full_name, email").eq("role", "inspector");
@@ -186,7 +193,7 @@ export default async function AdminVehicleDetailPage({
                 status or whether an auction exists (reopenInspectionAction also
                 has no status gate). Vehicle status no longer hides either button. */}
             <div className="mt-5 border-t border-grey-100 pt-5">
-              {!auction && (
+              {biddingEnabled && !auction && (
                 <>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-grey-500">Create auction</p>
                   <CreateAuctionButton
@@ -197,12 +204,18 @@ export default async function AdminVehicleDetailPage({
                   />
                 </>
               )}
+              {!biddingEnabled && !auction && (
+                <>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-grey-500">Publish listing</p>
+                  <PublishListingButton vehicleId={v.id} priceEur={v.buy_now_price_eur ?? v.listed_price_eur} />
+                </>
+              )}
               <ReopenInspectionButton vehicleId={v.id} />
             </div>
 
             <dl className="mt-6 space-y-2.5 border-t border-grey-100 pt-5 text-sm">
               <Row label="Listed price" value={formatEur(v.listed_price_eur)} />
-              <Row label="Reserve" value={formatEur(v.reserve_price_eur)} />
+              <Row label={biddingEnabled ? "Reserve" : "Reserve (dormant — bidding off)"} value={formatEur(v.reserve_price_eur)} />
               <Row label="Buy now" value={formatEur(v.buy_now_price_eur)} />
               <Row label="Last update" value={formatRelativeTime(v.updated_at)} />
               <Row label="Seller" value={seller?.seller_name ?? "—"} />
@@ -212,7 +225,59 @@ export default async function AdminVehicleDetailPage({
 
           <MarketValueBar valuation={valuation} priceEur={v.listed_price_eur} title="Market valuation" priceLabel="Listed" />
 
-          {auction && (
+          {!biddingEnabled && auction && (
+            <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">Listing</p>
+                <Badge className={
+                  lstate === "live" ? "bg-success-50 text-success-700 ring-1 ring-success-100"
+                  : lstate === "sold" ? "bg-grey-900 text-white"
+                  : "bg-grey-100 text-grey-700 ring-1 ring-grey-200"
+                }>
+                  {lstate === "live" ? `Live · ${listingDaysLeft(auction.end_time)}d left`
+                    : lstate === "sold" ? "Sold" : lstate === "expired" ? "Expired" : auction.status}
+                </Badge>
+              </div>
+              <dl className="mt-3 space-y-2 text-sm">
+                <Row label="Price" value={formatEur(lprice)} />
+                <Row label="Published" value={new Date(auction.start_time).toLocaleString("en-GB")} />
+                <Row label={lstate === "live" ? "Ends" : "Ended"} value={new Date(auction.end_time).toLocaleString("en-GB")} />
+              </dl>
+              <Link
+                href={`/vehicle/${v.id}`}
+                className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:underline"
+              >
+                Open buyer listing view
+                <ExternalLink className="size-3.5" />
+              </Link>
+              {lstate !== "sold" && (
+                <div className="mt-4 border-t border-grey-100 pt-4">
+                  <PublishListingButton
+                    vehicleId={v.id}
+                    priceEur={lprice}
+                    variant={lstate === "live" ? "outline" : "default"}
+                    label={lstate === "live" ? "Change price (restarts 7 days)" : "Relist for 7 days"}
+                  />
+                </div>
+              )}
+              {/* Bidding is dormant: the auction fields stay on the row for when
+                  app_settings.bidding_enabled is switched back on. */}
+              <details className="mt-4 rounded-lg border border-dashed border-grey-300 bg-grey-50 px-3 py-2 text-sm">
+                <summary className="cursor-pointer text-xs font-semibold uppercase tracking-wide text-grey-500">
+                  Auction fields — bidding is OFF (dormant)
+                </summary>
+                <dl className="mt-2 space-y-1.5">
+                  <Row label="Starting price" value={formatEur(auction.starting_price_eur)} />
+                  <Row label="Reserve" value={formatEur(auction.reserve_price_eur)} />
+                  <Row label="Current bid" value={formatEur(auction.current_bid_eur)} />
+                  <Row label="Bids" value={`${auction.bid_count} (${auction.bidder_count} bidders)`} />
+                  <Row label="Row status" value={auction.status} />
+                </dl>
+              </details>
+            </div>
+          )}
+
+          {biddingEnabled && auction && (
             <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-wide text-grey-500">Auction</p>

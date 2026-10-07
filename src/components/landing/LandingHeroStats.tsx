@@ -16,7 +16,7 @@ export function LandingHeroStats({
 
   // Every value is a real DB count — no padding, no Math.max floors.
   const stats: { value: number; labelKey: string; sub?: string }[] = [
-    { value: vehicles,  labelKey: "statVehicles",  sub: liveAuctions ? `${liveAuctions} live now` : undefined },
+    { value: vehicles,  labelKey: "statVehicles",  sub: liveAuctions ? t("statLiveNow", { count: liveAuctions }) : undefined },
     { value: buyers,    labelKey: "statBuyers" },
     { value: countries, labelKey: "statCountries" },
     { value: cycles,    labelKey: "statCycles" },

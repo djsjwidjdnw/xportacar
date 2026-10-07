@@ -10,6 +10,7 @@ import type { ShippingRate } from "@/lib/shipping";
 import { isStripeConfigured } from "@/lib/stripe";
 import { loadPlatformSettings } from "@/lib/platform-settings";
 import { createClient } from "@/lib/supabase/server";
+import { getAppSettings } from "@/lib/settings";
 import { formatNumber } from "@/lib/utils";
 
 export const metadata = { title: "Settings · Admin" };
@@ -23,6 +24,7 @@ export default async function AdminSettingsPage() {
 
   // Live, editable platform config loaded from the storage-backed JSON.
   const settings = await loadPlatformSettings();
+  const { biddingEnabled } = await getAppSettings();
 
   // Counts for the storage panel (counts only — bytes require the storage
   // admin API which isn't accessible through createClient).
@@ -84,7 +86,9 @@ export default async function AdminSettingsPage() {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Read-only flags from the same config blob */}
-        <Section title="Auction features" icon={Building2}>
+        <Section title={biddingEnabled ? "Auction features" : "Auction features — dormant (bidding is OFF)"} icon={Building2}>
+          <Setting label="Bidding" value={biddingEnabled ? "On" : "Off — fixed-price marketplace"} status={biddingEnabled ? "ok" : "warn"}
+            hint="app_settings.bidding_enabled. Off: one price, 7-day listings, Buy via buy_now(). On: auctions, bids and counter-offers return." />
           <Setting label="Reserve price"  value={settings.reserveEnforced     ? "Enforced" : "Disabled"} status={settings.reserveEnforced ? "ok" : "warn"} />
           <Setting label="Proxy bidding"  value={settings.proxyBiddingEnabled ? "Enabled"  : "Disabled"} status={settings.proxyBiddingEnabled ? "ok" : "warn"} />
           <Setting label="Buy-now"        value={settings.buyNowEnabled       ? "Enabled"  : "Disabled"} status={settings.buyNowEnabled ? "ok" : "warn"} />

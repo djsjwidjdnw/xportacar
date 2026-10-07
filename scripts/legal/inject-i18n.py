@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# STALE GENERATOR - DO NOT RE-RUN AS-IS.
+# src/i18n/*.json is the source of truth for the terms/privacy copy. It was edited
+# directly after this script last ran (TUV price EUR 3,570; 2026-10-07 switch to a
+# fixed-price marketplace - no auction/bid wording). Re-running would restore the
+# old auction text and old prices. Port those edits into sections_*.py first.
 """Inject /privacy and /terms i18n namespaces into all 4 locale JSON files.
 
 Re-runnable: each run replaces the `privacy` and `terms` keys in each locale.

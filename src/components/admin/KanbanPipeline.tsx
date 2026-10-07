@@ -6,6 +6,7 @@ import { Calendar, ClipboardCheck, Gavel, CheckCircle2 } from "lucide-react";
 import { VehicleStatusSelect } from "./VehicleStatusSelect";
 import { InspectorAssignSelect } from "./InspectorAssignSelect";
 import { useTranslations } from "@/i18n/provider";
+import { useBiddingEnabled } from "@/lib/bidding";
 import { cn, formatEur } from "@/lib/utils";
 import type { Vehicle } from "@/types";
 
@@ -31,6 +32,7 @@ export function KanbanPipeline({
   inspectors?: Inspector[];
 }) {
   const t = useTranslations("admin");
+  const bidding = useBiddingEnabled();
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {columns.map((col) => {
@@ -41,7 +43,7 @@ export function KanbanPipeline({
             <header className="flex items-center justify-between gap-2 px-1 pb-2">
               <div className="flex items-center gap-2">
                 <Icon className="size-4 text-grey-600" />
-                <h3 className="text-sm font-bold text-grey-900">{t(meta.labelKey)}</h3>
+                <h3 className="text-sm font-bold text-grey-900">{t(!bidding && meta.labelKey === "pipelineInAuction" ? "pipelineListed" : meta.labelKey)}</h3>
               </div>
               <span className="rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-grey-700 ring-1 ring-grey-200">
                 {col.vehicles.length}

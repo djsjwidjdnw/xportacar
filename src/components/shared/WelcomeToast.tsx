@@ -8,10 +8,12 @@ import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { toast } from "@/components/ui/toast";
+import { useTranslations } from "@/i18n/provider";
 
 export function WelcomeToast() {
   const params = useSearchParams();
   const router = useRouter();
+  const t = useTranslations("common");
 
   useEffect(() => {
     if (params.get("welcome") === "1") {
@@ -20,7 +22,7 @@ export function WelcomeToast() {
       next.delete("welcome");
       router.replace(`${window.location.pathname}${next.toString() ? `?${next.toString()}` : ""}`, { scroll: false });
     } else if (params.get("signedOut") === "1") {
-      toast.info("Signed out", "See you next auction.");
+      toast.info(t("signedOut"), t("seeYouSoon"));
       const next = new URLSearchParams(params.toString());
       next.delete("signedOut");
       router.replace(`${window.location.pathname}${next.toString() ? `?${next.toString()}` : ""}`, { scroll: false });
