@@ -20,13 +20,17 @@
 //
 // Auth: protected by a shared secret (x-cron-secret header == CRON_SECRET env).
 // Deploy:  supabase functions deploy close-expired-auctions --no-verify-jwt
-// Secret:  supabase secrets set CRON_SECRET=<random>
-// Schedule (SQL, pg_cron + pg_net) — every 2 minutes:
+// Secret:  supabase secrets set CRON_SECRET=<random>, and the SAME value in
+//          Vault: select vault.create_secret('<random>', 'cron_secret');
+// Schedule (SQL, pg_cron + pg_net) — every 2 minutes. The job reads the secret
+// from Vault at run time; never put the value itself in cron.job:
 //   select cron.schedule('close-expired-auctions','*/2 * * * *', $$
 //     select net.http_post(
 //       url := 'https://<project>.functions.supabase.co/close-expired-auctions',
-//       headers := jsonb_build_object('x-cron-secret','<random>'));
+//       headers := jsonb_build_object('x-cron-secret',
+//         (select decrypted_secret from vault.decrypted_secrets where name = 'cron_secret')));
 //   $$);
+// (See supabase/manual/20261007_cron_secret_to_vault.sql.)
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 

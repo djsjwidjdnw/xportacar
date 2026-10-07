@@ -175,6 +175,9 @@ only governs unsold listings.
 ## Other findings (not changed by this run unless stated)
 - `invoices` RLS "buyers update own invoices" has no column limits or WITH CHECK; the finalize
   flow relies on it, but it also lets a buyer rewrite their own invoice's status/total over REST.
+  **Fixed 2026-10-07 — migration 032** (`finalize_my_invoice()`; buyer UPDATE removed).
 - `notifications` insert policy is `with check (true)` (any user can insert for anyone).
+  **Fixed 2026-10-07 — migration 033** (own-user inserts only; server writes via the service role).
 - The cron secret is stored in plain text inside `cron.job.command`.
+  **Fixed 2026-10-07** — moved to Vault secret `cron_secret` (`supabase/manual/20261007_cron_secret_to_vault.sql`).
 - 27/27 public tables rely on the default-ACL auto-grant (see CLAUDE.md, Supabase grants rule).
