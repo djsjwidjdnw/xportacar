@@ -16,10 +16,11 @@
 
 > **Fixed-price marketplace wording (2026-10-07).** Sourced from the live site
 > (`landing.*`, `support.q*`, `listing.*` in `src/i18n/en.json`). en-US is the only
-> App Store localization. **Promotional text is live** (saved + re-read via the App
-> Store Connect API). **Description and keywords below are NOT live yet:** Apple
-> refuses edits on the live 1.0 version (`409 STATE_ERROR … cannot be edited at
-> this time`); they go in when the next App Store version (1.0.1) is created.
+> App Store localization. **Promotional text is live.** Description, keywords,
+> promotional text and What's New below were pasted into App Store version
+> **1.0.1** (Prepare for Submission, build 12) and re-read on 2026-10-07; they
+> replace the 1.0 text when 1.0.1 is approved. 1.0.1 screenshots: still to upload
+> (the copied 1.0 bidding screenshots were removed from the 1.0.1 version).
 
 ## Subtitle (max 30)
 ```
@@ -33,13 +34,13 @@ Buy inspected UAE vehicles at a fixed price and import them to Europe. 7-day lis
 ```
 (154 chars)
 
-## Keywords (max 100, comma-separated) — for the next version
+## Keywords (max 100, comma-separated) — in 1.0.1
 ```
 car marketplace,vehicle import,used cars,Dubai,UAE,Europe,luxury cars,car shipping,RoRo,buy car
 ```
 (95 chars)
 
-## Description (max 4000) — for the next version
+## Description (max 4000) — in 1.0.1
 ```
 XportACar connects European buyers with quality, privately owned vehicles in the United Arab Emirates — inspected on the ground, listed at a fixed price, and shipped to the EU.
 
@@ -89,7 +90,7 @@ XportACar is now a fixed-price marketplace.
 • Flexible shipping: Dubai warehouse pickup, RoRo/container to EU ports, or door-to-door, plus optional German Registration (TÜV)
 • Available in English, German, French and Arabic
 
-Thank you for using XportACar. We'd love your feedback at support@xportacar.com.
+Thank you for using XportACar. We'd love your feedback at contact@xportacar.com.
 ```
 
 ---

@@ -25,10 +25,10 @@ Vehicle inspection field tool
 (29 chars)
 
 > **Fixed-price marketplace wording (2026-10-07).** en-US is the only App Store
-> localization. **Promotional text is live** (saved + re-read via the App Store
-> Connect API). **The description below is NOT live yet:** Apple refuses edits on
-> the live 1.0 version (`409 STATE_ERROR`); it goes in with the next App Store
-> version (1.0.1). Keywords are unchanged.
+> localization. **Promotional text is live.** Description, keywords, promotional
+> text and What's New below were pasted into App Store version **1.0.1** (Prepare
+> for Submission, build 9) and re-read on 2026-10-07, together with 5 new
+> screenshots per size (real 1.0.1 UI, see `screenshots.md`).
 
 ## Promotional text (max 170) — LIVE
 ```
@@ -42,7 +42,7 @@ vehicle inspection,car inspection,damage report,VIN,paint gauge,condition report
 ```
 (95 chars)
 
-## Description (max 4000) — for the next version
+## Description (max 4000) — in 1.0.1
 ```
 XportACar Inspection is the field tool used by XportACar's inspection teams in the United Arab Emirates to document privately owned vehicles and prepare them for sale on the XportACar marketplace.
 
@@ -68,21 +68,18 @@ Support: https://www.xportacar.com/support
 ```
 (1188 chars)
 
-## What's New — version 1.0.0 (max 4000)
+## What's New — version 1.0.1 (max 4000)
 ```
-Welcome to XportACar Inspection 1.0.
+XportACar Inspection 1.0.1
 
-• Guided 5-step inspection wizard: details, photos, damage, documents, review
-• Required exterior/interior/engine photo capture with guidance
-• New Paint Thickness Test capture to document gauge readings
-• Per-panel damage logging with severity and photos
-• Document attachments (registration, service book, insurance)
-• Market-based price recommendation for the review team
-• Automatic draft saving and resilient photo uploads
-• Submit completed inspections for office review and listing
+• Suggest an asking price for each vehicle — the admin team sets the final fixed price when it is listed for sale
+• Clearer email-confirmation and sign-in messages for inspector accounts
+• Refreshed XportACar logo and app icon
 
-Feedback is welcome at support@xportacar.com.
+Feedback is welcome at contact@xportacar.com.
 ```
+(Sourced from the inspector commits between build 8 and build 9: 767577d asking
+price, 562e35a confirm/sign-in copy, 2d8f871 brand assets.)
 
 ---
 

@@ -1,53 +1,39 @@
 # App Store screenshots — tooling
 
-Two scripts; isolated from the web app (own `package.json`, generated output is gitignored).
+Isolated from the web app (own `package.json`; generated output is gitignored).
+Spec, sizes and per-app screen lists: `docs/app-store/screenshots.md`.
 
-## 1) `make-mockups.py` — framed marketing screenshots (recommended)
-Composites raw screenshots onto a branded background inside a phone frame with a
-marketing headline, at all three required App Store sizes. Runs with Python +
-Pillow (no browser needed).
+## Current route (1.0.1+): real app UI, no iPhone needed
+1. **Build the app for web from the App Store build's commit** (a clean copy, so
+   the app repo is untouched):
+   ```
+   git -C ../xportacar-inspection archive --format=tar -o insp.tar <build-commit>
+   mkdir insp && tar -xf insp.tar -C insp && cd insp && npm ci && npm run build:web
+   ```
+   The buyer app has no web dependencies in its repo; add them in the COPY only:
+   ```
+   npm ci && npx expo install react-native-web react-dom @expo/metro-runtime
+   npx expo export --platform web
+   ```
+   Both builds use the production Supabase project from `app.json` `extra`.
+2. **Serve `dist/`** with any static server that falls back to `index.html`.
+3. **Capture** (iPhone 6.5" = 1284×2778 and iPad 13" = 2064×2752):
+   ```
+   npm install            # playwright
+   APP_EMAIL=... APP_PASSWORD=... node capture-app-web.mjs inspector iphone65 http://127.0.0.1:8702/ raw/iphone65
+   APP_EMAIL=... APP_PASSWORD=... node capture-app-web.mjs inspector ipad13   http://127.0.0.1:8702/ raw/ipad13
+   ```
+   Set `CDP_URL=http://127.0.0.1:9222` to drive an already-running Chrome (isolated
+   context); otherwise run `npx playwright install chromium` first.
+4. **Frame** with the brand background + headline + device frame:
+   ```
+   python make-store-shots.py inspector raw out
+   ```
+   Output: `out/<iphone65|ipad13>/<n>-<screen>.png` (PNG, RGB, no alpha).
+5. **Upload** to the version's screenshot sets in App Store Connect (6.5" iPhone and
+   13" iPad), then delete the old ones.
 
-```
-# 1. Put raw screenshots here (from the iOS Simulator — see step 3 below):
-#    scripts/screenshots/input/buyer/      marketplace.png vehicle.png auction.png bidding.png won.png
-#    scripts/screenshots/input/inspector/  list.png photos.png damage.png paint.png review.png
-# 2. Generate:
-python scripts/screenshots/make-mockups.py
-# 3. Output: scripts/screenshots/output/<app>/<size>/<screen>.png
-```
-Missing raw screenshots are replaced by labelled placeholders so the pipeline
-always produces a full preview set.
-
-## 2) `capture-web.mjs` — raw WEB captures (reference only)
-Captures the responsive **web** buyer app at the three device sizes. These are
-the web UI, **not** the native iOS app — use for the marketing site or quick
-reference, not as the final App Store screenshots.
-
-```
-cd scripts/screenshots
-npm install
-npx playwright install chromium
-BASE_URL=https://xportacar.vercel.app \
-BUYER_EMAIL=buyer@xportacar.com BUYER_PASSWORD=Demo!1234 \
-AUCTION_ID=22222222-0001-0000-0000-000000000999 \
-npm run capture
-# Output: scripts/screenshots/web-capture/<size>/
-```
-(Run the demo seed first — `supabase/seed_demo_porsche.sql` — so there's a live
-auction to capture.)
-
-## 3) Real iOS screenshots (required for the App Store)
-The apps are React Native / Expo, so genuine App Store screenshots must come
-from the **iOS Simulator** (or a device). Full step-by-step instructions —
-which device, which screen, what state — are in
-**`docs/app-store/screenshots.md`**. Capture those, drop them in `input/<app>/`,
-then run `make-mockups.py` to frame them.
-
-## Required sizes
-| Display | Pixels | Example device |
-|---|---|---|
-| 6.7" | 1290 × 2796 | iPhone 15 Pro Max / 16 Pro Max |
-| 6.5" | 1284 × 2778 | iPhone 11 Pro Max / XS Max (1242×2688 also accepted) |
-| 5.5" | 1242 × 2208 | iPhone 8 Plus |
-
-Apple recommends up to 10; provide at least 3–5 per app.
+## 1.0 tooling (history)
+- `make-mockups.py` — framed phone captures from `input/<app>/` at 6.7/6.5/5.5".
+- `make-ipad.py` — reframed the 6.5" mockups onto a 13" iPad canvas.
+- `capture-web.mjs` — captures the Next.js **website**, not the app (reference only).

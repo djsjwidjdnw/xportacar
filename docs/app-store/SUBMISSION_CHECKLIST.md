@@ -65,40 +65,25 @@ folder; this checklist is the work that must be done by hand in
       English as the governing version in case of discrepancy.
 
 ## 5) App Review Information (per app)
-- [ ] **Sign-in required:** Yes → provide a demo account:
-      - Buyer: `buyer@xportacar.com` / `Demo!1234`
-      - Inspector: `inspector@xportacar.com` / `Demo!1234`
-- [ ] **Contact:** Simon's name, email, phone (TBD).
-- [ ] **Review notes** — paste something like:
-
-  > XportACar is a UAE-to-EU online vehicle marketplace. Field teams in the UAE
-  > inspect privately owned cars and list them at a fixed price for 7 days;
-  > verified European buyers buy them at the listed price and import them.
-  >
-  > How to test the BUYER app:
-  > 1. Sign in with buyer@xportacar.com / Demo!1234.
-  > 2. Open the Marketplace and tap a listed vehicle to view its condition report.
-  > 3. Tap "Buy now", then "Confirm purchase" (a binding purchase at the listed
-  >    price; the 2.9% platform fee and shipping are added on the invoice).
-  > 4. On the order screen, choose shipping and tap "Confirm order", then
-  >    "Confirm payment" to see the proof-upload flow (PDF/JPG/PNG). This is
-  >    upload-only; no real payment is taken in-app — settlement is a manual
-  >    bank wire handled off-app.
-  >
-  > How to test the INSPECTOR app:
-  > 1. Sign in with inspector@xportacar.com / Demo!1234.
-  > 2. Start a new inspection and step through details → photos → damage →
-  >    documents → review. The Damage step includes a "Paint Thickness Test"
-  >    photo capture.
-  >
-  > Note: no in-app purchases or payments occur inside the apps. Settlement is
-  > a B2B bank transfer arranged outside the app. Purchases are binding, so the
-  > apps are intended for adult business users.
-  >
-  > (2026-10-07: the App Review notes saved on the live buyer 1.0 version were
-  > rewritten to this fixed-price flow through the App Store Connect API, so the
-  > next version inherits them. The marketplace must have at least one listing
-  > for the reviewer to buy.)
+- [x] **Sign-in required:** Yes (set on both 1.0.1 versions, 2026-10-07):
+      - Buyer app: `chasebitz0613+appreview@gmail.com` — "Lukas Hartmann", a
+        KYC-**verified** buyer created for App Review so the reviewer can buy.
+        Its password lives ONLY in App Store Connect's Sign-In Information — it
+        is a verified buyer that can make binding purchases, so never commit it.
+        (`buyer@xportacar.com` is KYC *pending* and cannot buy.)
+      - Inspector app: `inspector@xportacar.com` / `Demo!1234` (verified on the
+        live backend; `Demo1234!` does NOT work).
+- [x] **Contact:** Chase Bitz, phone and email (copied from 1.0; filled before
+      the notes, or the notes won't save).
+- [x] **Review notes** (saved on both 1.0.1 versions) name both accounts and
+      their roles, say purchases are paid by bank transfer outside the app, and
+      give account deletion: buyer app → Profile tab → "Delete account";
+      inspector app → Profile tab → "Delete account".
+- [ ] **Before submitting the buyer app:** at least one REAL live listing must
+      exist, or the reviewer has nothing to buy. The reviewer's test purchase is
+      a real order in production: it marks that listing sold and issues an
+      invoice (emailed to the Gmail alias above) — cancel it and relist after
+      review.
 
 ## 6) Export compliance
 - [ ] Both apps set `ITSAppUsesNonExemptEncryption = false` in `app.json`, so the
