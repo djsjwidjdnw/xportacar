@@ -46,7 +46,7 @@ export function AppDownloadBanner() {
       <div className="m-3 flex items-center gap-3 rounded-2xl bg-gradient-to-r from-brand-600 to-brand-700 p-3 text-white shadow-lg ring-1 ring-brand-500/40">
         <span className="grid size-10 shrink-0 place-items-center overflow-hidden rounded-xl bg-white shadow-sm">
           <Image
-            src="/logos/xportacar-logo.jpg"
+            src="/icons/icon-192.png"
             alt="XportACar"
             width={32}
             height={32}

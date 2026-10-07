@@ -1,6 +1,6 @@
 /* XportACar Service Worker — offline shell + stale-while-revalidate for static assets */
 
-const SW_VERSION = "xpc-v1";
+const SW_VERSION = "xpc-v2";
 const STATIC_CACHE = `${SW_VERSION}-static`;
 const RUNTIME_CACHE = `${SW_VERSION}-runtime`;
 

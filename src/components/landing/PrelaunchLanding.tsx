@@ -21,7 +21,7 @@ export function PrelaunchLanding({ countdownTarget }: { countdownTarget: string 
       {/* Faded logo watermark — subordinate to the signup, kept subtle. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/logos/xportacar-logo.jpg"
+        src="/logos/xportacar-wordmark.png"
         alt=""
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/3 -z-10 w-[72vw] max-w-[800px] -translate-x-1/2 -translate-y-1/2 select-none opacity-[0.08]"

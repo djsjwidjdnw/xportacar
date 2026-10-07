@@ -67,9 +67,9 @@ export const metadata: Metadata = {
     alternateLocale: ["de_DE", "fr_FR", "ar_AE"],
     images: [
       {
-        url: "/icons/icon-512.png",
-        width: 512,
-        height: 512,
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
         alt: "XportACar logo",
       },
     ],
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: ["/icons/icon-512.png"],
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
