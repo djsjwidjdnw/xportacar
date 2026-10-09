@@ -88,7 +88,8 @@ folder; this checklist is the work that must be done by hand in
       production (marks it sold, issues an invoice emailed to the Gmail alias);
       a rolled-back rehearsal of exactly that purchase passed on 2026-10-07.
       **If review is still pending on day 6 (2026-10-13), relist it** (admin
-      Publish/Relist restarts the 7 days).
+      Publish/Relist restarts the 7 days). Since 2026-10-09 this applies to the
+      1.0.2 review.
 
 ## 6) Export compliance
 - [ ] Both apps set `ITSAppUsesNonExemptEncryption = false` in `app.json`, so the
@@ -113,12 +114,32 @@ folder; this checklist is the work that must be done by hand in
         13:09:01 UTC → **Waiting for Review**
       - XportACar Inspector 1.0.1 (build 9): submission `8966b875-e8ff-4336-bcf1-f25c1218cd82`,
         13:09:12 UTC → **Waiting for Review**
+- [x] **1.0.1 approved and released 2026-10-07** (~22:22 UTC buyer, ~22:25 UTC
+      inspector). It shipped the Step 6 icons, which Chase then rejected.
+- [x] **1.0.2 submitted 2026-10-09** (original icons restored, Chase's call), through
+      the same API flow after a pre-submit gate (build VALID with version 1.0.2, export
+      compliance false, build attached, What's New set, screenshots COMPLETE, review
+      contact, demo account and notes present, demo listing active). The icon Apple
+      extracted from each build matches the original icon (mean difference 1.6 buyer,
+      2.8 inspector, out of 255).
+      - XportACar 1.0.2 (build 14), version `326eee70-8c1d-43e3-b93b-6623e395189d`,
+        submission `88300285-1cf9-430e-a64a-556d4b4b94b6`, 14:34:08 UTC → **Waiting for Review**
+      - XportACar Inspector 1.0.2 (build 11), version `421c22e6-7bd0-426e-90db-e335768dc8d8`,
+        submission `cfe38b5d-848e-4a40-9a05-e71045f34dd7`, 14:41:16 UTC → **Waiting for Review**
+      - What's New (both): "Restores the original XportACar app icon, plus minor fixes."
+        Description, keywords, URLs, screenshots (same checksums) and review details
+        carried over from 1.0.1 automatically. Promotional text does **not** carry over
+        to a new version, so it was copied from 1.0.1 by hand.
+      - Builds 13/10 (stamped 1.0.1) were uploaded by EAS but never became App Store
+        Connect builds, because an approved version closes its build train.
 - [x] Release: **automatic after approval** (`AFTER_APPROVAL`) on both versions.
 - [ ] Watch for Apple messages in **Resolution Center**; the review notes above
       pre-empt the most common questions (sign-in, how buying works, no
       in-app payment).
 
-## 9) After BOTH apps are approved — cleanup (pre-approved by Chase)
+## 9) After BOTH 1.0.2 versions are approved — cleanup (pre-approved by Chase)
+Chase, 2026-10-09: run this only after both **1.0.2** versions are approved, not
+before. The 1.0.1 approvals do not count, because the 1.0.2 reviewers need the demo listing.
 1. Copy to recovery tables first: the demo vehicle with its photos, paint
    readings, auction, bids, invoice, payment proofs, notifications, email-log rows
    and audit rows, plus anything the reviewers created (e.g. an inspection the

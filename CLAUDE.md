@@ -328,20 +328,44 @@ grant select, insert, update, delete on public.<table> to service_role;
   but a fresh database (preview branch, `db reset`) would deny them. See
   `docs/MIGRATIONS.md` → "Grants audit".
 
-## Current state — App Store 1.0.1 in review (as of 2026-10-07)
+## Brand assets rule (standing, effective 2026-10-09)
 
-- **Both apps are in App Review.** XportACar 1.0.1 (build 12) and XportACar Inspector
-  1.0.1 (build 9) were submitted 2026-10-07 13:09 UTC and read **Waiting for Review**.
-  Release is automatic after approval. Details: `docs/app-store/SUBMISSION_CHECKLIST.md`.
+- App icons, adaptive icons, app favicons, splash images, the web favicon, PWA icons
+  and `docs/app-store/*-icon-1024.png` are the **originals from before Step 6**,
+  restored byte-for-byte on 2026-10-09 (from web 7be02cf, buyer 6b14a22, inspector
+  767577d).
+- The **only** approved logo change is the car-free logo
+  `docs/brand/xportacar-logo-no-car.png` (original artwork with the car removed). It is
+  used as `public/logos/xportacar-logo.jpg`, both apps' `assets/logo.jpg`,
+  `public/og-image.png` and the emblem in `public/invoice-letterhead.pdf`.
+- **Never regenerate, redraw, recolour or re-letter brand assets without showing Chase
+  first.**
+
+## Current state — App Store 1.0.2 in review (as of 2026-10-09)
+
+- **1.0.1 is live.** Apple approved both 1.0.1 versions and released them on
+  2026-10-07 (~22:22 UTC; buyer build 12, inspector build 9). Those builds carry the
+  rejected Step 6 icons, which stay on the App Store until 1.0.2 is approved.
+- **1.0.2 is in App Review** to put the original icons back (Chase, 2026-10-09):
+  XportACar 1.0.2 (build 14, submission `88300285-1cf9-430e-a64a-556d4b4b94b6`) and
+  XportACar Inspector 1.0.2 (build 11, submission `cfe38b5d-848e-4a40-9a05-e71045f34dd7`),
+  both **Waiting for Review**. Release is automatic after approval. What's New: "Restores
+  the original XportACar app icon, plus minor fixes." All other text, review notes and
+  screenshots are carried over from 1.0.1. Builds 13/10 (stamped 1.0.1) uploaded but
+  never became App Store Connect builds, because the 1.0.1 train closed on approval.
+  Details: `docs/app-store/SUBMISSION_CHECKLIST.md`.
+- **OTA runtimes:** store binaries run 1.0.0, 1.0.1 and, once approved, 1.0.2. Publish
+  every OTA to each one (`docs/OTA_UPDATES.md` in both app repos).
 - **Demo listing for App Review (production):** vehicle
   `5f4e3424-89fa-43e8-b05d-d9fe795e31ff`, auction `84326b8b-7140-40df-bf21-69f97da3e2a5`,
   "2019 Mercedes-Benz AMG GT C Roadster — Demo listing for App Review, not for sale",
   €104,900, live until **2026-10-14 13:02 UTC**. Stock photos, credited in
-  `docs/app-store/demo-photo-credits.md`. **If review is still pending on day 6
-  (2026-10-13), relist it** (admin Publish/Relist restarts the 7 days).
-- **Cleanup, pre-approved by Chase once BOTH apps are approved:** copy the demo
-  listing and everything the reviewers created to recovery tables, then delete them
-  (Storage objects included), then restart invoice numbering
+  `docs/app-store/demo-photo-credits.md`. **If the 1.0.2 review is still pending on
+  2026-10-13, relist it** (admin Publish/Relist restarts the 7 days).
+- **Cleanup, pre-approved by Chase, runs only after BOTH 1.0.2 versions are approved**
+  (Chase, 2026-10-09; the 1.0.1 approvals do not count): copy the demo listing and
+  everything the reviewers created to recovery tables, then delete them (Storage objects
+  included), then restart invoice numbering
   (`setval('public.invoice_number_seq', 1, false)` while no invoice exists) so the first
   real invoice is XPC-2026-000001. Steps: SUBMISSION_CHECKLIST.md section 9.
 - **Landing mode stays ON** (`app_settings.landing_mode_enabled`) until Chase flips it.
