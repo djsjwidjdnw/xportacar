@@ -137,7 +137,16 @@ folder; this checklist is the work that must be done by hand in
       pre-empt the most common questions (sign-in, how buying works, no
       in-app payment).
 
-## 9) After BOTH 1.0.2 versions are approved — cleanup (pre-approved by Chase)
+## 9) After BOTH 1.0.2 versions are approved — cleanup (pre-approved by Chase) — DONE 2026-10-15
+Both 1.0.2 versions were live (READY_FOR_SALE) on 2026-10-15. Done that day:
+recovery copies in `recovery_20261015_*` (7 tables, 51 rows), the demo vehicle,
+listing, 20 photos, 6 paint readings, 2 cached valuations and its audit row deleted,
+the 20 Storage objects removed, invoice numbering at (1, false) so the next invoice is
+XPC-2026-000001. The reviewers created nothing else; their logins are kept.
+Files: `supabase/manual/20261015_recovery_demo_listing.sql`,
+`supabase/manual/20261015_delete_demo_listing.sql`,
+`scripts/maintenance/remove-demo-storage-20261015.mjs`.
+
 Chase, 2026-10-09: run this only after both **1.0.2** versions are approved, not
 before. The 1.0.1 approvals do not count, because the 1.0.2 reviewers need the demo listing.
 1. Copy to recovery tables first: the demo vehicle with its photos, paint
