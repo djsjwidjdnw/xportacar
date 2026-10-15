@@ -1,10 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendKycApprovedEmail, sendKycRejectedEmail } from "@/lib/email";
 import { LISTING_MS } from "@/lib/listing";
+import { requestMarketPrices } from "@/lib/market-prices";
 import type { NotificationType, VehicleStatus } from "@/types";
 
 export interface AdminResult {
@@ -763,6 +765,8 @@ export async function createAuctionAction(
   revalidatePath("/auctions");
   const auctionId = (data as { id: string }).id;
   revalidatePath(`/auction/${auctionId}`);
+  // Market prices for the listing, after the response (dormant while off).
+  after(() => requestMarketPrices(supabase, input.vehicleId, "publish"));
   return { ok: true, auctionId };
 }
 
@@ -845,5 +849,9 @@ export async function publishListingAction(input: {
   revalidatePath("/admin/auctions");
   revalidatePath("/marketplace");
   revalidatePath(`/vehicle/${input.vehicleId}`);
+  // UAE vs EU market prices: one lookup per listing, after the response is
+  // sent, so it can never slow down or fail the publish. While
+  // market_prices_enabled is off this logs one line and calls nothing.
+  after(() => requestMarketPrices(supabase, input.vehicleId, existing ? "relist" : "publish"));
   return { ok: true, auctionId };
 }
