@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Car, Gavel, Users, BadgeDollarSign, Settings, ClipboardCheck,
-  MessageSquare, FileText, ShieldCheck, HardHat, Rocket,
+  MessageSquare, FileText, ShieldCheck, HardHat, Rocket, Plug,
   ChevronRight, Menu,
 } from "lucide-react";
 import { useState } from "react";
@@ -31,6 +31,7 @@ const NAV = [
   { href: "/admin/users",           key: "navUsers",       icon: Users },
   { href: "/admin/finance",         key: "navFinance",     icon: BadgeDollarSign },
   { href: "/admin/prelaunch",       key: "navPrelaunch",   icon: Rocket },
+  { href: "/admin/integrations",    key: "navIntegrations", icon: Plug },
   { href: "/admin/settings",        key: "navSettings",    icon: Settings },
 ] as const;
 
