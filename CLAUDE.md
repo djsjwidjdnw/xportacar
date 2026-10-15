@@ -341,37 +341,45 @@ grant select, insert, update, delete on public.<table> to service_role;
 - **Never regenerate, redraw, recolour or re-letter brand assets without showing Chase
   first.**
 
-## Current state — App Store 1.0.2 in review (as of 2026-10-09)
+## Current state — App Store 1.0.2 live (checked 2026-10-15)
 
-- **1.0.1 is live.** Apple approved both 1.0.1 versions and released them on
-  2026-10-07 (~22:22 UTC; buyer build 12, inspector build 9). Those builds carry the
-  rejected Step 6 icons, which stay on the App Store until 1.0.2 is approved.
-- **1.0.2 is in App Review** to put the original icons back (Chase, 2026-10-09):
-  XportACar 1.0.2 (build 14, submission `88300285-1cf9-430e-a64a-556d4b4b94b6`) and
-  XportACar Inspector 1.0.2 (build 11, submission `cfe38b5d-848e-4a40-9a05-e71045f34dd7`),
-  both **Waiting for Review**. Release is automatic after approval. What's New: "Restores
-  the original XportACar app icon, plus minor fixes." All other text, review notes and
-  screenshots are carried over from 1.0.1. Builds 13/10 (stamped 1.0.1) uploaded but
-  never became App Store Connect builds, because the 1.0.1 train closed on approval.
+- **1.0.2 is live.** App Store Connect (read 2026-10-15): XportACar 1.0.2 (build 14) and
+  XportACar Inspector 1.0.2 (build 11) are READY_FOR_SALE, both review submissions
+  COMPLETE. They carry the original icons. 1.0.1 (Step 6 icons) was live from 2026-10-07.
   Details: `docs/app-store/SUBMISSION_CHECKLIST.md`.
-- **OTA runtimes:** store binaries run 1.0.0, 1.0.1 and, once approved, 1.0.2. Publish
-  every OTA to each one (`docs/OTA_UPDATES.md` in both app repos).
+- **OTA runtimes:** store binaries run 1.0.0, 1.0.1 and 1.0.2. Publish every OTA to each
+  one (`docs/OTA_UPDATES.md` in both app repos).
 - **Demo listing for App Review (production):** vehicle
   `5f4e3424-89fa-43e8-b05d-d9fe795e31ff`, auction `84326b8b-7140-40df-bf21-69f97da3e2a5`,
-  "2019 Mercedes-Benz AMG GT C Roadster — Demo listing for App Review, not for sale",
-  €104,900, live until **2026-10-14 13:02 UTC**. Stock photos, credited in
-  `docs/app-store/demo-photo-credits.md`. **If the 1.0.2 review is still pending on
-  2026-10-13, relist it** (admin Publish/Relist restarts the 7 days).
-- **Cleanup, pre-approved by Chase, runs only after BOTH 1.0.2 versions are approved**
-  (Chase, 2026-10-09; the 1.0.1 approvals do not count): copy the demo listing and
-  everything the reviewers created to recovery tables, then delete them (Storage objects
-  included), then restart invoice numbering
-  (`setval('public.invoice_number_seq', 1, false)` while no invoice exists) so the first
-  real invoice is XPC-2026-000001. Steps: SUBMISSION_CHECKLIST.md section 9.
+  "2019 Mercedes-Benz AMG GT C Roadster — Demo listing for App Review, not for sale".
+  Expired 2026-10-14 13:02 UTC (auction ended, vehicle listed); reviewers bought nothing
+  (0 invoices). Do not relist it.
+- **Cleanup, pre-approved by Chase, is now unblocked** (both 1.0.2 versions approved; not
+  yet run as of 2026-10-15): copy the demo listing and everything the reviewers created to
+  recovery tables, then delete them (Storage objects included), then restart invoice
+  numbering (`setval('public.invoice_number_seq', 1, false)` while no invoice exists) so the
+  first real invoice is XPC-2026-000001. Steps: SUBMISSION_CHECKLIST.md section 9.
 - **Landing mode stays ON** (`app_settings.landing_mode_enabled`) until Chase flips it.
 - **ReFit** (`C:\Users\chase\projects\hardware-memory`): its `eas.json` `ascApiKeyPath`
   still points at `C:\Users\chase\AuthKey_A29TQJT273.p8`, which was deleted on
   2026-10-07, so ReFit's `eas submit` needs a new key path.
+
+## Market prices, UAE vs EU (built dormant 2026-10-15)
+
+- Every car page (web + buyer app) can show a "Market prices" card: UAE price from
+  Dubizzle Motors via the Apify actor in `app_settings.market_prices_apify_actor`, EU price
+  from Vincario vehicle market value (europe group). Looked up once per listing by the
+  `market-prices` Edge Function when an admin publishes or relists; never on page view.
+  Engine: `supabase/functions/_shared/marketPrices.ts` (tests:
+  `npx tsx scripts/test-market-prices.ts`). Migration 034.
+- **OFF** until Chase flips `app_settings.market_prices_enabled` on the admin
+  Integrations page (`/admin/integrations`); the database refuses while a key is missing.
+- **Never use Chase's keys for market prices.** Its keys live only in Vault
+  (`market_vincario_api_key`, `market_vincario_secret_key`, `market_apify_token`), written
+  only through the Integrations page. The VINCARIO_*/AUTODEV_API_KEY Edge secrets stay for
+  VIN decoding. Launch-day move to Simon's accounts: `docs/integrations/KEY_SWAP_PROMPT.md`.
+- About €2 per car (Vincario €1.99 on the 100-lookup pack + Apify ≈ $0.05, capped at $0.10
+  a run). No live paid lookup has been run yet.
 
 ## Environment Variables Needed
 ```
