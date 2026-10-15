@@ -1,0 +1,38 @@
+{
+  "When you use an incorrect API key": {
+    "error": true,
+    "message": "Unknown API Key"
+  },
+  "When you use an incorrect control sum": {
+    "error": true,
+    "message": "Invalid Control sum"
+  },
+  "When you run out of prepaid lookups": {
+    "error": true,
+    "message": "Not Enough Lookups"
+  },
+  "When you reach a limit of requests per minute": {
+    "error": true,
+    "message": "You've reached limit of 60 requests per minute. Contact us at info@vincario.com for a customized limit."
+  },
+  "When VIN is not recognized": {
+    "error": true,
+    "message": "Not recognized"
+  },
+  "When we are not able to provide data": {
+    "error": true,
+    "message": "Insufficient statistical data."
+  },
+  "Query parameter 'odometer' has no value": {
+    "error": true,
+    "message": "Odometer value cannot be empty"
+  },
+  "Query parameter 'odometer' value must be greater than or equal to 0": {
+    "error": true,
+    "message": "Odometer value must be greater than or equal to 0"
+  },
+  "Query parameter 'odometer_unit' has non valid value.": {
+    "error": true,
+    "message": "Invalid odometer_unit. Supported values are km, mi"
+  }
+}

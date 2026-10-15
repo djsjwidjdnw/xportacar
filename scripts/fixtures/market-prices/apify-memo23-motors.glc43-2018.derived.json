@@ -1,0 +1,4720 @@
+[
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742901",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742901,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742901/",
+      "price": {
+        "formatted": "112,000",
+        "raw": "112000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2017",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "141000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "112000.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2017",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 112000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742902",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742902,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742902/",
+      "price": {
+        "formatted": "115,500",
+        "raw": "115500.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2018",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "133500",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "115500.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2018",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 115500,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742903",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742903,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742903/",
+      "price": {
+        "formatted": "118,000",
+        "raw": "118000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2018",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "121000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "118000.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2018",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 118000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "bd4bd8e1bf584bbab5c943f73c9ad93b",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742808,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+      "price": {
+        "formatted": "119,000",
+        "raw": "119000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2018",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "128000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "119000.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2018",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 119000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742904",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742904,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742904/",
+      "price": {
+        "formatted": "121,000",
+        "raw": "121000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2019",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "98000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "121000.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2019",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 121000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742905",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742905,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742905/",
+      "price": {
+        "formatted": "124,900",
+        "raw": "124900.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2018",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "87500",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "124900.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2018",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 124900,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742906",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742906,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742906/",
+      "price": {
+        "formatted": "126,500",
+        "raw": "126500.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2019",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "92000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "126500.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2019",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 126500,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742907",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742907,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742907/",
+      "price": {
+        "formatted": "129,000",
+        "raw": "129000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2019",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "76000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "129000.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2019",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 129000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742908",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742908,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742908/",
+      "price": {
+        "formatted": "133,000",
+        "raw": "133000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2019",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "64000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "133000.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2019",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 133000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742905",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742905,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742905/",
+      "price": {
+        "formatted": "124,900",
+        "raw": "124900.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2018",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "87500",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "124900.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2018",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 124900,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742909",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742909,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742909/",
+      "price": {
+        "formatted": "89,000",
+        "raw": "89000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2015",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "160000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "89000.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2015",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 89000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742910",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742910,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742910/",
+      "price": {
+        "formatted": "1,190,000",
+        "raw": "1190000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2018",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "110000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "1190000.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2018",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 1190000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742911",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742911,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/derived-16742911/",
+      "price": {
+        "formatted": "2,999",
+        "raw": "2999.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2019",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "90000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "2999.00",
+      "place_id": "62237",
+      "model": "GLC",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2019",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 2999,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  },
+  {
+    "lister": {
+      "is_agent": true,
+      "is_verified_user": false,
+      "initials": "V",
+      "id": "e1785e3c-1b32-4412-9862-82e1944f9085",
+      "is_verified_business": false,
+      "agent_type": "public",
+      "first_name": "VIP Design Luxury Automobiles",
+      "last_name": "",
+      "is_sms_enabled": true,
+      "is_facebook_verified": false,
+      "business": null,
+      "auto_agent_id": 8107,
+      "legacy_id": 20103100,
+      "is_whatsapp_enabled": true,
+      "active_listings_count": 44,
+      "name": "VIP Design Luxury Automobiles Trading L.L.C.",
+      "encrypted_user_id": "hHvz2fiKRwLEJLKT78TtvxLRx4jcJDnhnqY8gEK0oOs=",
+      "joined_timestamp": 1689588222,
+      "is_email_verified": true,
+      "photo_url": "https://dbz-images.dubizzle.com/profiles/auto_agency/WhatsApp_Image_2023-07-18_at_13.22.52.jpeg?impolicy=agency",
+      "is_phone_number_verified": true
+    },
+    "listing": {
+      "company": {
+        "name": null,
+        "logo": null,
+        "is_confidential": false,
+        "url": ""
+      },
+      "categories": [
+        {
+          "full_slug": "motors",
+          "id": "529f73fb-52b1-4b6d-a8ad-f3728901b877",
+          "name": "Motors",
+          "slug": "motors",
+          "legacy_id": 7
+        },
+        {
+          "full_slug": "motors/used-cars",
+          "id": "37a3b47f-7d37-4f18-9296-2960775bc9a0",
+          "name": "Used Cars",
+          "slug": "used-cars",
+          "legacy_id": 140
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz",
+          "id": "53f5e810-6cf0-4f6f-8ad6-1b91015087e7",
+          "name": "Mercedes-Benz",
+          "slug": "mercedes-benz",
+          "legacy_id": 1459
+        },
+        {
+          "full_slug": "motors/used-cars/mercedes-benz/glc",
+          "id": "2eb68266-e938-4c30-a205-607138a6dc73",
+          "name": "GLC",
+          "slug": "glc",
+          "legacy_id": 2434
+        }
+      ],
+      "show_car_finance": true,
+      "uuid": "derived16742912",
+      "is_verified_user": false,
+      "stock_level": "out_of_stock",
+      "content_type_id": 200,
+      "is_cotd_booked": false,
+      "is_editable": true,
+      "listing_uuid": "bd4bd8e1-bf58-4bba-b5c9-43f73c9ad93b",
+      "location": {
+        "name": "City Walk, Al Wasl, Dubai, UAE",
+        "coordinates": {
+          "lat": "25.20008700",
+          "lng": "55.26470100"
+        },
+        "id": [
+          62237,
+          63466,
+          199,
+          4
+        ]
+      },
+      "description": "• Contact Information:<br>- Phone Number: ...",
+      "discount_percentage": "0",
+      "is_verified_business": false,
+      "is_reserved": false,
+      "posted_timestamp": 1770973119,
+      "car_finance_lead_enabled": false,
+      "seller_account_type": "IN",
+      "inspection_status": "request_inspection",
+      "is_coming_soon": false,
+      "listing_id": 16742912,
+      "breadcrumbs": [
+        {
+          "label": {
+            "en": "Motors",
+            "ar": "موتورات"
+          },
+          "path": "motors/"
+        },
+        {
+          "label": {
+            "en": "Used Cars",
+            "ar": "سيارات مستعملة"
+          },
+          "path": "motors/used-cars/"
+        }
+      ],
+      "expired_timestamp": 1773565122,
+      "is_chat_enabled": false,
+      "action_urls": {
+        "inspection": "https://vas.dubizzle.com/inspection/",
+        "upgrade": "",
+        "car_report_url": "/products/car-report/16742808/200/2434/"
+      },
+      "is_cotw_booked": false,
+      "absolute_url": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/gle/derived-16742912/",
+      "price": {
+        "formatted": "210,000",
+        "raw": "210000.00",
+        "currency": "AED"
+      },
+      "is_remote_job": false,
+      "pre_discount_price": "0",
+      "is_ai_paa": false,
+      "show_car_finance_cta": false,
+      "car_trade_in_lead_enabled": false,
+      "car_finance_calculator_enabled": true,
+      "photos_combined": [
+        {
+          "main": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+          "micro": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=carousel"
+        }
+      ],
+      "short_url": "https://dubizzle.com/s/DOBIP9S",
+      "name": "Mercedes GLC 43 AMG",
+      "estimated_delivery_date": "2026-02-25T19:54:04.130186+00:00",
+      "details": {
+        "primary": [
+          {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic",
+            "slug": "motors_trim"
+          },
+          {
+            "label": "Interior Color",
+            "value": "Tan",
+            "slug": "interior_color"
+          },
+          {
+            "label": "Horsepower",
+            "value": "300 - 399 HP",
+            "slug": "horsepower"
+          },
+          {
+            "label": "Exterior Color",
+            "value": "Black",
+            "slug": "exterior_color"
+          },
+          {
+            "label": "Doors",
+            "value": "4 door",
+            "slug": "doors"
+          }
+        ],
+        "make_model_trim": [
+          {
+            "label": "Make Model Trim",
+            "value": "Mercedes-Benz GLC GLC 43 AMG 4Matic",
+            "slug": "make_model_trim"
+          }
+        ],
+        "secondary": [
+          {
+            "label": "Body Type",
+            "value": "SUV",
+            "slug": "body_type"
+          },
+          {
+            "label": "Fuel Type",
+            "value": "Petrol",
+            "slug": "fuel_type"
+          },
+          {
+            "label": "Year",
+            "value": "2019",
+            "slug": "year"
+          },
+          {
+            "label": "Seating Capacity",
+            "value": "5 Seater",
+            "slug": "seating_capacity"
+          },
+          {
+            "label": "Kilometers",
+            "value": "50000",
+            "slug": "kilometers"
+          },
+          {
+            "label": "No. of Cylinders",
+            "value": "6",
+            "slug": "no_of_cylinders"
+          },
+          {
+            "label": "Transmission Type",
+            "value": "Automatic Transmission",
+            "slug": "transmission_type"
+          },
+          {
+            "label": "Regional Specs",
+            "value": "GCC Specs",
+            "slug": "regional_specs"
+          },
+          {
+            "label": "Engine Capacity (cc)",
+            "value": "2500 - 2999 cc",
+            "slug": "engine_capacity_cc"
+          },
+          {
+            "label": "Seller type",
+            "value": "Dealer",
+            "slug": "seller_type"
+          },
+          {
+            "label": "Warranty",
+            "value": "No",
+            "slug": "warranty"
+          },
+          {
+            "label": "Target Market",
+            "value": "UAE (can be exported)",
+            "slug": "target_market"
+          },
+          {
+            "label": "Steering Side",
+            "value": "Left Hand",
+            "slug": "steering_side"
+          }
+        ]
+      },
+      "inventory_type": "",
+      "return_policy": {
+        "days": 14
+      },
+      "tracking": {
+        "neighbourhood": {
+          "name": "City Walk",
+          "id": 62237
+        },
+        "legacy_id": 16742808
+      }
+    },
+    "ad_ops": {
+      "site_cat_4": "glc",
+      "emirate": "dubai",
+      "CL_Listing": "MTAU",
+      "fuel": "Petrol",
+      "price_band_aed": "105K-125K",
+      "price_aed": "210000.00",
+      "place_id": "62237",
+      "model": "GLE",
+      "seats": "5",
+      "auto_model": 2434,
+      "lang": "en",
+      "site_cat_3": "mercedes-benz",
+      "loc": "UAE, Dubai, Al Wasl, City Walk",
+      "site_cat_2": "used-cars",
+      "auto_make_name": "Mercedes-Benz",
+      "image_url": "https://dbz-images.dubizzle.com/images/2026/02/13/839b05de553f4fd98ceddd1a3a1bf4a0-.jpeg?impolicy=dpv",
+      "trim_id": "19772",
+      "language": "en",
+      "site": "dubai",
+      "lister_id": 20103100,
+      "auto_make": 1459,
+      "page_type": "dpv",
+      "ad_unit": "motors used-cars mercedes-benz glc",
+      "year": "2019",
+      "site_cat_1": "motors",
+      "make": "Mercedes-Benz"
+    },
+    "basicInfo": {
+      "promoted": false,
+      "is_coming_soon": false,
+      "photos_count": 13,
+      "is_super_ad": false,
+      "can_chat": false,
+      "absolute_url": {
+        "en": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/",
+        "ar": "https://dubai.dubizzle.com/motors/used-cars/mercedes-benz/glc/2026/2/13/mercedes-glc-43-amg-2-991---bd4bd8e1bf584bbab5c943f73c9ad93b/"
+      },
+      "has_whatsapp_number": true,
+      "price": 210000,
+      "is_reserved": false,
+      "has_phone_number": true,
+      "description": {
+        "en": "• Contact Information:...",
+        "ar": "• Contact Information:..."
+      },
+      "is_premium": false,
+      "user_id": 20103100,
+      "seller_type": "DL",
+      "is_verified_business": false,
+      "is_featured_agent": false,
+      "details": {
+        "Trim": {
+          "en": {
+            "label": "Trim",
+            "value": "GLC 43 AMG 4Matic"
+          },
+          "ar": {
+            "label": "الفئة",
+            "value": "GLC 43 AMG 4Matic"
+          }
+        },
+        "Horsepower": {
+          "en": {
+            "label": "Horsepower",
+            "value": "300 - 399 HP"
+          },
+          "ar": {
+            "label": "قوة حصان",
+            "value": "300 - 399 حصان"
+          }
+        },
+        "Year": {
+          "en": {
+            "label": "Year",
+            "value": "2018"
+          },
+          "ar": {
+            "label": "السنة",
+            "value": "2018"
+          }
+        }
+      }
+    }
+  }
+]

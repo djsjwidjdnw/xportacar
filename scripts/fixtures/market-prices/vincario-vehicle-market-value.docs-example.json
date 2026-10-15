@@ -1,0 +1,407 @@
+{
+  "vin": "XXXDEF1GH23456789",
+  "price": 0,
+  "price_currency": "USD",
+  "balance": {
+    "API Decode": 218,
+    "API Stolen Check": 205,
+    "API Vehicle Market Value": 205,
+    "API OEM VIN Lookup": 0
+  },
+  "vehicle": {
+    "vehicle_id": 4599,
+    "make": "Toyota",
+    "make_id": 108,
+    "model": "Yaris",
+    "model_id": 18753,
+    "model_year": 2012,
+    "transmission": "Automatic",
+    "transmission_id": 2,
+    "engine_displacement_ccm": 1497,
+    "fuel_type_primary": "Gasoline",
+    "fuel_type_primary_id": 8,
+    "make_logo": "https://vindecoder.eu/img/make/toyota.svg"
+  },
+  "period": {
+    "from": "2022-11-14",
+    "to": "2023-11-14"
+  },
+  "market_price": {
+    "europe": {
+      "price_count": 29,
+      "price_currency": "EUR",
+      "price_below": 5000,
+      "price_median": 6700,
+      "price_avg": 6774,
+      "price_above": 8500,
+      "price_stdev": 1267
+    },
+    "north_america": {
+      "price_count": 13,
+      "price_currency": "USD",
+      "price_below": 6700,
+      "price_median": 8500,
+      "price_avg": 9065,
+      "price_above": 12800,
+      "price_stdev": 1823
+    }
+  },
+  "market_odometer": {
+    "europe": {
+      "odometer_count": 29,
+      "odometer_unit": "km",
+      "odometer_below": 62400,
+      "odometer_median": 88586,
+      "odometer_avg": 96812,
+      "odometer_above": 130000,
+      "odometer_stdev": 50081
+    },
+    "north_america": {
+      "odometer_count": 13,
+      "odometer_unit": "mi",
+      "odometer_below": 26400,
+      "odometer_median": 41731,
+      "odometer_avg": 40395,
+      "odometer_above": 56700,
+      "odometer_stdev": 15815
+    }
+  },
+  "records": [
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 4799,
+      "price_currency": "EUR",
+      "odometer": 280000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 4895,
+      "price_currency": "EUR",
+      "odometer": 130000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 4900,
+      "price_currency": "EUR",
+      "odometer": 150000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 4990,
+      "price_currency": "EUR",
+      "odometer": 148583,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 5250,
+      "price_currency": "EUR",
+      "odometer": 149099,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 5900,
+      "price_currency": "EUR",
+      "odometer": 62400,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 5900,
+      "price_currency": "EUR",
+      "odometer": 99800,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 5900,
+      "price_currency": "EUR",
+      "odometer": 103000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 5999,
+      "price_currency": "EUR",
+      "odometer": 138500,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6190,
+      "price_currency": "EUR",
+      "odometer": 29000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 6410,
+      "price_currency": "USD",
+      "odometer": 54370,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6499,
+      "price_currency": "EUR",
+      "odometer": 68218,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6500,
+      "price_currency": "EUR",
+      "odometer": 122000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6500,
+      "price_currency": "EUR",
+      "odometer": 128300,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6699,
+      "price_currency": "EUR",
+      "odometer": 68890,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6700,
+      "price_currency": "EUR",
+      "odometer": 85000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 6740,
+      "price_currency": "USD",
+      "odometer": 61746,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6800,
+      "price_currency": "EUR",
+      "odometer": 99928,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6950,
+      "price_currency": "EUR",
+      "odometer": 75000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6990,
+      "price_currency": "EUR",
+      "odometer": 120464,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 6999,
+      "price_currency": "EUR",
+      "odometer": 87818,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 7290,
+      "price_currency": "EUR",
+      "odometer": 99000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 7300,
+      "price_currency": "EUR",
+      "odometer": 45500,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 7349,
+      "price_currency": "EUR",
+      "odometer": 102458,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 7590,
+      "price_currency": "EUR",
+      "odometer": 81645,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 7980,
+      "price_currency": "EUR",
+      "odometer": 53128,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 7990,
+      "price_currency": "EUR",
+      "odometer": 44545,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 8130,
+      "price_currency": "USD",
+      "odometer": 37624,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 8130,
+      "price_currency": "USD",
+      "odometer": 41731,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 8199,
+      "price_currency": "EUR",
+      "odometer": 88586,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 8450,
+      "price_currency": "USD",
+      "odometer": 50095,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 8490,
+      "price_currency": "EUR",
+      "odometer": 68000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 8500,
+      "price_currency": "USD",
+      "odometer": 54370,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 8500,
+      "price_currency": "USD",
+      "odometer": 56700,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 8550,
+      "price_currency": "USD",
+      "odometer": 47491,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 8700,
+      "price_currency": "EUR",
+      "odometer": 50000,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 9610,
+      "price_currency": "USD",
+      "odometer": 24463,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 9620,
+      "price_currency": "USD",
+      "odometer": 6761,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "DE",
+      "continent": "EU",
+      "price": 10199,
+      "price_currency": "EUR",
+      "odometer": 28699,
+      "odometer_unit": "km"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 10640,
+      "price_currency": "USD",
+      "odometer": 32821,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 11750,
+      "price_currency": "USD",
+      "odometer": 30568,
+      "odometer_unit": "mi"
+    },
+    {
+      "market": "US",
+      "continent": "NA",
+      "price": 12820,
+      "price_currency": "USD",
+      "odometer": 26396,
+      "odometer_unit": "mi"
+    }
+  ]
+}
