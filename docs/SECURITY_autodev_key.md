@@ -72,9 +72,9 @@ no need to set them.)
 
 - **Local dev:** `xportacar/.env.local` (gitignored) — `AUTODEV_API_KEY` and
   `VALUATION_API_KEY` both set to the rotated key.
-- **Vercel (production):** add **`AUTODEV_API_KEY`** (and/or `VALUATION_API_KEY`)
-  = the rotated key under Project → Settings → Environment Variables. Never use
-  `NEXT_PUBLIC_` for this — it must stay server-side only.
+- **Vercel:** none since 2026-10-15. The web's auto.dev valuation was removed, so
+  `AUTODEV_API_KEY` and `VALUATION_API_KEY` were deleted from Vercel. (Never use
+  `NEXT_PUBLIC_` for any auto.dev key.)
 - **Supabase:** `AUTODEV_API_KEY` set via `supabase secrets set` (above).
 
 ## Git history

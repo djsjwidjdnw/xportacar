@@ -29,7 +29,7 @@ WHERE EVERY KEY LIVES TODAY (all on Chase's accounts unless noted)
 | Vincario, vehicle market value | market-prices Edge Function | Vault `market_vincario_api_key`, `market_vincario_secret_key` (empty until today) | yes, Integrations page |
 | Apify | market-prices Edge Function | Vault `market_apify_token` (empty until today) | yes, Integrations page |
 | Vincario, VIN decoding | vin-decoder-proxy | Edge Function secrets `VINCARIO_API_KEY`, `VINCARIO_SECRET_KEY` | yes |
-| Auto.dev | vin-decoder-proxy; valuation-proxy (inspector app) | Edge Function secret `AUTODEV_API_KEY`; Vercel `AUTODEV_API_KEY` and `VALUATION_API_KEY` (no longer read by the web since 2026-10-15) | yes |
+| Auto.dev | vin-decoder-proxy (VIN decoding) | Edge Function secret `AUTODEV_API_KEY` (the Vercel copies were removed 2026-10-15) | yes |
 | Resend | web emails; Supabase Auth emails | Vercel `RESEND_API_KEY` (Production + Preview), `RESEND_PRELAUNCH_AUDIENCE_ID`, `EMAIL_FROM`; Supabase Auth custom SMTP password | yes, see STEP 3 |
 | Vercel | hosting | Chase's Vercel account | only if Chase says so |
 | Supabase | database, auth, functions | Chase's Supabase org; keys in Vercel env and in both apps' app.json (publishable key) | only if Chase says so |
@@ -102,9 +102,8 @@ STEP 3 — RESEND
 
 STEP 4 — AUTO.DEV
 - auto.dev dashboard → copy the API key.
-- Edge Function secret AUTODEV_API_KEY = the new key (method 3). Vercel AUTODEV_API_KEY and
-  VALUATION_API_KEY are no longer read by the web: replace them with the new key too, or list them as
-  unused for Chase to remove. Don't delete them without asking.
+- Edge Function secret AUTODEV_API_KEY = the new key (method 3). It is the only place the auto.dev
+  key lives (Vercel's copies were removed on 2026-10-15).
 - Test: as the admin in the browser, call the vin-decoder-proxy function with a real VIN from the
   vehicles table and check that the response's `sources` include "autodev".
 
