@@ -344,13 +344,13 @@ function ServiceCard({
       </div>
       {status.detail && <p className={`mt-1 text-xs ${status.tone === "error" ? "font-mono text-error-700" : "text-grey-500"}`}>{status.detail}</p>}
       {(where || last4 !== undefined) && (
-        <dl className="mt-4 space-y-1.5 text-sm">
-          {where && <div className="flex flex-wrap justify-between gap-2"><dt className="text-grey-500">Stored in</dt><dd className="text-right text-grey-800">{where}</dd></div>}
+        <dl className="mt-4 grid grid-cols-[5.5rem_1fr] gap-x-3 gap-y-1.5 text-sm">
+          {where && <><dt className="text-grey-500">Stored in</dt><dd className="break-words text-grey-800">{where}</dd></>}
           {last4 !== undefined && (
-            <div className="flex flex-wrap justify-between gap-2">
+            <>
               <dt className="text-grey-500">Key</dt>
-              <dd className="font-mono text-grey-900">{last4 ? `••••${last4}` : "—"}{last4Extra ? ` · ${last4Extra}` : ""}</dd>
-            </div>
+              <dd className="font-mono text-grey-900">{last4 ? `••••${last4}` : "Not set"}{last4Extra ? ` · ${last4Extra}` : ""}</dd>
+            </>
           )}
         </dl>
       )}
