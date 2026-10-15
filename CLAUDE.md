@@ -349,16 +349,14 @@ grant select, insert, update, delete on public.<table> to service_role;
   Details: `docs/app-store/SUBMISSION_CHECKLIST.md`.
 - **OTA runtimes:** store binaries run 1.0.0, 1.0.1 and 1.0.2. Publish every OTA to each
   one (`docs/OTA_UPDATES.md` in both app repos).
-- **Demo listing for App Review (production):** vehicle
-  `5f4e3424-89fa-43e8-b05d-d9fe795e31ff`, auction `84326b8b-7140-40df-bf21-69f97da3e2a5`,
-  "2019 Mercedes-Benz AMG GT C Roadster — Demo listing for App Review, not for sale".
-  Expired 2026-10-14 13:02 UTC (auction ended, vehicle listed); reviewers bought nothing
-  (0 invoices). Do not relist it.
-- **Cleanup, pre-approved by Chase, is now unblocked** (both 1.0.2 versions approved; not
-  yet run as of 2026-10-15): copy the demo listing and everything the reviewers created to
-  recovery tables, then delete them (Storage objects included), then restart invoice
-  numbering (`setval('public.invoice_number_seq', 1, false)` while no invoice exists) so the
-  first real invoice is XPC-2026-000001. Steps: SUBMISSION_CHECKLIST.md section 9.
+- **App Review demo cleaned up (2026-10-15).** The demo listing (vehicle
+  `5f4e3424-…`, "2019 Mercedes-Benz AMG GT C Roadster — Demo listing for App Review") and
+  everything tied to it are deleted, Storage included; copies in `recovery_20261015_*`
+  (7 tables, kept). Reviewers created nothing else; their logins (inspector@xportacar.com,
+  chasebitz0613+appreview@gmail.com) are kept for future reviews. Production has **no
+  vehicles** now. Invoice numbering is at (1, false): the first real invoice is
+  **XPC-2026-000001**; any test purchase consumes a number, so reset it again afterwards
+  while no invoice exists. A future App Review needs a new demo listing.
 - **Landing mode stays ON** (`app_settings.landing_mode_enabled`) until Chase flips it.
 - **ReFit** (`C:\Users\chase\projects\hardware-memory`): its `eas.json` `ascApiKeyPath`
   still points at `C:\Users\chase\AuthKey_A29TQJT273.p8`, which was deleted on
@@ -377,9 +375,16 @@ grant select, insert, update, delete on public.<table> to service_role;
 - **Never use Chase's keys for market prices.** Its keys live only in Vault
   (`market_vincario_api_key`, `market_vincario_secret_key`, `market_apify_token`), written
   only through the Integrations page. The VINCARIO_*/AUTODEV_API_KEY Edge secrets stay for
-  VIN decoding. Launch-day move to Simon's accounts: `docs/integrations/KEY_SWAP_PROMPT.md`.
+  VIN decoding (Vercel's AUTODEV_API_KEY/VALUATION_API_KEY were removed 2026-10-15).
+  Launch-day move to Simon's accounts: `docs/integrations/KEY_SWAP_PROMPT.md`.
+- When the UAE side has no data, the card shows the **seller's asking price**
+  (`vehicles.price_aed`, the inspector's "Asking price") labelled as such. **Intentional**
+  (Chase, 2026-10-15): Simon charges only the platform fee, no markup, so the ask is the
+  listing price. The inspector wizard no longer pre-fills the asking price (the old auto.dev
+  US "market estimate" was removed from all apps 2026-10-15).
 - About €2 per car (Vincario €1.99 on the 100-lookup pack + Apify ≈ $0.05, capped at $0.10
-  a run). No live paid lookup has been run yet.
+  a run). No live paid lookup has been run yet. The privacy policy (section 5, updated
+  2026-10-15) already names Vincario and Apify.
 
 ## Environment Variables Needed
 ```
