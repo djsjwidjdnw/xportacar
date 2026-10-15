@@ -204,6 +204,21 @@
     "severityMajor": "Major",
     "description": "Seller notes"
   },
+  "marketPrices": {
+    "title": "Market prices",
+    "subtitle": "What this car sells for, from real listings in the UAE and Europe.",
+    "uaeLabel": "UAE market price",
+    "euLabel": "EU market price",
+    "askingLabel": "Seller's asking price (UAE)",
+    "basedOnUae": "Based on {count} UAE listings",
+    "basedOnEu": "Based on {count} European listings, EU-spec reference",
+    "askingNote": "UAE market data isn't available for this car.",
+    "differenceMarket": "Difference (EU − UAE)",
+    "differenceAsking": "Difference (EU − asking price)",
+    "specNote": "GCC-spec cars can sell below EU-spec equivalents.",
+    "updated": "Updated {date}",
+    "approx": "≈ {amount}"
+  },
   "auction": {
     "title": "Auction · {make} {model}",
     "currentBid": "Current bid",
@@ -392,7 +407,8 @@
     "activityWhen": "When",
     "statLiveListings": "Live listings",
     "pipelineListed": "Listed",
-    "navListings": "Listings"
+    "navListings": "Listings",
+    "navIntegrations": "Integrations"
   },
   "support": {
     "title": "Support",
@@ -590,7 +606,6 @@
     "feeNote": "Plus 2.9% platform fee and shipping, invoiced after purchase.",
     "viewOrder": "View your order",
     "youBoughtThis": "You bought this vehicle",
-    "marketValue": "Market {price}",
     "backToMarketplace": "Back to marketplace",
     "errUnavailable": "This listing is no longer available.",
     "errGeneric": "Something went wrong. Please try again.",

@@ -204,6 +204,21 @@
     "severityMajor": "Majeur",
     "description": "Notes du vendeur"
   },
+  "marketPrices": {
+    "title": "Prix du marché",
+    "subtitle": "Ce que vaut ce véhicule, d'après de vraies annonces aux Émirats et en Europe.",
+    "uaeLabel": "Prix du marché aux EAU",
+    "euLabel": "Prix du marché dans l'UE",
+    "askingLabel": "Prix demandé par le vendeur (EAU)",
+    "basedOnUae": "Basé sur {count} annonces aux EAU",
+    "basedOnEu": "Basé sur {count} annonces européennes, référence version UE",
+    "askingNote": "Aucune donnée de marché des EAU n'est disponible pour ce véhicule.",
+    "differenceMarket": "Écart (UE − EAU)",
+    "differenceAsking": "Écart (UE − prix demandé)",
+    "specNote": "Les véhicules aux normes GCC peuvent se vendre moins cher que leurs équivalents aux normes UE.",
+    "updated": "Mis à jour le {date}",
+    "approx": "≈ {amount}"
+  },
   "auction": {
     "title": "Enchère · {make} {model}",
     "currentBid": "Enchère actuelle",
@@ -392,7 +407,8 @@
     "navPrelaunch": "Pré-lancement",
     "statLiveListings": "Annonces en ligne",
     "pipelineListed": "En vente",
-    "navListings": "Annonces"
+    "navListings": "Annonces",
+    "navIntegrations": "Intégrations"
   },
   "support": {
     "title": "Assistance",
@@ -590,7 +606,6 @@
     "feeNote": "Plus 2,9 % de commission de plateforme et la livraison, facturés après l'achat.",
     "viewOrder": "Voir votre commande",
     "youBoughtThis": "Vous avez acheté ce véhicule",
-    "marketValue": "Marché {price}",
     "backToMarketplace": "Retour au marché",
     "errUnavailable": "Cette annonce n'est plus disponible.",
     "errGeneric": "Une erreur s'est produite. Veuillez réessayer.",

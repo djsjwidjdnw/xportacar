@@ -15,7 +15,6 @@ import { useLocale, useTranslations } from "@/i18n/provider";
 import { useCurrency } from "@/lib/currency";
 import { daysLeftLabel, listingDaysLeft, listingPrice, listingState } from "@/lib/listing";
 import { cn, formatKm, pickThumbnailPhoto, thumb } from "@/lib/utils";
-import { estimateValuation } from "@/lib/valuation";
 import type { Auction, Vehicle } from "@/types";
 
 const LOCALE_MAP: Record<string, string> = { en: "en-GB", de: "de-DE", ar: "ar-AE", fr: "fr-FR" };
@@ -52,9 +51,6 @@ export function ListingCard({
   const lastDay = state === "live" && listingDaysLeft(listing?.end_time, now) <= 1;
   const price = listingPrice(listing, vehicle);
   const photo = pickThumbnailPhoto(vehicle.vehicle_photos)?.url ?? "/placeholder/no-photo.svg";
-  const marketAvg = estimateValuation({
-    make: vehicle.make, model: vehicle.model, year: vehicle.year, mileageKm: vehicle.mileage_km,
-  }).avgEur;
   const title = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
 
   return (
@@ -110,9 +106,6 @@ export function ListingCard({
             <div className="text-right">
               <p className="text-[11px] font-medium uppercase tracking-wide text-grey-500">{t("listing.price")}</p>
               <p className="text-base font-extrabold text-grey-900 tabular-nums">{format(price ?? 0)}</p>
-              <p className="mt-0.5 text-[10px] font-medium text-grey-500 tabular-nums">
-                {t("listing.marketValue", { price: format(marketAvg) })}
-              </p>
             </div>
           </div>
 

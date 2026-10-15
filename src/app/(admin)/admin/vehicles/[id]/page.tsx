@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
-import { MarketValueBar } from "@/components/vehicle/MarketValueBar";
+import { MarketPricesCard } from "@/components/vehicle/MarketPricesCard";
+import { AdminMarketPrices } from "@/components/admin/AdminMarketPrices";
 import { VehicleStatusSelect } from "@/components/admin/VehicleStatusSelect";
 import { LifecycleActions } from "@/components/admin/LifecycleActions";
 import { InspectorAssign } from "@/components/admin/InspectorAssign";
@@ -19,7 +20,7 @@ import { createClient } from "@/lib/supabase/server";
 import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getAppSettings } from "@/lib/settings";
 import { listingDaysLeft, listingPrice, listingState } from "@/lib/listing";
-import { getVehicleValuation } from "@/lib/valuation-server";
+import { getVehicleMarketPrices, marketPricesEnabled } from "@/lib/market-prices";
 import { formatEur, formatRelativeTime } from "@/lib/utils";
 import type { VehicleWithMedia } from "@/types";
 
@@ -68,9 +69,11 @@ export default async function AdminVehicleDetailPage({
     .from("vehicle_sellers").select("seller_name, seller_phone").eq("vehicle_id", id).maybeSingle();
   const seller = (sellerRow ?? null) as { seller_name: string | null; seller_phone: string | null } | null;
 
-  const valuation = await getVehicleValuation({
-    make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km, vehicleId: v.id,
-  });
+  const [marketPrices, marketOn] = await Promise.all([
+    getVehicleMarketPrices(supabase, id),
+    marketPricesEnabled(supabase),
+  ]);
+  const askingPriceAed = (vehicle as { price_aed?: number | null }).price_aed ?? null;
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
@@ -89,7 +92,7 @@ export default async function AdminVehicleDetailPage({
               <p className="font-bold text-grey-900">Awaiting your review</p>
               <p className="mt-0.5 text-sm text-grey-600">
                 The inspector submitted this vehicle for listing. Review the full report below (photos,
-                condition, pricing, market valuation), then approve, request changes, or edit &amp; list.
+                condition, pricing), then approve, request changes, or edit &amp; list.
               </p>
             </div>
           )}
@@ -139,6 +142,9 @@ export default async function AdminVehicleDetailPage({
               paintThicknessUrl={paintThicknessUrl}
             />
           </section>
+
+          {/* Exactly what buyers see (hidden when neither side has data). */}
+          <MarketPricesCard prices={marketPrices} askingPriceAed={askingPriceAed} marketSpec={v.market_spec ?? null} />
 
           {v.description && (
             <section className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">
@@ -223,7 +229,7 @@ export default async function AdminVehicleDetailPage({
             </dl>
           </div>
 
-          <MarketValueBar valuation={valuation} priceEur={v.listed_price_eur} title="Market valuation" priceLabel="Listed" />
+          <AdminMarketPrices vehicleId={v.id} prices={marketPrices} enabled={marketOn} />
 
           {!biddingEnabled && auction && (
             <div className="rounded-2xl border border-grey-200 bg-white p-6 shadow-xs">

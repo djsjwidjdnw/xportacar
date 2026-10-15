@@ -9,7 +9,7 @@ import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { ConditionReport } from "@/components/vehicle/ConditionReport";
 import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { ShippingOptions } from "@/components/vehicle/ShippingOptions";
-import { MarketValueBar } from "@/components/vehicle/MarketValueBar";
+import { MarketPricesCard } from "@/components/vehicle/MarketPricesCard";
 import { PaintThicknessReport } from "@/components/vehicle/PaintThicknessReport";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { VehiclePriceCard } from "@/components/vehicle/VehiclePriceCard";
@@ -20,7 +20,7 @@ import { normalizeVehicleRow } from "@/lib/supabase/normalize";
 import { getTranslations } from "@/i18n/server";
 import { getAppSettings } from "@/lib/settings";
 import { daysLeftLabel, listingPrice, listingState } from "@/lib/listing";
-import { getVehicleValuation } from "@/lib/valuation-server";
+import { getVehicleMarketPrices } from "@/lib/market-prices";
 import { auctionPhase, cn, formatEur, pickThumbnailPhoto } from "@/lib/utils";
 import type { KycStatus, VehicleWithMedia } from "@/types";
 
@@ -92,9 +92,12 @@ export default async function VehicleDetailPage({
 
   if (error || !vehicle) notFound();
 
-  const [{ data: { user } }, { biddingEnabled }] = await Promise.all([
+  // Market prices are read from the stored row only; a buyer page never
+  // triggers a lookup (those run when an admin publishes or relists).
+  const [{ data: { user } }, { biddingEnabled }, marketPrices] = await Promise.all([
     supabase.auth.getUser(),
     getAppSettings(),
+    getVehicleMarketPrices(supabase, id),
   ]);
   let watching = false;
   let kycStatus: KycStatus | null = null;
@@ -160,9 +163,9 @@ export default async function VehicleDetailPage({
       ? (auction.current_bid_eur ?? auction.starting_price_eur)
       : v.listed_price_eur;
 
-  const valuation = await getVehicleValuation({
-    make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km, vehicleId: v.id,
-  });
+  // The inspector's asking price in AED: shown by the market prices card only
+  // when the UAE market figure is unavailable, labelled as the asking price.
+  const askingPriceAed = (vehicle as { price_aed?: number | null }).price_aed ?? null;
 
   // JSON-LD Vehicle structured data — Google enriches listings with
   // mileage / fuel / price when this is present.
@@ -367,7 +370,7 @@ export default async function VehicleDetailPage({
 
             <PaintThicknessReport readings={paintReadings} />
 
-            <MarketValueBar valuation={valuation} priceEur={headlinePrice ?? v.listed_price_eur} />
+            <MarketPricesCard prices={marketPrices} askingPriceAed={askingPriceAed} marketSpec={v.market_spec ?? null} />
 
             <ShippingOptions vehicleId={v.id} vehiclePriceEur={headlinePrice ?? null} />
 

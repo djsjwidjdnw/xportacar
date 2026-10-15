@@ -204,6 +204,21 @@
     "severityMajor": "Schwer",
     "description": "Anmerkungen des Verkäufers"
   },
+  "marketPrices": {
+    "title": "Marktpreise",
+    "subtitle": "Wofür dieses Auto gehandelt wird, aus echten Inseraten in den VAE und in Europa.",
+    "uaeLabel": "Marktpreis VAE",
+    "euLabel": "Marktpreis EU",
+    "askingLabel": "Preisvorstellung des Verkäufers (VAE)",
+    "basedOnUae": "Basierend auf {count} Inseraten in den VAE",
+    "basedOnEu": "Basierend auf {count} europäischen Inseraten, Referenz EU-Ausführung",
+    "askingNote": "Für dieses Auto liegen keine Marktdaten aus den VAE vor.",
+    "differenceMarket": "Differenz (EU − VAE)",
+    "differenceAsking": "Differenz (EU − Preisvorstellung)",
+    "specNote": "Fahrzeuge in GCC-Ausführung werden oft unter vergleichbaren EU-Fahrzeugen gehandelt.",
+    "updated": "Aktualisiert am {date}",
+    "approx": "≈ {amount}"
+  },
   "auction": {
     "title": "Auktion · {make} {model}",
     "currentBid": "Aktuelles Gebot",
@@ -392,7 +407,8 @@
     "navPrelaunch": "Pre-Launch",
     "statLiveListings": "Aktive Angebote",
     "pipelineListed": "Angeboten",
-    "navListings": "Angebote"
+    "navListings": "Angebote",
+    "navIntegrations": "Integrationen"
   },
   "support": {
     "title": "Support",
@@ -590,7 +606,6 @@
     "feeNote": "Zzgl. 2,9 % Plattformgebühr und Versand, nach dem Kauf in Rechnung gestellt.",
     "viewOrder": "Bestellung ansehen",
     "youBoughtThis": "Sie haben dieses Fahrzeug gekauft",
-    "marketValue": "Markt {price}",
     "backToMarketplace": "Zurück zum Marktplatz",
     "errUnavailable": "Dieses Angebot ist nicht mehr verfügbar.",
     "errGeneric": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",

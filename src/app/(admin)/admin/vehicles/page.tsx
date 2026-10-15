@@ -11,17 +11,12 @@ import { LoadMoreLink } from "@/components/admin/LoadMoreLink";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslations } from "@/i18n/server";
 import { formatEur, formatKm } from "@/lib/utils";
-import { estimateValuation, pricePosition } from "@/lib/valuation";
 import type { Vehicle, VehicleStatus } from "@/types";
 
-const VS_MARKET_STYLE: Record<string, string> = {
-  fair:  "bg-success-50 text-success-700 ring-success-100",
-  below: "bg-warning-50 text-warning-700 ring-warning-100",
-  above: "bg-error-50 text-error-700 ring-error-100",
-};
-const VS_MARKET_LABEL: Record<string, string> = { fair: "Fair", below: "Below", above: "Above" };
-
 export const metadata = { title: "Vehicles" };
+
+// Stored UAE / EU market medians (market-prices lookups), by vehicle id.
+interface MarketCell { uae_median_eur: number | null; uae_status: string | null; eu_median_eur: number | null; eu_status: string | null }
 
 const STATUS_STYLE: Record<VehicleStatus, string> = {
   draft:                "bg-grey-100 text-grey-700 ring-grey-200",
@@ -72,6 +67,15 @@ export default async function AdminVehiclesPage({
 
   // deno-lint-ignore no-explicit-any
   const list = (vehicles ?? []) as (Vehicle & { auctions: any[] })[];
+
+  const market = new Map<string, MarketCell>();
+  if (list.length) {
+    const { data: priceRows } = await supabase
+      .from("vehicle_market_prices")
+      .select("vehicle_id, uae_median_eur, uae_status, eu_median_eur, eu_status")
+      .in("vehicle_id", list.map((v) => v.id));
+    for (const r of (priceRows ?? []) as (MarketCell & { vehicle_id: string })[]) market.set(r.vehicle_id, r);
+  }
 
   return (
     <div className="px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
@@ -124,8 +128,9 @@ export default async function AdminVehiclesPage({
             <TableBody>
               {list.map((v) => {
                 const auction = Array.isArray(v.auctions) ? v.auctions[0] : v.auctions;
-                const val = estimateValuation({ make: v.make, model: v.model, year: v.year, mileageKm: v.mileage_km });
-                const pos = pricePosition(v.listed_price_eur, val);
+                const m = market.get(v.id);
+                const uae = m?.uae_status === "ok" && m.uae_median_eur != null ? Number(m.uae_median_eur) : null;
+                const eu = m?.eu_status === "ok" && m.eu_median_eur != null ? Number(m.eu_median_eur) : null;
                 return (
                   <TableRow key={v.id} className="cursor-pointer transition-colors hover:bg-grey-50 [&>td]:px-5 [&>td]:py-3.5">
                     <TableCell>
@@ -138,13 +143,17 @@ export default async function AdminVehiclesPage({
                     <TableCell className="hidden xl:table-cell text-sm text-grey-700">{formatKm(v.mileage_km)}</TableCell>
                     <TableCell className="tabular-nums">
                       <span className="font-semibold text-grey-900">{formatEur(v.listed_price_eur)}</span>
-                      {pos !== "unknown" && (
-                        <span className={`ml-2 inline-block rounded-full px-1.5 py-0.5 align-middle text-[10px] font-bold uppercase ring-1 ${VS_MARKET_STYLE[pos]}`}>
-                          {VS_MARKET_LABEL[pos]}
-                        </span>
+                    </TableCell>
+                    <TableCell className="hidden 2xl:table-cell tabular-nums text-xs text-grey-600">
+                      {uae == null && eu == null ? (
+                        <span className="text-grey-400">—</span>
+                      ) : (
+                        <>
+                          <span className="block">UAE {uae != null ? formatEur(uae) : "—"}</span>
+                          <span className="block">EU {eu != null ? formatEur(eu) : "—"}</span>
+                        </>
                       )}
                     </TableCell>
-                    <TableCell className="hidden 2xl:table-cell tabular-nums text-sm text-grey-600">{formatEur(val.avgEur)}</TableCell>
                     <TableCell className="hidden xl:table-cell">
                       {auction ? (
                         <Link href={`/auction/${auction.id}`} className="text-xs font-medium text-brand-700 hover:underline">
