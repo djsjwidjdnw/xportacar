@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, Building2, MapPin, Phone, Clock, ChevronDown, LifeBuoy, FileText, ShieldCheck } from "lucide-react";
+import { Mail, Building2, MapPin, Clock, ChevronDown, LifeBuoy, FileText, ShieldCheck } from "lucide-react";
 
 import { getTranslations } from "@/i18n/server";
 
@@ -13,11 +13,11 @@ export default async function SupportPage() {
     a: t(`q${n}a`),
   }));
 
-  const contact = [
+  // No phone number exists, so there is no phone row.
+  const contact: { icon: typeof Mail; label: string; value: string; href?: string; pending?: boolean }[] = [
     { icon: Mail, label: t("emailLabel"), value: t("email"), href: `mailto:${t("email")}` },
-    { icon: Building2, label: t("companyLabel"), value: t("toBeCompleted"), pending: true },
-    { icon: MapPin, label: t("addressLabel"), value: t("toBeCompleted"), pending: true },
-    { icon: Phone, label: t("phoneLabel"), value: t("toBeCompleted"), pending: true },
+    { icon: Building2, label: t("companyLabel"), value: "Global Business Consultancy L.L.C-FZ (Advise DUBAI)" },
+    { icon: MapPin, label: t("addressLabel"), value: "Meydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E." },
     { icon: Clock, label: t("hoursLabel"), value: t("hoursValue") },
   ];
 
