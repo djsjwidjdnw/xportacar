@@ -688,5 +688,30 @@
     "s5Body": "Martin Matthias Krause\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.",
     "s6Title": "Règlement des litiges de consommation",
     "s6Body": "Nous ne sommes ni obligés ni disposés à participer à une procédure de règlement des litiges devant un organisme de médiation de la consommation."
+  },
+  "cookies": {
+    "lastUpdated": "Dernière mise à jour",
+    "lastUpdatedValue": "3 novembre 2026",
+    "effective": "Entrée en vigueur",
+    "effectiveValue": "3 novembre 2026",
+    "noticeTitle": "À noter",
+    "translationNotice": "Les traductions sont fournies pour votre confort. En cas de divergence, la version anglaise prévaut.",
+    "tocLabel": "Sommaire",
+    "title": "Politique de cookies",
+    "intro": "Cette page liste chaque cookie et chaque élément de stockage du navigateur utilisés par le site XportACar, à quoi ils servent et combien de temps ils durent.",
+    "legalNotice": "Elle décrit ce que le site enregistre réellement et ne constitue pas un conseil juridique.",
+    "contactFooter": "Des questions ? Écrivez à contact@xportacar.com.",
+    "s1Title": "En bref",
+    "s1Body": "XportACar utilise uniquement les cookies et le stockage du navigateur nécessaires au fonctionnement du site : vous garder connecté, mémoriser votre langue et charger rapidement. Nous n'utilisons aucun cookie publicitaire, de mesure d'audience ou de suivi, et aucun tiers ne dépose de cookies via notre site.\n\nLes pages publiques ne déposent aucun cookie tant que vous ne vous connectez pas ou ne choisissez pas de langue.",
+    "s2Title": "Cookies",
+    "s2Body": "- sb-klettmjnnttajdyajafn-auth-token (parfois découpé en parties se terminant par .0, .1) : vous garde connecté. Déposé à la connexion et renouvelé pendant votre utilisation. Dure jusqu'à 400 jours et est supprimé à la déconnexion.\n- sb-klettmjnnttajdyajafn-auth-token-code-verifier : déposé uniquement lorsque vous demandez la réinitialisation de votre mot de passe, pour que le lien fonctionne dans le même navigateur. Supprimé dès que le lien a été utilisé.\n- xpc_locale : mémorise la langue choisie. Dure 1 an.",
+    "s3Title": "Stockage du navigateur",
+    "s3Body": "- Stockage local, xpc_app_banner_dismissed : mémorise que vous avez fermé la bannière de téléchargement de l'application, pour qu'elle ne réapparaisse pas. Reste jusqu'à ce que vous effaciez les données de votre navigateur.\n- Cache du service worker (xpc-v3-static et xpc-v3-runtime) : copies des fichiers du site (scripts, styles, images, polices) et des pages que vous ouvrez, pour que le site se charge plus vite et s'ouvre même sans connexion. Les requêtes directes à notre base de données ne sont jamais mises en cache. Les anciennes copies sont supprimées lors d'une mise à jour du site, et tout est effacé lorsque vous supprimez les données du site.",
+    "s4Title": "Tiers",
+    "s4Body": "Aucun service tiers ne dépose de cookies sur notre site. Il n'y a ni publicité, ni mesure d'audience, ni suivi par les réseaux sociaux.",
+    "s5Title": "Vos choix",
+    "s5Body": "Ces éléments étant nécessaires au fonctionnement du site, nous ne demandons pas de consentement séparé. Vous pouvez les bloquer ou les supprimer à tout moment dans les réglages de votre navigateur. Supprimer le cookie de connexion vous déconnecte ; supprimer xpc_locale rétablit la langue de votre navigateur.",
+    "s6Title": "Applications mobiles",
+    "s6Body": "Les applications XportACar n'utilisent pas de cookies. Elles conservent votre connexion et votre langue dans le stockage sécurisé du téléphone. La connexion est supprimée à la déconnexion ; les deux sont supprimées lorsque vous supprimez l'application."
   }
 }

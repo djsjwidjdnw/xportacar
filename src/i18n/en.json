@@ -688,5 +688,30 @@
     "s5Body": "Martin Matthias Krause\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.",
     "s6Title": "Consumer dispute resolution",
     "s6Body": "We are neither obliged nor willing to take part in dispute resolution proceedings before a consumer arbitration board."
+  },
+  "cookies": {
+    "lastUpdated": "Last updated",
+    "lastUpdatedValue": "3 November 2026",
+    "effective": "Effective",
+    "effectiveValue": "3 November 2026",
+    "noticeTitle": "Important",
+    "translationNotice": "Translations are provided for convenience. In case of discrepancy, the English version governs.",
+    "tocLabel": "Contents",
+    "title": "Cookie Policy",
+    "intro": "This page lists every cookie and every item of browser storage the XportACar website uses, what each one does and how long it lasts.",
+    "legalNotice": "It describes what the website actually stores and is not legal advice.",
+    "contactFooter": "Questions? Email contact@xportacar.com.",
+    "s1Title": "Summary",
+    "s1Body": "XportACar uses only the cookies and browser storage the website needs to work: keeping you signed in, remembering your language and loading quickly. We do not use advertising, analytics or tracking cookies, and no third party sets cookies through our website.\n\nPublic pages set no cookies until you sign in or choose a language.",
+    "s2Title": "Cookies",
+    "s2Body": "- sb-klettmjnnttajdyajafn-auth-token (sometimes split into parts ending in .0, .1): keeps you signed in. Set when you sign in and refreshed while you use the site. Lasts up to 400 days and is deleted when you sign out.\n- sb-klettmjnnttajdyajafn-auth-token-code-verifier: set only when you ask for a password reset, so the reset link works in the same browser. Deleted once the link has been used.\n- xpc_locale: remembers the language you chose. Lasts 1 year.",
+    "s3Title": "Browser storage",
+    "s3Body": "- Local storage, xpc_app_banner_dismissed: remembers that you closed the app download banner, so it is not shown again. Stays until you clear your browser data.\n- Service worker cache (xpc-v3-static and xpc-v3-runtime): copies of the website's files (scripts, styles, images, fonts) and of the pages you open, so the site loads faster and still opens without a connection. Direct requests to our database are never cached. Old copies are deleted when the site is updated, and everything is removed when you clear the site's data.",
+    "s4Title": "Third parties",
+    "s4Body": "No third-party service sets cookies on our website. There is no advertising, analytics or social-media tracking.",
+    "s5Title": "Your choices",
+    "s5Body": "Because these items are needed for the website to work, we do not ask for separate consent. You can block or delete them in your browser settings at any time. Deleting the sign-in cookie signs you out; deleting xpc_locale resets the language to your browser's language.",
+    "s6Title": "Mobile apps",
+    "s6Body": "The XportACar apps do not use cookies. They keep your sign-in and your language in the phone's secure storage. Your sign-in is removed when you sign out; both are removed when you delete the app."
   }
 }

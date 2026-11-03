@@ -688,5 +688,30 @@
     "s5Body": "Martin Matthias Krause\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.",
     "s6Title": "Verbraucherstreitbeilegung",
     "s6Body": "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+  },
+  "cookies": {
+    "lastUpdated": "Zuletzt aktualisiert",
+    "lastUpdatedValue": "3. November 2026",
+    "effective": "In Kraft seit",
+    "effectiveValue": "3. November 2026",
+    "noticeTitle": "Hinweis",
+    "translationNotice": "Übersetzungen werden zur Erleichterung bereitgestellt. Bei Abweichungen ist die englische Fassung maßgeblich.",
+    "tocLabel": "Inhalt",
+    "title": "Cookie-Richtlinie",
+    "intro": "Diese Seite führt jedes Cookie und jeden Browserspeicher auf, den die XportACar-Website nutzt, wofür er dient und wie lange er bestehen bleibt.",
+    "legalNotice": "Sie beschreibt, was die Website tatsächlich speichert, und ist keine Rechtsberatung.",
+    "contactFooter": "Fragen? Schreiben Sie an contact@xportacar.com.",
+    "s1Title": "Zusammenfassung",
+    "s1Body": "XportACar nutzt nur die Cookies und den Browserspeicher, die die Website zum Funktionieren braucht: um Sie angemeldet zu halten, Ihre Sprache zu speichern und schnell zu laden. Wir verwenden keine Werbe-, Analyse- oder Tracking-Cookies, und kein Dritter setzt über unsere Website Cookies.\n\nÖffentliche Seiten setzen keine Cookies, bis Sie sich anmelden oder eine Sprache wählen.",
+    "s2Title": "Cookies",
+    "s2Body": "- sb-klettmjnnttajdyajafn-auth-token (teils aufgeteilt in Teile mit der Endung .0, .1): hält Sie angemeldet. Wird bei der Anmeldung gesetzt und während der Nutzung erneuert. Bleibt bis zu 400 Tage bestehen und wird beim Abmelden gelöscht.\n- sb-klettmjnnttajdyajafn-auth-token-code-verifier: wird nur gesetzt, wenn Sie das Zurücksetzen Ihres Passworts anfordern, damit der Link im selben Browser funktioniert. Wird gelöscht, sobald der Link verwendet wurde.\n- xpc_locale: speichert die gewählte Sprache. Bleibt 1 Jahr bestehen.",
+    "s3Title": "Browserspeicher",
+    "s3Body": "- Local Storage, xpc_app_banner_dismissed: merkt sich, dass Sie das Banner zum App-Download geschlossen haben, damit es nicht erneut erscheint. Bleibt bestehen, bis Sie Ihre Browserdaten löschen.\n- Service-Worker-Cache (xpc-v3-static und xpc-v3-runtime): Kopien der Dateien der Website (Skripte, Stile, Bilder, Schriften) und der Seiten, die Sie öffnen, damit die Website schneller lädt und auch ohne Verbindung öffnet. Direkte Anfragen an unsere Datenbank werden nie zwischengespeichert. Alte Kopien werden bei einem Update der Website gelöscht, und alles wird entfernt, wenn Sie die Daten der Website löschen.",
+    "s4Title": "Dritte",
+    "s4Body": "Kein Drittanbieter setzt Cookies auf unserer Website. Es gibt keine Werbung, keine Analyse und kein Tracking durch soziale Netzwerke.",
+    "s5Title": "Ihre Wahlmöglichkeiten",
+    "s5Body": "Da diese Einträge für das Funktionieren der Website nötig sind, fragen wir nicht gesondert nach Ihrer Einwilligung. Sie können sie jederzeit in Ihren Browsereinstellungen blockieren oder löschen. Wenn Sie das Anmelde-Cookie löschen, werden Sie abgemeldet; wenn Sie xpc_locale löschen, gilt wieder die Sprache Ihres Browsers.",
+    "s6Title": "Mobile Apps",
+    "s6Body": "Die XportACar-Apps verwenden keine Cookies. Sie speichern Ihre Anmeldung und Ihre Sprache im sicheren Speicher des Telefons. Die Anmeldung wird beim Abmelden entfernt, beides beim Löschen der App."
   }
 }
