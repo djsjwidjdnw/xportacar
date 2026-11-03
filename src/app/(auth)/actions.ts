@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { registerBuyer } from "@/lib/auth/registerBuyer";
 import { resolveLocale } from "@/i18n/server";
+import { resolveListingNext, sanitizeNext } from "@/lib/listing-redirect";
 
 export type AuthFormState = {
   ok: boolean;
@@ -21,7 +22,7 @@ export async function signInAction(
 ): Promise<AuthFormState> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
-  const next = String(formData.get("next") ?? "/marketplace");
+  const requestedNext = sanitizeNext(formData.get("next"));
 
   if (!email || !password) {
     return { ok: false, error: "Please enter your email and password." };
@@ -50,7 +51,9 @@ export async function signInAction(
     }
   }
 
-  redirect(next);
+  // Never land on a deleted car: a stale /vehicle/<id> or /auction/<id> goes
+  // to the marketplace notice instead.
+  redirect(await resolveListingNext(supabase, requestedNext));
 }
 
 export async function signUpAction(

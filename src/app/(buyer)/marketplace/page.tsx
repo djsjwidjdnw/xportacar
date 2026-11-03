@@ -4,6 +4,8 @@ import { MarketplaceFilters } from "@/components/marketplace/MarketplaceFilters"
 import { SaveSearchButton } from "@/components/marketplace/SaveSearchButton";
 import { MarketplaceResults } from "@/components/marketplace/MarketplaceResults";
 import { CurrencyPills } from "@/components/buyer/CurrencyPills";
+import { ListingUnavailableNotice } from "@/components/marketplace/ListingUnavailableNotice";
+import { LISTING_UNAVAILABLE_NOTICE } from "@/lib/listing-redirect";
 import { createClient } from "@/lib/supabase/server";
 import { getAppSettings } from "@/lib/settings";
 import { getTranslations } from "@/i18n/server";
@@ -14,9 +16,9 @@ export const metadata = { title: "Marketplace" };
 export default async function MarketplacePage({
   searchParams,
 }: {
-  searchParams: Promise<MarketplaceSearchParams>;
+  searchParams: Promise<MarketplaceSearchParams & { notice?: string }>;
 }) {
-  const sp = await searchParams;
+  const { notice, ...sp } = await searchParams;
   const supabase = await createClient();
   const t = await getTranslations();
   const [{ data: { user } }, { biddingEnabled }] = await Promise.all([
@@ -44,6 +46,10 @@ export default async function MarketplacePage({
   return (
     <div className="bg-grey-50 py-10">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {notice === LISTING_UNAVAILABLE_NOTICE && (
+          <ListingUnavailableNotice message={t("marketplace.listingUnavailable")} />
+        )}
+
         <header className="mb-8">
           <h1 className="text-3xl font-extrabold tracking-tight text-grey-900 sm:text-4xl">
             {t("marketplace.title")}

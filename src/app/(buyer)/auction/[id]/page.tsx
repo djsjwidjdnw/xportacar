@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,7 @@ import { PhotoGallery } from "@/components/vehicle/PhotoGallery";
 import { SpecsGrid } from "@/components/vehicle/SpecsGrid";
 import { createClient } from "@/lib/supabase/server";
 import { getAppSettings } from "@/lib/settings";
+import { LISTING_UNAVAILABLE_URL, isMissingRow } from "@/lib/listing-redirect";
 import { getTranslations } from "@/i18n/server";
 import { auctionPhase } from "@/lib/utils";
 import type { Auction, BidWithBidder, KycStatus, VehicleWithMedia } from "@/types";
@@ -35,7 +36,11 @@ export default async function AuctionPage({
     .eq("id", id)
     .single();
 
-  if (error || !auctionRow) notFound();
+  // A deleted or hidden listing goes back to the marketplace with a notice.
+  if (!auctionRow) {
+    if (isMissingRow(error)) redirect(LISTING_UNAVAILABLE_URL);
+    throw new Error(`auction ${id}: ${error?.message}`);
+  }
 
   const auction = auctionRow as unknown as Auction & { vehicle: VehicleWithMedia };
   const v = auction.vehicle;

@@ -7,7 +7,7 @@ import { getTranslations } from "@/i18n/server";
 
 export async function generateMetadata() {
   const t = await getTranslations("notFound");
-  return { title: "Vehicle not found · XportACar", description: t("metaDescription") };
+  return { title: `${t("metaTitle")} · XportACar`, description: t("metaDescription") };
 }
 
 export default async function NotFound() {
@@ -22,11 +22,10 @@ export default async function NotFound() {
 
           <p className="mt-6 text-sm font-bold uppercase tracking-[0.16em] text-brand-600">404</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-grey-900 sm:text-4xl">
-            Vehicle not found
+            {t("title")}
           </h1>
           <p className="mx-auto mt-3 max-w-md text-grey-600">
-            The page or vehicle you were looking for doesn&apos;t exist — it may have been sold,
-            relisted, or the link is wrong. Try searching the marketplace.
+            {t("body")}
           </p>
 
           {/* Search form — routes to /marketplace with a query param.
@@ -38,7 +37,7 @@ export default async function NotFound() {
               <input
                 type="text"
                 name="q"
-                placeholder="Search Mercedes, BMW, VIN…"
+                placeholder={t("searchPlaceholder")}
                 className="h-12 w-full rounded-lg border border-grey-200 bg-white pl-10 pr-3 text-sm font-medium text-grey-900 placeholder:text-grey-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
               />
             </div>
@@ -46,7 +45,7 @@ export default async function NotFound() {
               type="submit"
               className={cn(buttonVariants({ variant: "default", size: "lg" }), "h-12 px-5")}
             >
-              Search
+              {t("searchCta")}
             </button>
           </form>
 

@@ -1,6 +1,6 @@
 import { after } from "next/server";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import { CheckCircle2, ArrowRight, Trophy } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 import { settleEndedAuctions } from "@/lib/auctions";
 import { getAppSettings } from "@/lib/settings";
+import { LISTING_UNAVAILABLE_URL, isMissingRow } from "@/lib/listing-redirect";
 import { isStripeConfigured } from "@/lib/stripe";
 import { getTranslations } from "@/i18n/server";
 import { auctionPhase, cn } from "@/lib/utils";
@@ -49,7 +50,10 @@ export default async function AuctionWonPage({
     .eq("id", id)
     .single();
 
-  if (error || !auctionRow) notFound();
+  if (!auctionRow) {
+    if (isMissingRow(error)) redirect(LISTING_UNAVAILABLE_URL);
+    throw new Error(`auction ${id}: ${error?.message}`);
+  }
 
   // deno-lint-ignore no-explicit-any
   const a = auctionRow as any;

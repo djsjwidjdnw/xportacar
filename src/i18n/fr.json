@@ -169,7 +169,8 @@
     "noResults": "Aucun véhicule ne correspond à ces filtres",
     "clearFilters": "Effacer les filtres",
     "loadMore": "Charger plus",
-    "loadingMore": "Chargement…"
+    "loadingMore": "Chargement…",
+    "listingUnavailable": "Cette annonce n'est plus disponible."
   },
   "vehicle": {
     "specs": "Spécifications",
@@ -656,6 +657,11 @@
   },
   "notFound": {
     "metaDescription": "Nous n'avons pas trouvé la page demandée. Parcourez plutôt notre marché de véhicules ÉAU–UE.",
-    "browseCta": "Parcourir le marché"
+    "browseCta": "Parcourir le marché",
+    "metaTitle": "Page introuvable",
+    "title": "Page introuvable",
+    "body": "La page que vous cherchez n'existe pas ou a été déplacée. Essayez de rechercher sur la place de marché.",
+    "searchPlaceholder": "Rechercher Mercedes, BMW, VIN…",
+    "searchCta": "Rechercher"
   }
 }

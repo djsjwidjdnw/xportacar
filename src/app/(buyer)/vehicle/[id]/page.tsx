@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { ArrowRight, CalendarClock, Gavel, Hourglass, MapPin, Sparkles } from "lucide-react";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -21,6 +21,7 @@ import { getTranslations } from "@/i18n/server";
 import { getAppSettings } from "@/lib/settings";
 import { daysLeftLabel, listingPrice, listingState } from "@/lib/listing";
 import { getVehicleMarketPrices } from "@/lib/market-prices";
+import { LISTING_UNAVAILABLE_URL, isMissingRow } from "@/lib/listing-redirect";
 import { auctionPhase, cn, formatEur, pickThumbnailPhoto } from "@/lib/utils";
 import type { KycStatus, VehicleWithMedia } from "@/types";
 
@@ -39,7 +40,7 @@ export async function generateMetadata(
     `)
     .eq("id", id)
     .single();
-  if (!data) return { title: "Vehicle not found" };
+  if (!data) return { title: (await getTranslations("marketplace"))("listingUnavailable") };
   // deno-lint-ignore no-explicit-any
   const v = data as any;
   const photo = (v.vehicle_photos ?? [])
@@ -90,7 +91,11 @@ export default async function VehicleDetailPage({
     .eq("id", id)
     .single();
 
-  if (error || !vehicle) notFound();
+  // A deleted or hidden car goes back to the marketplace with a notice.
+  if (!vehicle) {
+    if (isMissingRow(error)) redirect(LISTING_UNAVAILABLE_URL);
+    throw new Error(`vehicle ${id}: ${error?.message}`);
+  }
 
   // Market prices are read from the stored row only; a buyer page never
   // triggers a lookup (those run when an admin publishes or relists).

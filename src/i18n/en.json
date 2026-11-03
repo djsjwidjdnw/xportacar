@@ -169,7 +169,8 @@
     "noResults": "No vehicles match these filters",
     "clearFilters": "Clear filters",
     "loadMore": "Load more",
-    "loadingMore": "Loading…"
+    "loadingMore": "Loading…",
+    "listingUnavailable": "This listing is no longer available."
   },
   "vehicle": {
     "specs": "Specifications",
@@ -656,6 +657,11 @@
   },
   "notFound": {
     "metaDescription": "We couldn't find the page you were looking for. Browse our UAE-to-EU vehicle marketplace instead.",
-    "browseCta": "Browse the marketplace"
+    "browseCta": "Browse the marketplace",
+    "metaTitle": "Page not found",
+    "title": "Page not found",
+    "body": "The page you were looking for doesn't exist or has moved. Try searching the marketplace.",
+    "searchPlaceholder": "Search Mercedes, BMW, VIN…",
+    "searchCta": "Search"
   }
 }

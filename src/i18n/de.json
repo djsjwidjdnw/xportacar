@@ -169,7 +169,8 @@
     "noResults": "Keine Fahrzeuge passen zu diesen Filtern",
     "clearFilters": "Filter zurücksetzen",
     "loadMore": "Mehr laden",
-    "loadingMore": "Wird geladen…"
+    "loadingMore": "Wird geladen…",
+    "listingUnavailable": "Dieses Angebot ist nicht mehr verfügbar."
   },
   "vehicle": {
     "specs": "Spezifikationen",
@@ -656,6 +657,11 @@
   },
   "notFound": {
     "metaDescription": "Wir konnten die gesuchte Seite nicht finden. Stöbern Sie stattdessen in unserem Fahrzeugmarktplatz VAE–EU.",
-    "browseCta": "Zum Marktplatz"
+    "browseCta": "Zum Marktplatz",
+    "metaTitle": "Seite nicht gefunden",
+    "title": "Seite nicht gefunden",
+    "body": "Die gesuchte Seite existiert nicht oder wurde verschoben. Durchsuchen Sie den Marktplatz.",
+    "searchPlaceholder": "Mercedes, BMW, FIN suchen…",
+    "searchCta": "Suchen"
   }
 }
