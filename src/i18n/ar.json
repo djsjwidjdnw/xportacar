@@ -146,7 +146,12 @@
     "footerLinkHelp": "مركز المساعدة",
     "footerCopy": "© {year} XportACar. جميع الحقوق محفوظة.",
     "statLiveNow": "{count} متاحة الآن",
-    "footerStrap": "الإمارات → أوروبا · مفحوصة · معروضة · مُسلَّمة"
+    "footerStrap": "الإمارات → أوروبا · مفحوصة · معروضة · مُسلَّمة",
+    "footerLinkWatchlist": "قائمة المتابعة",
+    "footerLinkDashboard": "لوحة التحكم",
+    "footerLinkHowItWorks": "كيف تعمل المنصة",
+    "footerLinkCookies": "سياسة ملفات تعريف الارتباط",
+    "footerLinkImprint": "بيانات الناشر"
   },
   "marketplace": {
     "title": "السوق",

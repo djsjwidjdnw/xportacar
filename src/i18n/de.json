@@ -146,7 +146,12 @@
     "footerLinkHelp": "Hilfe",
     "footerCopy": "© {year} XportACar. Alle Rechte vorbehalten.",
     "statLiveNow": "{count} jetzt online",
-    "footerStrap": "VAE → EUROPA · Geprüft · Angeboten · Geliefert"
+    "footerStrap": "VAE → EUROPA · Geprüft · Angeboten · Geliefert",
+    "footerLinkWatchlist": "Merkliste",
+    "footerLinkDashboard": "Dashboard",
+    "footerLinkHowItWorks": "So funktioniert's",
+    "footerLinkCookies": "Cookie-Richtlinie",
+    "footerLinkImprint": "Impressum"
   },
   "marketplace": {
     "title": "Marktplatz",

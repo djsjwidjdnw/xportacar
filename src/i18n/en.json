@@ -146,7 +146,12 @@
     "footerLinkHelp": "Help centre",
     "footerCopy": "© {year} XportACar. All rights reserved.",
     "statLiveNow": "{count} live now",
-    "footerStrap": "UAE → EUROPE · Inspected · Listed · Delivered"
+    "footerStrap": "UAE → EUROPE · Inspected · Listed · Delivered",
+    "footerLinkWatchlist": "Watchlist",
+    "footerLinkDashboard": "Dashboard",
+    "footerLinkHowItWorks": "How it works",
+    "footerLinkCookies": "Cookie policy",
+    "footerLinkImprint": "Imprint"
   },
   "marketplace": {
     "title": "Marketplace",

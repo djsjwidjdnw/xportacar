@@ -146,7 +146,12 @@
     "footerLinkHelp": "Aide",
     "footerCopy": "© {year} XportACar. Tous droits réservés.",
     "statLiveNow": "{count} en ligne",
-    "footerStrap": "ÉAU → EUROPE · Inspecté · En vente · Livré"
+    "footerStrap": "ÉAU → EUROPE · Inspecté · En vente · Livré",
+    "footerLinkWatchlist": "Liste de suivi",
+    "footerLinkDashboard": "Tableau de bord",
+    "footerLinkHowItWorks": "Comment ça marche",
+    "footerLinkCookies": "Politique de cookies",
+    "footerLinkImprint": "Mentions légales"
   },
   "marketplace": {
     "title": "Marché",
@@ -741,7 +746,7 @@
     "s7Title": "Comment obtenir ma facture ?",
     "s7Body": "Après l'achat, choisissez l'option d'expédition et les extras. Votre facture est alors finalisée et vous est envoyée par e-mail avec les coordonnées bancaires et la facture en PDF. Vous pouvez aussi l'ouvrir à tout moment depuis « Mes achats ».",
     "s8Title": "Comment supprimer mon compte ?",
-    "s8Body": "Sur le site ou dans l'application, ouvrez votre profil, choisissez « Supprimer le compte » et tapez DELETE pour confirmer. La suppression est définitive : votre profil, vos favoris et vos recherches enregistrées sont supprimés et vous perdez l'accès aux factures passées. Les factures sont conservées sous forme anonymisée. Vous recevez un e-mail de confirmation.",
+    "s8Body": "Sur le site ou dans l'application, ouvrez votre profil, choisissez « Supprimer le compte » et tapez DELETE pour confirmer. La suppression est définitive : votre profil, votre liste de suivi et vos recherches enregistrées sont supprimés et vous perdez l'accès aux factures passées. Les factures sont conservées sous forme anonymisée. Vous recevez un e-mail de confirmation.",
     "s9Title": "Comment vous contacter ?",
     "s9Body": "Écrivez à contact@xportacar.com. Indiquez la référence du véhicule ou de la facture si vous l'avez."
   },

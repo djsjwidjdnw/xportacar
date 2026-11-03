@@ -41,22 +41,24 @@ export function Footer({ biddingEnabled = false }: { biddingEnabled?: boolean })
             <FooterCol title={t("footerCol1")} links={[
               { href: "/marketplace", label: t("footerLinkMarketplace") },
               ...(biddingEnabled ? [{ href: "/auctions", label: t("footerLinkAuctions") }] : []),
-              { href: "/watchlist",   label: "Watchlist" },
-              { href: "/dashboard",   label: "Dashboard" },
+              { href: "/watchlist",   label: t("footerLinkWatchlist") },
+              { href: "/dashboard",   label: t("footerLinkDashboard") },
             ]}/>
 
             <FooterCol title={t("footerCol2")} links={[
               { href: "/about",   label: t("footerLinkAbout") },
               { href: "/contact", label: t("footerLinkContact") },
               { href: "/help",    label: t("footerLinkHelp") },
-              { href: "#how",     label: "How it works" },
+              // The #how section only exists on the marketing homepage (hidden while
+              // landing mode is on), so point at the help centre's first answer.
+              { href: "/help#s1", label: t("footerLinkHowItWorks") },
             ]}/>
 
             <FooterCol title={t("footerCol3")} links={[
               { href: "/terms",   label: t("footerLinkTerms") },
               { href: "/privacy", label: t("footerLinkPrivacy") },
-              { href: "/cookies", label: "Cookie policy" },
-              { href: "/imprint", label: "Imprint" },
+              { href: "/cookies", label: t("footerLinkCookies") },
+              { href: "/imprint", label: t("footerLinkImprint") },
             ]}/>
           </div>
         </div>
