@@ -663,5 +663,30 @@
     "body": "الصفحة التي تبحث عنها غير موجودة أو تم نقلها. جرّب البحث في السوق.",
     "searchPlaceholder": "ابحث عن مرسيدس، بي إم دبليو، رقم الهيكل…",
     "searchCta": "بحث"
+  },
+  "imprint": {
+    "lastUpdated": "آخر تحديث",
+    "lastUpdatedValue": "3 نوفمبر 2026",
+    "effective": "تاريخ السريان",
+    "effectiveValue": "3 نوفمبر 2026",
+    "noticeTitle": "ملاحظة مهمة",
+    "translationNotice": "تُقدَّم الترجمات للتسهيل، وعند وجود اختلاف تكون النسخة الإنجليزية هي المرجع.",
+    "tocLabel": "المحتويات",
+    "title": "بيانات الناشر",
+    "intro": "معلومات عن الشركة التي تدير XportACar (بالألمانية: Impressum).",
+    "legalNotice": "تحدد هذه الصفحة الجهة المشغّلة للموقع والتطبيقات.",
+    "contactFooter": "لديك أسئلة؟ راسلنا على contact@xportacar.com.",
+    "s1Title": "الجهة المشغّلة",
+    "s1Body": "Global Business Consultancy L.L.C-FZ\nتعمل باسم Advise DUBAI\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.\n\nXportACar علامة تجارية تديرها Global Business Consultancy L.L.C-FZ.",
+    "s2Title": "الشكل القانوني والرخصة التجارية",
+    "s2Body": "شركة ذات مسؤولية محدودة مسجلة في المنطقة الحرة بميدان، دبي (L.L.C-FZ).\n\nرقم الرخصة التجارية: 2534919.01\nجهة الإصدار: المنطقة الحرة بميدان (Meydan Free Zone)، دبي، الإمارات العربية المتحدة",
+    "s3Title": "المدير العام",
+    "s3Body": "Martin Matthias Krause",
+    "s4Title": "التواصل",
+    "s4Body": "البريد الإلكتروني: contact@xportacar.com",
+    "s5Title": "المسؤول عن المحتوى",
+    "s5Body": "Martin Matthias Krause\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.",
+    "s6Title": "تسوية نزاعات المستهلكين",
+    "s6Body": "لسنا ملزمين ولا مستعدين للمشاركة في إجراءات تسوية النزاعات أمام جهة تحكيم للمستهلكين."
   }
 }

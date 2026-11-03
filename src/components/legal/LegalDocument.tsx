@@ -1,7 +1,9 @@
-// Shared layout for plain-English legal pages (/privacy, /terms).
+// Shared layout for plain-English legal and help pages (/privacy, /terms,
+// /imprint, /cookies, /help).
 // Sections, titles and bodies come from the named i18n namespace, which
 // keeps all 4 locales in lockstep. Bodies support paragraphs (separated by
-// blank lines) and simple bullet lists (lines starting with "- ").
+// blank lines), line breaks inside a paragraph, simple bullet lists (lines
+// starting with "- ") and email addresses, which become mailto links.
 //
 // IMPORTANT: this is platform documentation only. It is NOT legal advice
 // and has NOT been reviewed by qualified counsel. Before going live with
@@ -13,7 +15,7 @@ export async function LegalDocument({
   namespace,
   sectionCount,
 }: {
-  namespace: "privacy" | "terms";
+  namespace: "privacy" | "terms" | "imprint" | "cookies" | "help";
   sectionCount: number;
 }) {
   const t = await getTranslations(namespace);
@@ -70,7 +72,7 @@ export async function LegalDocument({
         </div>
 
         <p className="mt-14 border-t border-grey-100 pt-6 text-sm text-grey-500">
-          {t("contactFooter")}
+          {linkifyEmails(t("contactFooter"))}
         </p>
       </div>
     </div>
@@ -88,12 +90,26 @@ function ProseBody({ text }: { text: string }) {
         if (allBullets) {
           return (
             <ul key={i} className="list-disc space-y-1.5 pl-6">
-              {lines.map((l, j) => <li key={j}>{l.trim().replace(/^- /, "")}</li>)}
+              {lines.map((l, j) => <li key={j}>{linkifyEmails(l.trim().replace(/^- /, ""))}</li>)}
             </ul>
           );
         }
-        return <p key={i}>{b}</p>;
+        return <p key={i} className="whitespace-pre-line">{linkifyEmails(b)}</p>;
       })}
     </div>
+  );
+}
+
+/** Turns every email address in a string into a mailto link. */
+function linkifyEmails(text: string) {
+  const parts = text.split(/([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/);
+  return parts.map((part, i) =>
+    i % 2 === 1 ? (
+      <a key={i} href={`mailto:${part}`} className="font-medium text-brand-700 hover:underline">
+        {part}
+      </a>
+    ) : (
+      part
+    ),
   );
 }

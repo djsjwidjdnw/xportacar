@@ -663,5 +663,30 @@
     "body": "Die gesuchte Seite existiert nicht oder wurde verschoben. Durchsuchen Sie den Marktplatz.",
     "searchPlaceholder": "Mercedes, BMW, FIN suchen…",
     "searchCta": "Suchen"
+  },
+  "imprint": {
+    "lastUpdated": "Zuletzt aktualisiert",
+    "lastUpdatedValue": "3. November 2026",
+    "effective": "In Kraft seit",
+    "effectiveValue": "3. November 2026",
+    "noticeTitle": "Hinweis",
+    "translationNotice": "Übersetzungen werden zur Erleichterung bereitgestellt. Bei Abweichungen ist die englische Fassung maßgeblich.",
+    "tocLabel": "Inhalt",
+    "title": "Impressum",
+    "intro": "Angaben zum Betreiber von XportACar gemäß § 5 DDG.",
+    "legalNotice": "Diese Seite nennt den Betreiber der Website und der Apps.",
+    "contactFooter": "Fragen? Schreiben Sie an contact@xportacar.com.",
+    "s1Title": "Anbieter",
+    "s1Body": "Global Business Consultancy L.L.C-FZ\nhandelnd als Advise DUBAI\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.\n\nXportACar ist eine Marke der Global Business Consultancy L.L.C-FZ.",
+    "s2Title": "Rechtsform und Handelslizenz",
+    "s2Body": "Gesellschaft mit beschränkter Haftung, eingetragen in der Meydan Free Zone, Dubai (L.L.C-FZ).\n\nHandelslizenz-Nr.: 2534919.01\nAusgestellt von: Meydan Free Zone, Dubai, Vereinigte Arabische Emirate",
+    "s3Title": "Geschäftsführer",
+    "s3Body": "Martin Matthias Krause",
+    "s4Title": "Kontakt",
+    "s4Body": "E-Mail: contact@xportacar.com",
+    "s5Title": "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV",
+    "s5Body": "Martin Matthias Krause\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.",
+    "s6Title": "Verbraucherstreitbeilegung",
+    "s6Body": "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
   }
 }

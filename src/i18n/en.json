@@ -663,5 +663,30 @@
     "body": "The page you were looking for doesn't exist or has moved. Try searching the marketplace.",
     "searchPlaceholder": "Search Mercedes, BMW, VIN…",
     "searchCta": "Search"
+  },
+  "imprint": {
+    "lastUpdated": "Last updated",
+    "lastUpdatedValue": "3 November 2026",
+    "effective": "Effective",
+    "effectiveValue": "3 November 2026",
+    "noticeTitle": "Important",
+    "translationNotice": "Translations are provided for convenience. In case of discrepancy, the English version governs.",
+    "tocLabel": "Contents",
+    "title": "Imprint",
+    "intro": "Information about the company that operates XportACar (in German: Impressum).",
+    "legalNotice": "This page identifies the operator of the website and apps.",
+    "contactFooter": "Questions? Email contact@xportacar.com.",
+    "s1Title": "Operator",
+    "s1Body": "Global Business Consultancy L.L.C-FZ\ntrading as Advise DUBAI\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.\n\nXportACar is a brand operated by Global Business Consultancy L.L.C-FZ.",
+    "s2Title": "Legal form and trade licence",
+    "s2Body": "Limited liability company registered in the Meydan Free Zone, Dubai (L.L.C-FZ).\n\nTrade licence number: 2534919.01\nIssued by: Meydan Free Zone, Dubai, U.A.E.",
+    "s3Title": "Managing director",
+    "s3Body": "Martin Matthias Krause",
+    "s4Title": "Contact",
+    "s4Body": "Email: contact@xportacar.com",
+    "s5Title": "Responsible for content",
+    "s5Body": "Martin Matthias Krause\nMeydan Grandstand, 6th Floor, Meydan Road, Nad Al Sheba, Dubai, U.A.E.",
+    "s6Title": "Consumer dispute resolution",
+    "s6Body": "We are neither obliged nor willing to take part in dispute resolution proceedings before a consumer arbitration board."
   }
 }
