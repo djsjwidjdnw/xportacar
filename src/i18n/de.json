@@ -744,5 +744,17 @@
     "s8Body": "Öffnen Sie auf der Website oder in der App Ihr Profil, wählen Sie „Konto löschen“ und geben Sie zur Bestätigung DELETE ein. Die Löschung ist endgültig: Ihr Profil, Ihre Merkliste und Ihre gespeicherten Suchen werden entfernt, und Sie verlieren den Zugriff auf frühere Rechnungen. Rechnungen werden anonymisiert aufbewahrt. Sie erhalten eine Bestätigung per E-Mail.",
     "s9Title": "Wie erreiche ich Sie?",
     "s9Body": "Schreiben Sie an contact@xportacar.com. Geben Sie, falls vorhanden, die Fahrzeug- oder Rechnungsreferenz an."
+  },
+  "contact": {
+    "metaTitle": "Kontakt",
+    "title": "Kontakt",
+    "intro": "Fragen zu einem Fahrzeug, einem Kauf, einem Versand oder Ihrem Konto? Schreiben Sie uns.",
+    "emailLabel": "E-Mail",
+    "emailCta": "Schreiben Sie uns",
+    "addressLabel": "Adresse",
+    "operatorLabel": "Betreiber",
+    "operatorValue": "Global Business Consultancy L.L.C-FZ, handelnd als Advise DUBAI",
+    "helpLink": "Hilfe-Center",
+    "imprintLink": "Impressum"
   }
 }

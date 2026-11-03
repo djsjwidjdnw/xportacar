@@ -744,5 +744,17 @@
     "s8Body": "On the website or in the app, open Profile, choose Delete account and type DELETE to confirm. Deletion is permanent: your profile, watchlist and saved searches are removed and you lose access to past invoices. Invoices are kept in anonymised form. You get a confirmation email.",
     "s9Title": "How do I contact you?",
     "s9Body": "Email contact@xportacar.com. Include the vehicle or invoice reference if you have one."
+  },
+  "contact": {
+    "metaTitle": "Contact",
+    "title": "Contact",
+    "intro": "Questions about a vehicle, a purchase, a shipment or your account? Email us.",
+    "emailLabel": "Email",
+    "emailCta": "Write to us",
+    "addressLabel": "Address",
+    "operatorLabel": "Operator",
+    "operatorValue": "Global Business Consultancy L.L.C-FZ, trading as Advise DUBAI",
+    "helpLink": "Help centre",
+    "imprintLink": "Imprint"
   }
 }

@@ -744,5 +744,17 @@
     "s8Body": "Sur le site ou dans l'application, ouvrez votre profil, choisissez « Supprimer le compte » et tapez DELETE pour confirmer. La suppression est définitive : votre profil, vos favoris et vos recherches enregistrées sont supprimés et vous perdez l'accès aux factures passées. Les factures sont conservées sous forme anonymisée. Vous recevez un e-mail de confirmation.",
     "s9Title": "Comment vous contacter ?",
     "s9Body": "Écrivez à contact@xportacar.com. Indiquez la référence du véhicule ou de la facture si vous l'avez."
+  },
+  "contact": {
+    "metaTitle": "Contact",
+    "title": "Contact",
+    "intro": "Une question sur un véhicule, un achat, une expédition ou votre compte ? Écrivez-nous.",
+    "emailLabel": "E-mail",
+    "emailCta": "Nous écrire",
+    "addressLabel": "Adresse",
+    "operatorLabel": "Exploitant",
+    "operatorValue": "Global Business Consultancy L.L.C-FZ, exerçant sous le nom Advise DUBAI",
+    "helpLink": "Centre d'aide",
+    "imprintLink": "Mentions légales"
   }
 }
